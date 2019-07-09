@@ -29,7 +29,9 @@ public class Document {
     public void computeWordVector() {
         cachedDocumentVector = Arrays.asList(this.content
                 .toLowerCase()
+                // Remove non (alphanumeric, :, space) characters
                 .replaceAll("[^a-zA-Z\\d\\s:]", "")
+                // Split on colon or space
                 .split("[ |:]"));
     }
 
