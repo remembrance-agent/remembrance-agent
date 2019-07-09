@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class FileIO {
@@ -28,5 +29,13 @@ public class FileIO {
             }
         }
         return filePaths;
+    }
+
+    public static String getFileName(String fromAbsolutePath) {
+        return new File(fromAbsolutePath).getName();
+    }
+
+    public static Date getLastModified(String absoluteFilePath) {
+        return new Date(new File(absoluteFilePath).lastModified() * 1000L);
     }
 }

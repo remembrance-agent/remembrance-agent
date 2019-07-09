@@ -1,12 +1,11 @@
 package io.p13i.ra.models;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Document {
-    private Context context;
-    private final String content;
+    protected Context context;
+    protected String content;
 
     private List<String> cachedDocumentVector = null;
 

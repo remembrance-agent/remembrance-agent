@@ -1,8 +1,8 @@
 package io.p13i.ra;
 
 import io.p13i.ra.models.Document;
-import io.p13i.ra.models.DocumentDatabase;
-import io.p13i.ra.models.LocalDiskDocumentDatabase;
+import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.tfidf.TFIDFCalculator;
 import io.p13i.ra.tfidf.TFIDFScoredDocument;
 
@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class RemembranceAgent {
-
     private DocumentDatabase documentDatabase;
 
-    public void indexDocuments(String databaseFolderPath) {
-        documentDatabase = new LocalDiskDocumentDatabase(databaseFolderPath);
+    public RemembranceAgent(DocumentDatabase documentDatabase) {
+        this.documentDatabase = documentDatabase;
+    }
+
+    public void indexDocuments() {
         documentDatabase.load();
         documentDatabase.index();
     }
@@ -36,8 +38,9 @@ public class RemembranceAgent {
     }
 
     public static void main(String[] args) {
-        RemembranceAgent ra = new RemembranceAgent();
-        ra.indexDocuments("/Users/p13i/Projects/glass-notes/sample-documents");
+        DocumentDatabase documentDatabase = new LocalDiskDocumentDatabase("/Users/p13i/Projects/glass-notes/sample-documents");
+        RemembranceAgent ra = new RemembranceAgent(documentDatabase);
+        ra.indexDocuments();
         List<TFIDFScoredDocument> suggestedDocuments = ra.determineSuggestions("a", 2);
         for (TFIDFScoredDocument doc : suggestedDocuments) {
             System.out.println(doc.toString());

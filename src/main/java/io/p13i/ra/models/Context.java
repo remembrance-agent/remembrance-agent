@@ -15,10 +15,6 @@ public class Context {
         this.date = date;
     }
 
-    public static Context of(Document document) {
-        return new Context(null, null, null, null);
-    }
-
     public String getLocation() {
         return location;
     }
