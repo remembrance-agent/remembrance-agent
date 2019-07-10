@@ -1,9 +1,12 @@
 package io.p13i.ra.models;
 
-import java.util.Arrays;
+import io.p13i.ra.utils.WordVector;
+
 import java.util.List;
 
 public class Document {
+    public final int CONTENT_TRUNCATED_MAX_LENGTH = 5;
+
     protected Context context;
     protected String content;
 
@@ -25,13 +28,14 @@ public class Document {
         return content;
     }
 
+    public String getContentTruncated() {
+        boolean includeEllipses = this.content.length() > CONTENT_TRUNCATED_MAX_LENGTH;
+        return content.substring(0, Math.min(content.length(), CONTENT_TRUNCATED_MAX_LENGTH)) + (includeEllipses ? "..." : "");
+    }
+
     public void computeWordVector() {
-        cachedDocumentVector = Arrays.asList(this.content
-                .toLowerCase()
-                // Remove non (alphanumeric, :, space) characters
-                .replaceAll("[^a-zA-Z\\d\\s:]", "")
-                // Split on colon or space
-                .split("[ |:]"));
+        cachedDocumentVector = WordVector.getWordVector(this.content);
+        cachedDocumentVector = WordVector.removeMostCommonWords(cachedDocumentVector);
     }
 
     public List<String> getWordVector() {
@@ -40,6 +44,6 @@ public class Document {
 
     @Override
     public String toString() {
-        return "<Document content='" + getContent() + "', word vector size=" + getWordVector().size() + ">";
+        return "<" + Document.class.getSimpleName() + " content='" + getContentTruncated() + "', word vector size=" + getWordVector().size() + ">";
     }
 }

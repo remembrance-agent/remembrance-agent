@@ -1,7 +1,6 @@
 package io.p13i.ra.databases.localdisk;
 
 import io.p13i.ra.databases.DocumentDatabase;
-import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.FileIO;
 
@@ -19,19 +18,19 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
     }
 
     @Override
-    public void load() {
+    public void loadDocuments() {
         documents = new ArrayList<>();
         List<String> documentsFilePaths = FileIO.listDirectory(this.directory);
         for (String documentFilePath : documentsFilePaths) {
             String fileName = FileIO.getFileName(documentFilePath);
             String fileContents = FileIO.read(documentFilePath);
-            Date lastModified = FileIO.getLastModified(documentFilePath);
+            Date lastModified = FileIO.getLastModifiedDate(documentFilePath);
             this.documents.add(new LocalDiskDocument(fileContents, fileName, lastModified));
         }
     }
 
     @Override
-    public void index() {
+    public void indexDocuments() {
         for (Document document : this.documents) {
             document.computeWordVector();
         }
@@ -44,8 +43,8 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
 
     public static void main(String[] args) {
         LocalDiskDocumentDatabase documentDatabase = new LocalDiskDocumentDatabase("/Users/p13i/Projects/glass-notes/sample-documents");
-        documentDatabase.load();
-        documentDatabase.index();
+        documentDatabase.loadDocuments();
+        documentDatabase.indexDocuments();
         List<Document> documents = documentDatabase.getAllDocuments();
         for (Document document : documents) {
             System.out.println(document.toString());

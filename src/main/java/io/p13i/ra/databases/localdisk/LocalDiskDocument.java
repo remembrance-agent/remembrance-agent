@@ -22,6 +22,6 @@ public class LocalDiskDocument extends Document {
 
     @Override
     public String toString() {
-        return "<" + LocalDiskDocument.class.getSimpleName() + " content='" + getContent() + "' filename='" + getFilename() + "'>";
+        return "<" + LocalDiskDocument.class.getSimpleName() + " content='" + getContentTruncated() + "' filename='" + getFilename() + "'>";
     }
 }

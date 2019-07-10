@@ -1,10 +1,11 @@
 package io.p13i.ra;
 
+import io.p13i.ra.similarity.DocumentSimilarityCalculator;
+import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
-import io.p13i.ra.tfidf.TFIDFCalculator;
-import io.p13i.ra.tfidf.TFIDFScoredDocument;
+import io.p13i.ra.models.ScoredDocument;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,30 +20,39 @@ public class RemembranceAgent {
     }
 
     public void indexDocuments() {
-        documentDatabase.load();
-        documentDatabase.index();
+        documentDatabase.loadDocuments();
+        documentDatabase.indexDocuments();
     }
 
-    public List<TFIDFScoredDocument> determineSuggestions(String query, int numSuggestions) {
-        PriorityQueue<TFIDFScoredDocument> scoredDocuments = new PriorityQueue<>(numSuggestions, Collections.reverseOrder());
+    public List<ScoredDocument> determineSuggestions(String query, Context queryContext, int numSuggestions) {
+        // PriorityQueue
+        PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(numSuggestions, Collections.reverseOrder());
         List<Document> allDocuments = this.documentDatabase.getAllDocuments();
         for (Document document : allDocuments) {
-            double score = TFIDFCalculator.tfIdf(document, allDocuments, query);
-            scoredDocuments.add(new TFIDFScoredDocument(score, document));
+            double score = DocumentSimilarityCalculator.compute(query, queryContext, document, allDocuments);
+            scoredDocuments.add(new ScoredDocument(score, document));
         }
-        List<TFIDFScoredDocument> suggestedDocuments = new ArrayList<>(numSuggestions);
+
+        // Get the top numSuggestions documents
+        List<ScoredDocument> suggestedDocuments = new ArrayList<>(numSuggestions);
         while (suggestedDocuments.size() < numSuggestions && !scoredDocuments.isEmpty()) {
-            suggestedDocuments.add(scoredDocuments.poll());
+            ScoredDocument suggestedDocument = scoredDocuments.poll();
+            if (!Double.isNaN(suggestedDocument.getScore()) && suggestedDocument.getScore() > 0.0) {
+                suggestedDocuments.add(suggestedDocument);
+            }
         }
         return suggestedDocuments;
     }
 
     public static void main(String[] args) {
-        DocumentDatabase documentDatabase = new LocalDiskDocumentDatabase("/Users/p13i/Projects/glass-notes/sample-documents");
-        RemembranceAgent ra = new RemembranceAgent(documentDatabase);
+        RemembranceAgent ra = new RemembranceAgent(new LocalDiskDocumentDatabase("/Users/p13i/Projects/glass-notes/sample-documents"));
         ra.indexDocuments();
-        List<TFIDFScoredDocument> suggestedDocuments = ra.determineSuggestions("a", 2);
-        for (TFIDFScoredDocument doc : suggestedDocuments) {
+
+        Context queryContext = new Context(null, null, null, null);
+        final int numSuggestions = 2;
+        List<ScoredDocument> suggestedDocuments = ra.determineSuggestions("c", queryContext, numSuggestions);
+
+        for (ScoredDocument doc : suggestedDocuments) {
             System.out.println(doc.toString());
         }
     }

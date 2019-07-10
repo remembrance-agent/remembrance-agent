@@ -5,7 +5,7 @@ import io.p13i.ra.models.Document;
 import java.util.List;
 
 public interface DocumentDatabase {
-    void load();
-    void index();
+    void loadDocuments();
+    void indexDocuments();
     List<Document> getAllDocuments();
 }

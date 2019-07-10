@@ -2,7 +2,7 @@ package io.p13i.ra.models;
 
 import java.util.Date;
 
-public class Context {
+public final class Context {
     private String location;
     private String person;
     private String subject;

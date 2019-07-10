@@ -11,11 +11,10 @@ import java.util.List;
 public class FileIO {
     public static String read(String filePath) {
         try {
-            List<String> allLines = Files.readAllLines(new File(filePath).toPath());
-            return String.join("", allLines);
+            return Files.readString(new File(filePath).toPath());
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -35,7 +34,7 @@ public class FileIO {
         return new File(fromAbsolutePath).getName();
     }
 
-    public static Date getLastModified(String absoluteFilePath) {
+    public static Date getLastModifiedDate(String absoluteFilePath) {
         return new Date(new File(absoluteFilePath).lastModified() * 1000L);
     }
 }

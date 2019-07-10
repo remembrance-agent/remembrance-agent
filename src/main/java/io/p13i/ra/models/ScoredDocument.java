@@ -1,12 +1,12 @@
-package io.p13i.ra.tfidf;
+package io.p13i.ra.models;
 
-import io.p13i.ra.models.Document;
+import java.text.DecimalFormat;
 
-public class TFIDFScoredDocument implements Comparable<TFIDFScoredDocument> {
+public final class ScoredDocument implements Comparable<ScoredDocument> {
     private double score;
     private Document document;
 
-    public TFIDFScoredDocument(double score, Document document) {
+    public ScoredDocument(double score, Document document) {
         this.score = score;
         this.document = document;
     }
@@ -20,12 +20,12 @@ public class TFIDFScoredDocument implements Comparable<TFIDFScoredDocument> {
     }
 
     @Override
-    public int compareTo(TFIDFScoredDocument o) {
+    public int compareTo(ScoredDocument o) {
         return Double.compare(this.score, o.score);
     }
 
     @Override
     public String toString() {
-        return "<TFIDFScoredDocument score=" + getScore() + ", document=" + getDocument().toString() + ">";
+        return "<ScoredDocument score=" + new DecimalFormat("#0.0000").format(getScore()) + ", document=" + getDocument().toString() + ">";
     }
 }

@@ -1,4 +1,4 @@
-package io.p13i.ra.tfidf;
+package io.p13i.ra.utils;
 
 import io.p13i.ra.models.Document;
 
@@ -29,8 +29,9 @@ public class TFIDFCalculator {
      * @param term String represents a term
      * @return the inverse term frequency of term in documents
      */
-    private static double idf(List<Document> docs, String term) {
+    private static double idf(Iterable<Document> docs, String term) {
         double n = 0;
+        int N = 0;
         for (Document doc : docs) {
             List<String> wordVector = doc.getWordVector();
             for (String word : wordVector) {
@@ -39,18 +40,19 @@ public class TFIDFCalculator {
                     break;
                 }
             }
+            N++;
         }
-        return Math.log(docs.size() / n);
+        return Math.log(N / n);
     }
 
     /**
-     * @param doc  a text document
-     * @param docs all documents
-     * @param term term
+     * @param queryTerm term
+     * @param document  a text document
+     * @param documents all documents
      * @return the TF-IDF of term
      */
-    public static double tfIdf(Document doc, List<Document> docs, String term) {
-        return tf(doc, term) * idf(docs, term);
+    public static double tfIdf(String queryTerm, Document document, Iterable<Document> documents) {
+        return tf(document, queryTerm) * idf(documents, queryTerm);
 
     }
 
@@ -62,7 +64,7 @@ public class TFIDFCalculator {
 
         List<Document> documents = Arrays.asList(doc1, doc2, doc3);
 
-        double tfidf = TFIDFCalculator.tfIdf(doc1, documents, "a");
+        double tfidf = TFIDFCalculator.tfIdf("a", doc1, documents);
         System.out.println("TF-IDF (a) = " + tfidf);
     }
 }
