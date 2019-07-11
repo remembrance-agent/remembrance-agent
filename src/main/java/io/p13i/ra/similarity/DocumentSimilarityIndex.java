@@ -11,15 +11,15 @@ import io.p13i.ra.utils.WordVector;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class DocumentSimilarityCalculator {
+public class DocumentSimilarityIndex {
 
     private static final Logger LOGGER = Logger.getLogger( RemembranceAgentClient.class.getName() );
 
-    private static final double CONTENT_BIAS = 0.95;
-    private static final double LOCATION_BIAS = 0.01;
-    private static final double PERSON_BIAS = 0.01;
-    private static final double SUBJECT_BIAS = 0.02;
-    private static final double DATE_BIAS = 0.01;
+    private static final double CONTENT_BIAS = 1.00;
+    private static final double LOCATION_BIAS = 0.00;
+    private static final double PERSON_BIAS = 0.00;
+    private static final double SUBJECT_BIAS = 0.00;
+    private static final double DATE_BIAS = 0.00;
 
     static {
         Assert.equal(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);

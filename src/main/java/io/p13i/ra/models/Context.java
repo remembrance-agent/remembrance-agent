@@ -2,6 +2,9 @@ package io.p13i.ra.models;
 
 import java.util.Date;
 
+/**
+ * Represents all the contextual information surround a document
+ */
 public final class Context {
     private String location;
     private String person;

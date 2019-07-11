@@ -1,6 +1,6 @@
 package io.p13i.ra;
 
-import io.p13i.ra.similarity.DocumentSimilarityCalculator;
+import io.p13i.ra.similarity.DocumentSimilarityIndex;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.databases.DocumentDatabase;
@@ -30,7 +30,7 @@ public class RemembranceAgent {
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(numSuggestions, Collections.reverseOrder());
         List<Document> allDocuments = this.documentDatabase.getAllDocuments();
         for (Document document : allDocuments) {
-            double score = DocumentSimilarityCalculator.compute(query, queryContext, document, allDocuments);
+            double score = DocumentSimilarityIndex.compute(query, queryContext, document, allDocuments);
             scoredDocuments.add(new ScoredDocument(score, document));
         }
 

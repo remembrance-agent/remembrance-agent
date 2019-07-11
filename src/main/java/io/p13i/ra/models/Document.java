@@ -4,24 +4,31 @@ import io.p13i.ra.utils.WordVector;
 
 import java.util.List;
 
+/**
+ * Houses all information about a file and it's context in the world
+ */
 public class Document {
-    public final int CONTENT_TRUNCATED_MAX_LENGTH = 5;
+    /**
+     * How many characters to place in the toString() call
+     */
+    private static final int CONTENT_TRUNCATED_MAX_LENGTH = 20;
 
-    protected Context context;
-    protected String content;
+    private final String content;
+    private final Context context;
 
     private List<String> cachedDocumentVector = null;
 
     public Document(String content) {
+        this(content, new Context(null, null, null, null));
+    }
+
+    public Document(String content, Context context) {
         this.content = content;
+        this.context = context;
     }
 
     public Context getContext() {
         return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
     }
 
     public String getContent() {
@@ -30,7 +37,7 @@ public class Document {
 
     public String getContentTruncated() {
         boolean includeEllipses = this.content.length() > CONTENT_TRUNCATED_MAX_LENGTH;
-        return content.substring(0, Math.min(content.length(), CONTENT_TRUNCATED_MAX_LENGTH)) + (includeEllipses ? "..." : "");
+        return content.substring(0, Math.min(this.content.length(), CONTENT_TRUNCATED_MAX_LENGTH)) + (includeEllipses ? "..." : "");
     }
 
     public void computeWordVector() {

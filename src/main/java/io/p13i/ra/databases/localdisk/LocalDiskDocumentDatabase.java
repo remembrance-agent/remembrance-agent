@@ -8,11 +8,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Represents the data store of files on local disk
+ */
 public class LocalDiskDocumentDatabase implements DocumentDatabase {
 
     private String directory;
     private List<Document> documents;
 
+    /**
+     * @param directory The directory to index
+     */
     public LocalDiskDocumentDatabase(String directory) {
         this.directory = directory;
     }
@@ -24,7 +30,7 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
 
     @Override
     public void loadDocuments() {
-        documents = new ArrayList<>();
+        this.documents = new ArrayList<>();
         List<String> documentsFilePaths = FileIO.listDirectory(this.directory);
         for (String documentFilePath : documentsFilePaths) {
             String fileName = FileIO.getFileName(documentFilePath);

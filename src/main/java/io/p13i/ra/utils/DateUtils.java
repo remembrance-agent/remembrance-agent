@@ -32,4 +32,8 @@ public class DateUtils {
     public static String timestamp() {
         return nowAs(TIMESTAMP_FORMAT);
     }
+
+    public static String timestampOf(Date date) {
+        return formatDate(date, TIMESTAMP_FORMAT);
+    }
 }

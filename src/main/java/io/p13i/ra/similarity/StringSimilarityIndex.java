@@ -49,9 +49,9 @@ public class StringSimilarityIndex implements SimilarityIndex<String> {
      */
     private static int min(int... numbers) {
         int minValue = Integer.MAX_VALUE;
-        for (int i = 0; i < numbers.length; i++) {
-            if (numbers[i] < minValue) {
-                minValue = numbers[i];
+        for (int number : numbers) {
+            if (number < minValue) {
+                minValue = number;
             }
         }
         return minValue;
