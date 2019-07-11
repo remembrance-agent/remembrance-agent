@@ -15,13 +15,13 @@ public class TFIDFCalculator {
      * @return term frequency of term in document
      */
     private static double tf(Document doc, String term) {
-        double result = 0;
+        int result = 0;
         List<String> wordVector = doc.getWordVector();
         for (String word : wordVector) {
             if (term.equalsIgnoreCase(word))
                 result++;
         }
-        return result / wordVector.size();
+        return result / (double) wordVector.size();
     }
 
     /**
@@ -30,7 +30,7 @@ public class TFIDFCalculator {
      * @return the inverse term frequency of term in documents
      */
     private static double idf(Iterable<Document> docs, String term) {
-        double n = 0;
+        int n = 0;
         int N = 0;
         for (Document doc : docs) {
             List<String> wordVector = doc.getWordVector();
@@ -42,7 +42,7 @@ public class TFIDFCalculator {
             }
             N++;
         }
-        return Math.log(N / n);
+        return Math.log((double) N / (double) n);
     }
 
     /**

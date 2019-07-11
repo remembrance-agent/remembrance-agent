@@ -20,11 +20,22 @@ public class WordVector {
     }
 
     public static List<String> getWordVector(String content) {
-        return Arrays.asList(content
+        List<String> wordVector = ListUtils.fromArray(content
                 .toLowerCase()
                 // Remove non (alphanumeric, :, space) characters
                 .replaceAll("[^a-zA-Z\\d\\s:]", "")
                 // Split on colon or space
-                .split("[ |:]"));
+                .split("[ |:]"), new ListUtils.Filter<String>() {
+            @Override
+            public boolean shouldInclude(String item) {
+                return item != null && item.length() > 0;
+            }
+        });
+
+        if (wordVector.size() == 1 && wordVector.get(0).length() == 0) {
+            wordVector.remove(0);
+        }
+
+        return wordVector;
     }
 }

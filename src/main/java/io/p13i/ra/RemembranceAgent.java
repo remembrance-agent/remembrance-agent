@@ -19,9 +19,10 @@ public class RemembranceAgent {
         this.documentDatabase = documentDatabase;
     }
 
-    public void indexDocuments() {
+    public List<Document> indexDocuments() {
         documentDatabase.loadDocuments();
         documentDatabase.indexDocuments();
+        return this.documentDatabase.getAllDocuments();
     }
 
     public List<ScoredDocument> determineSuggestions(String query, Context queryContext, int numSuggestions) {

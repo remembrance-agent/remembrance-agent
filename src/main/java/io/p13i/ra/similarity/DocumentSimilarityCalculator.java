@@ -1,13 +1,20 @@
 package io.p13i.ra.similarity;
 
+import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.Assert;
+import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.TFIDFCalculator;
+import io.p13i.ra.utils.WordVector;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 public class DocumentSimilarityCalculator {
+
+    private static final Logger LOGGER = Logger.getLogger( RemembranceAgentClient.class.getName() );
+
     private static final double CONTENT_BIAS = 0.95;
     private static final double LOCATION_BIAS = 0.01;
     private static final double PERSON_BIAS = 0.01;
@@ -19,7 +26,25 @@ public class DocumentSimilarityCalculator {
     }
 
     public static double compute(String query, Context queryContext, Document document, List<Document> allDocuments) {
-        double contentScore = TFIDFCalculator.tfIdf(query, document, allDocuments);
+        List<String> wordVector = WordVector.getWordVector(query);
+        wordVector = WordVector.removeMostCommonWords(wordVector);
+
+        LOGGER.info("Computed query word vector: '" + ListUtils.asString(wordVector) + "'");
+
+        double wordScoreSum = 0.0;
+        for (String word : wordVector) {
+            double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
+            LOGGER.info(String.format("Ranked word '%s' as %04f in %s", word, wordScore, document.getContext().getSubject()));
+
+            if (Double.isNaN(wordScore)) {
+                wordScore = 0.0;
+            }
+
+            wordScoreSum += wordScore;
+        }
+
+        // Normalize
+        double contentScore = wordScoreSum / (double) wordVector.size();
 
         StringSimilarityIndex stringSimilarityIndex = new StringSimilarityIndex();
         DateSimilarityIndex dateSimilarityIndex = new DateSimilarityIndex();

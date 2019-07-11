@@ -18,6 +18,11 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
     }
 
     @Override
+    public String getName() {
+        return LocalDiskDocumentDatabase.class.getName();
+    }
+
+    @Override
     public void loadDocuments() {
         documents = new ArrayList<>();
         List<String> documentsFilePaths = FileIO.listDirectory(this.directory);
