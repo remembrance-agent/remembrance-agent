@@ -41,11 +41,10 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
         jFrame = new JFrame("Remembrance Agent") {{
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(600, 195 + 150);
-//            setResizable(false);
-            add(new JPanel() {
-
-                {
+            setSize(600, 260);
+            setResizable(false);
+            setAlwaysOnTop(true);
+            add(new JPanel() {{
                 setLayout(null);
                 add(sSuggestionsPanel = new JPanel() {{
                     setBounds(10, 10, 580, 75);
@@ -62,7 +61,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                     setEditable(false);
                 }}, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS) {{
                     getViewport().setPreferredSize(new Dimension(580, 50 + 150));
-                    setBounds(10, 130, 580, 50 + 150);
+                    setBounds(10, 140, 580, 100);
                     setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Logs"), BorderFactory.createEmptyBorder(5,5,5,5)));
                     new SmartScroller(this, SmartScroller.VERTICAL, SmartScroller.END);
                 }});
