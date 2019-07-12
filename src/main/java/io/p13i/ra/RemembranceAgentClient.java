@@ -3,6 +3,7 @@ package io.p13i.ra;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -143,10 +144,27 @@ public class RemembranceAgentClient implements NativeKeyListener {
                 } else {
                     LOGGER.info(String.format("Got %d suggestion(s):", suggestions.size()));
 
+                    int startY = 10;
+
                     sSuggestionsPanel.removeAll();
                     for (ScoredDocument doc : suggestions) {
-                        sSuggestionsPanel.add(new JLabel(doc.getDocument().getContext().getSubject()));
+                        final int yPos = startY;
+                        sSuggestionsPanel.add(new JButton(doc.getDocument().getContext().getSubject()) {{
+                            setBounds(25, yPos, 540, 15);
+                            setPreferredSize(new Dimension(540, 15));
+                            addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    try {
+                                        Desktop.getDesktop().open(new File(doc.getDocument().getUri()));
+                                    } catch (IOException ex) {
+                                        ex.printStackTrace();
+                                    }
+                                }
+                            });
+                        }});
                         LOGGER.info(" -> " + doc.toString());
+                        startY += 15;
                     }
                     sSuggestionsPanel.validate();
                 }

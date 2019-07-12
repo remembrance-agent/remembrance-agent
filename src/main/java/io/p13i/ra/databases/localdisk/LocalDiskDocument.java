@@ -3,7 +3,9 @@ package io.p13i.ra.databases.localdisk;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.DateUtils;
+import io.p13i.ra.utils.URIUtils;
 
+import java.net.URI;
 import java.util.Date;
 
 /**
@@ -13,9 +15,10 @@ public class LocalDiskDocument extends Document {
     private Date lastModified;
     private String filename;
 
-    public LocalDiskDocument(String content, String filename, Date lastModified) {
+    public LocalDiskDocument(String content, String documentFilePath, String filename, Date lastModified) {
         super(content, new Context(null, null, filename, lastModified));
         this.filename = filename;
+        this.setUri(documentFilePath);
         this.lastModified = lastModified;
     }
 

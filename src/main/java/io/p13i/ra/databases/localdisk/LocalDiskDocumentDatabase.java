@@ -42,7 +42,7 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
                 String fileName = FileIO.getFileName(documentFilePath);
                 String fileContents = FileIO.read(documentFilePath);
                 Date lastModified = FileIO.getLastModifiedDate(documentFilePath);
-                this.documents.add(new LocalDiskDocument(fileContents, fileName, lastModified));
+                this.documents.add(new LocalDiskDocument(fileContents, documentFilePath, fileName, lastModified));
             } else {
                 LOGGER.info("Skipping file because it doesn't end with .txt: " + documentFilePath);
             }
