@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ListUtils {
+    /**
+     * Pretty print
+     * @param list a list
+     * @param <T> with a type
+     * @return into a string
+     */
     public static <T> String asString(List<T> list) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append('[');
@@ -25,6 +31,13 @@ public class ListUtils {
         return fromArray(array, new Filter<T>() {/* use default implementation */});
     }
 
+    /**
+     * Gets a list
+     * @param array from the given array
+     * @param filter filtering certain elements
+     * @param <T> of a given type
+     * @return into a new ArrayList
+     */
     public static <T> List<T> fromArray(T[] array, Filter<T> filter) {
         List<T> list = new ArrayList<T>(array.length);
         for (int i = 0; i < array.length; i++) {

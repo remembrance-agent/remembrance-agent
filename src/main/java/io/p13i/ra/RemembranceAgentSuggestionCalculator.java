@@ -1,8 +1,10 @@
-package io.p13i.ra.similarity;
+package io.p13i.ra;
 
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
+import io.p13i.ra.similarity.DateSimilarityIndex;
+import io.p13i.ra.similarity.StringSimilarityIndex;
 import io.p13i.ra.utils.Assert;
 import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.TFIDFCalculator;
@@ -11,7 +13,7 @@ import io.p13i.ra.utils.WordVector;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class DocumentSimilarityIndex {
+public class RemembranceAgentSuggestionCalculator {
 
     private static final Logger LOGGER = Logger.getLogger( RemembranceAgentClient.class.getName() );
 

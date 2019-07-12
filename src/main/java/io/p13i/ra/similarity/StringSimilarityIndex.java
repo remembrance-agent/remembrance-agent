@@ -1,5 +1,7 @@
 package io.p13i.ra.similarity;
 
+import io.p13i.ra.utils.Assert;
+
 public class StringSimilarityIndex implements SimilarityIndex<String> {
     public double calculate(String s1, String s2) {
         if (s1 == null || s2 == null) {
@@ -7,7 +9,11 @@ public class StringSimilarityIndex implements SimilarityIndex<String> {
         }
         int distance = levenshteinDistance(s1, s2);
         int longerStringLength = Math.max(s1.length(), s2.length());
-        return (longerStringLength - distance) / (double) longerStringLength;
+        double index = (longerStringLength - distance) / (double) longerStringLength;
+
+        Assert.inRange(index, INDEX_LOWER_BOUND, INDEX_HIGHER_BOUND);
+
+        return index;
     }
 
     /**

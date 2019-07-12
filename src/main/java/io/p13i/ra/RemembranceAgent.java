@@ -1,17 +1,21 @@
 package io.p13i.ra;
 
-import io.p13i.ra.similarity.DocumentSimilarityIndex;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.models.ScoredDocument;
+import io.p13i.ra.utils.ResourceUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
+
+/**
+ * Core RA implementation and wrapper functions
+ */
 public class RemembranceAgent {
     private DocumentDatabase documentDatabase;
 
@@ -30,7 +34,7 @@ public class RemembranceAgent {
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(numSuggestions, Collections.reverseOrder());
         List<Document> allDocuments = this.documentDatabase.getAllDocuments();
         for (Document document : allDocuments) {
-            double score = DocumentSimilarityIndex.compute(query, queryContext, document, allDocuments);
+            double score = RemembranceAgentSuggestionCalculator.compute(query, queryContext, document, allDocuments);
             scoredDocuments.add(new ScoredDocument(score, document));
         }
 
@@ -46,7 +50,8 @@ public class RemembranceAgent {
     }
 
     public static void main(String[] args) {
-        RemembranceAgent ra = new RemembranceAgent(new LocalDiskDocumentDatabase("/Users/p13i/Projects/glass-notes/sample-documents"));
+        String directoryPath = ResourceUtil.getResourcePath(RemembranceAgent.class, "sample-documents");
+        RemembranceAgent ra = new RemembranceAgent(new LocalDiskDocumentDatabase(directoryPath));
         ra.indexDocuments();
 
         Context queryContext = new Context(null, null, null, null);

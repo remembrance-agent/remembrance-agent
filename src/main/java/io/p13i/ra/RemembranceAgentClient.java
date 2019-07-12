@@ -16,6 +16,8 @@ import io.p13i.ra.models.Document;
 import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
 import io.p13i.ra.utils.DateUtils;
+import io.p13i.ra.utils.ResourceUtil;
+import jdk.internal.loader.Resource;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -32,7 +34,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
         public static void main(String[] args) {
 
             try {
-                InputStream stream = RemembranceAgentClient.class.getClassLoader().getResourceAsStream("logging.properties");
+                InputStream stream = ResourceUtil.getResourceStream(RemembranceAgentClient.class, "logging.properties");
                 LogManager.getLogManager().readConfiguration(stream);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -42,7 +44,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
             Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
             logger.setLevel(Level.WARNING);
 
-            DocumentDatabase database = new LocalDiskDocumentDatabase("/Users/p13i/Projects/glass-notes/sample-documents");
+            String directoryPath = ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents");
+            LOGGER.info("Got directory path: " + directoryPath);
+            DocumentDatabase database = new LocalDiskDocumentDatabase(directoryPath);
             LOGGER.info("Using " + database.getName());
 
             remembranceAgent = new RemembranceAgent(database);
@@ -94,16 +98,26 @@ public class RemembranceAgentClient implements NativeKeyListener {
             LOGGER.info("Keystroke: " + keyText);
 
             Character characterToAdd = null;
-            if (keyText.length() == 1) {
-                characterToAdd = keyText.charAt(0);
+            if (e.isActionKey() && e.getKeyCode() != NativeKeyEvent.VC_SHIFT) {
+                characterToAdd = ' ';
             } else {
-                if (keyText.equals("Space")) {
-                    characterToAdd = ' ';
+                if (keyText.length() == 1) {
+                    characterToAdd = keyText.charAt(0);
+                    if (e.getKeyCode() != NativeKeyEvent.VC_SHIFT) {
+                        // Lower case it then
+                        characterToAdd = characterToAdd.toString().toLowerCase().charAt(0);
+                    }
+                } else {
+                    if (keyText.equals("Space")) {
+                        characterToAdd = ' ';
+                    }
                 }
             }
+
+
             if (characterToAdd != null) {
                 breakingBuffer.addCharacter(characterToAdd);
-                LOGGER.info("Full buffer: " + breakingBuffer.toString());
+                LOGGER.info(String.format("[Buffer count=%04d:] %s", breakingBuffer.getTotalTypedCharactersCount(), breakingBuffer.toString()));
             }
 
         }

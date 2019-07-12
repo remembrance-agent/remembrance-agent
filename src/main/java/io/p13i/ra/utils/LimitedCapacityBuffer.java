@@ -1,34 +1,32 @@
 package io.p13i.ra.utils;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class LimitedCapacityBuffer<T> {
+
+/**
+ * Simple wrapper around a queue that limits the size of a queue and tracks the last element added to the queue.
+ * @param <T> The type of elements in the buffer
+ */
+class LimitedCapacityBuffer<T> {
 
     private Queue<T> queue;
+    private int totalAddedElementsCount = 0;
     private T lastAddedElement;
     private int maximumSize;
 
-    public LimitedCapacityBuffer(int maximumSize) {
+    LimitedCapacityBuffer(int maximumSize) {
         this.maximumSize = maximumSize;
         queue = new LinkedList<T>();
     }
 
-    public void add(T element) {
+    void add(T element) {
         if (queue.size() >= maximumSize) {
             queue.poll();
         }
         queue.add(element);
+        totalAddedElementsCount++;
         lastAddedElement = element;
-    }
-
-    public T peek() {
-        return queue.peek();
-    }
-
-    public T poll() {
-        return queue.poll();
     }
 
     @Override
@@ -40,11 +38,15 @@ public class LimitedCapacityBuffer<T> {
         return stringBuilder.toString();
     }
 
-    public int size() {
+    int size() {
         return queue.size();
     }
 
-    public T getLastAddedElement() {
+    T getLastAddedElement() {
         return lastAddedElement;
+    }
+
+    int getTotalAddedElementsCount() {
+        return totalAddedElementsCount;
     }
 }
