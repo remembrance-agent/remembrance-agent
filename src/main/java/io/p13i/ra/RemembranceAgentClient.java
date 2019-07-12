@@ -73,6 +73,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                             });
                         }});
                     }});
+                    add(new JMenu("© Pramod Kotipalli"));
                 }});
                 add(sSuggestionsPanel = new JPanel() {{
                     setBounds(10, 10, 580, 75);
