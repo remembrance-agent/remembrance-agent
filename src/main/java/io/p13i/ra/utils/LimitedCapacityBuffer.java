@@ -8,19 +8,19 @@ import java.util.Queue;
  * Simple wrapper around a queue that limits the size of a queue and tracks the last element added to the queue.
  * @param <T> The type of elements in the buffer
  */
-class LimitedCapacityBuffer<T> {
+public class LimitedCapacityBuffer<T> {
 
     private Queue<T> queue;
     private int totalAddedElementsCount = 0;
     private T lastAddedElement;
     private int maximumSize;
 
-    LimitedCapacityBuffer(int maximumSize) {
+    public LimitedCapacityBuffer(int maximumSize) {
         this.maximumSize = maximumSize;
         queue = new LinkedList<T>();
     }
 
-    void add(T element) {
+    public void add(T element) {
         if (queue.size() >= maximumSize) {
             queue.poll();
         }
@@ -31,9 +31,14 @@ class LimitedCapacityBuffer<T> {
 
     @Override
     public String toString() {
+        return toString("");
+    }
+
+    public String toString(String withSeperator) {
         StringBuilder stringBuilder = new StringBuilder();
         for (T c : queue) {
             stringBuilder.append(c);
+            stringBuilder.append(withSeperator);
         }
         return stringBuilder.toString();
     }
