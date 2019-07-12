@@ -36,7 +36,8 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static JLabel sKeystrokeBuffer;
     public static JTextArea sTextArea;
 
-    private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(30);
+    private static final int KEYBOARD_BUFFER_SIZE = 60;
+    private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
     private static Timer remembranceAgentUpdateTimer = new Timer();
     private static RemembranceAgent sRemembranceAgent;
     private static JPanel sSuggestionsPanel;
