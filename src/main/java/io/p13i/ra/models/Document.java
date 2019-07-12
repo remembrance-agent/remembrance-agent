@@ -2,7 +2,6 @@ package io.p13i.ra.models;
 
 import io.p13i.ra.utils.WordVector;
 
-import java.net.URI;
 import java.util.List;
 
 /**
@@ -17,7 +16,7 @@ public class Document {
     private final String content;
     private final Context context;
 
-    private String uri = null;
+    private String url = null;
 
     private List<String> cachedDocumentVector = null;
 
@@ -57,11 +56,11 @@ public class Document {
         return "<" + Document.class.getSimpleName() + " content='" + getContentTruncated() + "', word vector size=" + getWordVector().size() + ">";
     }
 
-    public String getUri() {
-        return uri;
+    public String getUrl() {
+        return url;
     }
 
-    public void setUri(String uri) {
-        this.uri = uri;
+    public void setURL(String url) {
+        this.url = url;
     }
 }

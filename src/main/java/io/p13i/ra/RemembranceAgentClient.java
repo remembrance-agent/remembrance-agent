@@ -34,7 +34,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final int SYS_EXIT_CODE = 1;
 
     private static JFrame jFrame;
-    private static JLabel sKeystrokeBuffer;
+    private static JLabel sKeystrokeBufferLabel;
     public static JTextArea sTextArea;
 
     private static final int KEYBOARD_BUFFER_SIZE = 60;
@@ -81,12 +81,23 @@ public class RemembranceAgentClient implements NativeKeyListener {
                             BorderFactory.createEmptyBorder(5,5,5,5)));
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                 }});
-                add(sKeystrokeBuffer = new JLabel() {{
+                add(sKeystrokeBufferLabel = new JLabel() {{
                     setBounds(10, 85, 580, 50);
                     setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createTitledBorder("Keylogger Buffer"),
                             BorderFactory.createEmptyBorder(5,5,5,5)));
                     setFont(new Font("monospaced", Font.PLAIN, 12));
+                }});
+                add(new JButton("Clear buffer") {{
+                    setBounds(600 - 150 - 10 - 10, 100, 150, 25);
+                    setFont(new Font("monospaced", Font.PLAIN, 12));
+                    addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            sBreakingBuffer.clear();
+                            sKeystrokeBufferLabel.setText("<cleared>");
+                        }
+                    });
                 }});
                 add(new JScrollPane(sTextArea = new JTextArea() {{
                     setFont(new Font("monospaced", Font.PLAIN, 12));
@@ -156,7 +167,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
                                     try {
-                                        Desktop.getDesktop().open(new File(doc.getDocument().getUri()));
+                                        Desktop.getDesktop().open(new File(doc.getDocument().getUrl()));
                                     } catch (IOException ex) {
                                         ex.printStackTrace();
                                     }
@@ -199,7 +210,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
         if (characterToAdd != null) {
             sBreakingBuffer.addCharacter(characterToAdd);
             LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
-            sKeystrokeBuffer.setText(sBreakingBuffer.toString());
+            sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
         }
 
     }

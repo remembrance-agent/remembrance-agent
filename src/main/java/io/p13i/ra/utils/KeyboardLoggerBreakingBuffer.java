@@ -43,6 +43,10 @@ public class KeyboardLoggerBreakingBuffer {
         limitedCapacityBuffer.add(newTimestamp);
     }
 
+    public void clear() {
+        limitedCapacityBuffer.clear();
+    }
+
     public int getTotalTypedCharactersCount() {
         return this.limitedCapacityBuffer.getTotalAddedElementsCount();
     }

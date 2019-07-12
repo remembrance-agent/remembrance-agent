@@ -29,6 +29,12 @@ public class LimitedCapacityBuffer<T> {
         lastAddedElement = element;
     }
 
+    public void clear() {
+        while (!queue.isEmpty()) {
+            queue.poll();
+        }
+    }
+
     @Override
     public String toString() {
         return toString("");
