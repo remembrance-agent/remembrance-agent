@@ -31,21 +31,22 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
-    private static final int SYS_EXIT_CODE = 1;
-
-    private static JFrame jFrame;
-    private static JLabel sKeystrokeBufferLabel;
-    public static JTextArea sTextArea;
-
     private static final int KEYBOARD_BUFFER_SIZE = 60;
+    private static final int RA_UPDATE_PERIOD_MS = 5000;  // ms
+
+    private static JFrame sJFrame;
+    private static JLabel sKeystrokeBufferLabel;
+    public static JTextArea sLogTextArea;
+
     private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
-    private static Timer remembranceAgentUpdateTimer = new Timer();
+    private static Timer sRemembranceAgentUpdateTimer = new Timer();
+    private static String sSelectedDirectory;
     private static RemembranceAgent sRemembranceAgent;
     private static JPanel sSuggestionsPanel;
 
     public static void main(String[] args) {
 
-        jFrame = new JFrame("Remembrance Agent") {{
+        sJFrame = new JFrame("Remembrance Agent") {{
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setSize(600, 260);
             setResizable(false);
@@ -62,13 +63,21 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                     fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                                     // disable the "All files" option.
                                     fileChooser.setAcceptAllFileFilterUsed(false);
-                                    switch (fileChooser.showOpenDialog(jFrame)) {
+                                    switch (fileChooser.showOpenDialog(sJFrame)) {
                                         case JFileChooser.APPROVE_OPTION:
-                                            String selectedDirectory = fileChooser.getSelectedFile().toPath().toString();
-                                            LOGGER.info("Selected directory: " + selectedDirectory);
-                                            initializeRemembranceAgent(selectedDirectory);
+                                            sSelectedDirectory = fileChooser.getSelectedFile().toPath().toString();
+                                            LOGGER.info("Selected directory: " + sSelectedDirectory);
+                                            initializeRemembranceAgent(sSelectedDirectory);
                                             break;
                                     }
+                                }
+                            });
+                        }});
+                        add(new JMenuItem("Reinitialize") {{
+                            addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    initializeRemembranceAgent(sSelectedDirectory);
                                 }
                             });
                         }});
@@ -90,7 +99,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                 }});
                 add(new JButton("Clear buffer") {{
-                    setBounds(600 - 150 - 10 - 10, 100, 150, 25);
+                    setBounds(600 - 120 - 10 - 10, 100, 120, 25);
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                     addActionListener(new ActionListener() {
                         @Override
@@ -100,7 +109,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                         }
                     });
                 }});
-                add(new JScrollPane(sTextArea = new JTextArea() {{
+                add(new JScrollPane(sLogTextArea = new JTextArea() {{
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                     setEditable(false);
                 }}, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS) {{
@@ -117,74 +126,36 @@ public class RemembranceAgentClient implements NativeKeyListener {
         try {
             InputStream stream = ResourceUtil.getResourceStream(RemembranceAgentClient.class, "logging.properties");
             LogManager.getLogManager().readConfiguration(stream);
-            ;
         } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(SYS_EXIT_CODE);
+            throw new RuntimeException(e);
         }
 
         // jnativehook produces a lot of logs
         Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.WARNING);
 
-        String directoryPath = ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents");
-        initializeRemembranceAgent(directoryPath);
+        sSelectedDirectory = ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents");
+        initializeRemembranceAgent(sSelectedDirectory);
 
         // Add the key logger
         try {
             GlobalScreen.registerNativeHook();
             GlobalScreen.addNativeKeyListener(new RemembranceAgentClient());
         } catch (NativeHookException e) {
-            e.printStackTrace();
-            System.exit(SYS_EXIT_CODE);
+            throw new RuntimeException(e);
         }
         LOGGER.info("Added native key logger.");
 
         // Start the RA task
-        remembranceAgentUpdateTimer.schedule(new TimerTask() {
+        sRemembranceAgentUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                String query = sBreakingBuffer.toString();
-                Context context = new Context(null, "p13i", query, DateUtils.now());
-                final int numSuggestions = 2;
-
-                LOGGER.info("Sending query to RA: '" + query + "'");
-                List<ScoredDocument> suggestions = sRemembranceAgent.determineSuggestions(query, context, numSuggestions);
-
-                if (suggestions.isEmpty()) {
-                    LOGGER.info("No suggestions :(");
-                } else {
-                    LOGGER.info(String.format("Got %d suggestion(s):", suggestions.size()));
-
-                    int startY = 10;
-
-                    sSuggestionsPanel.removeAll();
-                    for (ScoredDocument doc : suggestions) {
-                        final int yPos = startY;
-                        sSuggestionsPanel.add(new JButton(doc.getDocument().getContext().getSubject()) {{
-                            setBounds(25, yPos, 540, 15);
-                            setPreferredSize(new Dimension(540, 15));
-                            addActionListener(new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent e) {
-                                    try {
-                                        Desktop.getDesktop().open(new File(doc.getDocument().getUrl()));
-                                    } catch (IOException ex) {
-                                        ex.printStackTrace();
-                                    }
-                                }
-                            });
-                        }});
-                        LOGGER.info(" -> " + doc.toString());
-                        startY += 15;
-                    }
-                    sSuggestionsPanel.validate();
-                }
+                sendQueryToRemembranceAgent();
             }
-        }, 5000, 5000);
+        }, RA_UPDATE_PERIOD_MS, RA_UPDATE_PERIOD_MS);
         LOGGER.info("Scheduled Remembrance Agent update task.");
 
-        jFrame.setVisible(true);
+        sJFrame.setVisible(true);
     }
 
     public void nativeKeyPressed(NativeKeyEvent e) {
@@ -204,7 +175,6 @@ public class RemembranceAgentClient implements NativeKeyListener {
                 if (CharacterUtils.isAlphanumeric(charToAdd)) {
                     characterToAdd = charToAdd;
                 }
-            } else {
             }
         }
 
@@ -212,6 +182,8 @@ public class RemembranceAgentClient implements NativeKeyListener {
             sBreakingBuffer.addCharacter(characterToAdd);
             LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
             sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
+
+            sendQueryToRemembranceAgent();
         }
 
     }
@@ -230,6 +202,46 @@ public class RemembranceAgentClient implements NativeKeyListener {
         for (Document document : documentsIndexed) {
             LOGGER.info(document.toString());
         }
+    }
+
+    private static void sendQueryToRemembranceAgent() {
+        String query = sBreakingBuffer.toString();
+        Context context = new Context(null, "p13i", query, DateUtils.now());
+        final int numSuggestions = 2;
+
+        LOGGER.info("Sending query to RA: '" + query + "'");
+        List<ScoredDocument> suggestions = sRemembranceAgent.determineSuggestions(query, context, numSuggestions);
+
+        sSuggestionsPanel.removeAll();
+
+        if (suggestions.isEmpty()) {
+            LOGGER.info("No suggestions :(");
+        } else {
+            LOGGER.info(String.format("Got %d suggestion(s):", suggestions.size()));
+
+            int startY = 10;
+
+            for (ScoredDocument doc : suggestions) {
+                final int yPos = startY;
+                sSuggestionsPanel.add(new JButton(doc.getDocument().getContext().getSubject()) {{
+                    setBounds(25, yPos, 540, 15);
+                    setPreferredSize(new Dimension(540, 15));
+                    addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            try {
+                                Desktop.getDesktop().open(new File(doc.getDocument().getUrl()));
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    });
+                }});
+                LOGGER.info(" -> " + doc.toString());
+                startY += 15;
+            }
+        }
+        sSuggestionsPanel.validate();
     }
 
     public void nativeKeyReleased(NativeKeyEvent e) {

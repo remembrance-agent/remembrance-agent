@@ -2,8 +2,6 @@ package io.p13i.ra.utils;
 
 import io.p13i.ra.RemembranceAgentClient;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.*;
 
 public class LoggerUtils {
@@ -23,10 +21,10 @@ public class LoggerUtils {
                 } else {
                     message = record.getMessage();
                 }
-                RemembranceAgentClient.sTextArea.append(DateUtils.timestamp());
-                RemembranceAgentClient.sTextArea.append(" | ");
-                RemembranceAgentClient.sTextArea.append(message);
-                RemembranceAgentClient.sTextArea.append("\n");
+                RemembranceAgentClient.sLogTextArea.append(DateUtils.timestamp());
+                RemembranceAgentClient.sLogTextArea.append(" | ");
+                RemembranceAgentClient.sLogTextArea.append(message);
+                RemembranceAgentClient.sLogTextArea.append("\n");
             }
 
             @Override
