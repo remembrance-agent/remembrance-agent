@@ -3,16 +3,19 @@ package io.p13i.ra.databases.localdisk;
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.FileIO;
+import io.p13i.ra.utils.LoggerUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Represents the data store of files on local disk
  */
 public class LocalDiskDocumentDatabase implements DocumentDatabase {
 
+    private static final Logger LOGGER = LoggerUtils.getLogger(LocalDiskDocumentDatabase.class);
     private String directory;
     private List<Document> documents;
 
@@ -32,11 +35,17 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
     public void loadDocuments() {
         this.documents = new ArrayList<>();
         List<String> documentsFilePaths = FileIO.listDirectory(this.directory);
+        LOGGER.info("Found " + documentsFilePaths.size() + " documents in " + this.directory);
         for (String documentFilePath : documentsFilePaths) {
-            String fileName = FileIO.getFileName(documentFilePath);
-            String fileContents = FileIO.read(documentFilePath);
-            Date lastModified = FileIO.getLastModifiedDate(documentFilePath);
-            this.documents.add(new LocalDiskDocument(fileContents, fileName, lastModified));
+            LOGGER.info("Examining file: " + documentFilePath);
+            if (documentFilePath.endsWith(".txt")) {
+                String fileName = FileIO.getFileName(documentFilePath);
+                String fileContents = FileIO.read(documentFilePath);
+                Date lastModified = FileIO.getLastModifiedDate(documentFilePath);
+                this.documents.add(new LocalDiskDocument(fileContents, fileName, lastModified));
+            } else {
+                LOGGER.info("Skipping file because it doesn't end with .txt: " + documentFilePath);
+            }
         }
     }
 

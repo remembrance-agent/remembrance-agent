@@ -5,17 +5,14 @@ import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.similarity.DateSimilarityIndex;
 import io.p13i.ra.similarity.StringSimilarityIndex;
-import io.p13i.ra.utils.Assert;
-import io.p13i.ra.utils.ListUtils;
-import io.p13i.ra.utils.TFIDFCalculator;
-import io.p13i.ra.utils.WordVector;
+import io.p13i.ra.utils.*;
 
 import java.util.List;
 import java.util.logging.Logger;
 
 public class RemembranceAgentSuggestionCalculator {
 
-    private static final Logger LOGGER = Logger.getLogger( RemembranceAgentClient.class.getName() );
+    private static final Logger LOGGER = LoggerUtils.getLogger( RemembranceAgentClient.class);
 
     private static final double CONTENT_BIAS = 1.00;
     private static final double LOCATION_BIAS = 0.00;

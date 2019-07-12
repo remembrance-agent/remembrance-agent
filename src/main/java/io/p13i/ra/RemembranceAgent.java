@@ -24,8 +24,8 @@ public class RemembranceAgent {
     }
 
     public List<Document> indexDocuments() {
-        documentDatabase.loadDocuments();
-        documentDatabase.indexDocuments();
+        this.documentDatabase.loadDocuments();
+        this.documentDatabase.indexDocuments();
         return this.documentDatabase.getAllDocuments();
     }
 

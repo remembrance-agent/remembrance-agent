@@ -7,8 +7,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class FileIO {
+    private static final Logger LOGGER = LoggerUtils.getLogger(FileIO.class);
+
     /**
      * Reads all file contents as a string
      * @param filePath absolute file path
@@ -29,6 +32,7 @@ public class FileIO {
      * @return list of absolute paths of folders/file in this directory
      */
     public static List<String> listDirectory(String folderPath) {
+        LOGGER.info("Listing directory: " + folderPath);
         List<String> filePaths = new ArrayList<>();
         File folder = new File(folderPath);
         File[] folderFiles = folder.listFiles();

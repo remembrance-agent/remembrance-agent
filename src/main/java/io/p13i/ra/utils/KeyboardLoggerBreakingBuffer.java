@@ -9,7 +9,7 @@ import java.util.logging.Logger;
  * (space) character automatically.
  */
 public class KeyboardLoggerBreakingBuffer {
-    private static final Logger LOGGER = Logger.getLogger(KeyboardLoggerBreakingBuffer.class.getName());
+    private static final Logger LOGGER = LoggerUtils.getLogger(KeyboardLoggerBreakingBuffer.class);
     private static final long BREAKING_BUFFER_DURATION_SEC = 5;  // seconds
     private LimitedCapacityBuffer<TimestampedCharacter> limitedCapacityBuffer;
 
