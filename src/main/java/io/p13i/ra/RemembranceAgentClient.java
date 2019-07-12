@@ -3,7 +3,6 @@ package io.p13i.ra;
 import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.Format;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,21 +10,17 @@ import java.util.logging.*;
 
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
+import io.p13i.ra.gui.SmartScroller;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
-import io.p13i.ra.utils.DateUtils;
-import io.p13i.ra.utils.LimitedCapacityBuffer;
-import io.p13i.ra.utils.ResourceUtil;
-import jdk.internal.loader.Resource;
+import io.p13i.ra.utils.*;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
-import javax.swing.border.EtchedBorder;
 
 import static javax.swing.ScrollPaneConstants.*;
 
@@ -34,13 +29,13 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final Logger LOGGER = Logger.getLogger(RemembranceAgentClient.class.getName());
 
     private static JFrame jFrame;
-    private static JLabel mKeystrokeBuffer;
-    private static JTextArea mTextArea;
+    private static JLabel sKeystrokeBuffer;
+    private static JTextArea sTextArea;
 
-    private static KeyboardLoggerBreakingBuffer breakingBuffer = new KeyboardLoggerBreakingBuffer(30);
-    private static LimitedCapacityBuffer mUILogBuffer = new LimitedCapacityBuffer(2);
+    private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(30);
     private static Timer remembranceAgentUpdateTimer = new Timer();
     private static RemembranceAgent remembranceAgent;
+    private static JPanel sSuggestionsPanel;
 
     public static void main(String[] args) {
 
@@ -52,24 +47,24 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
                 {
                 setLayout(null);
-                add(new JLabel() {{
-                    setVerticalTextPosition(SwingConstants.TOP);
+                add(sSuggestionsPanel = new JPanel() {{
                     setBounds(10, 10, 580, 75);
                     setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Suggestions"), BorderFactory.createEmptyBorder(5,5,5,5)));
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                 }});
-                add(mKeystrokeBuffer = new JLabel() {{
-                    setVerticalTextPosition(SwingConstants.TOP);
+                add(sKeystrokeBuffer = new JLabel() {{
                     setBounds(10, 85, 580, 50);
                     setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Keylogger Buffer"), BorderFactory.createEmptyBorder(5,5,5,5)));
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                 }});
-                add(new JScrollPane(mTextArea = new JTextArea() {{
+                add(new JScrollPane(sTextArea = new JTextArea() {{
                     setFont(new Font("monospaced", Font.PLAIN, 12));
+                    setEditable(false);
                 }}, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS) {{
                     getViewport().setPreferredSize(new Dimension(580, 50 + 150));
                     setBounds(10, 130, 580, 50 + 150);
                     setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Logs"), BorderFactory.createEmptyBorder(5,5,5,5)));
+                    new SmartScroller(this, SmartScroller.VERTICAL, SmartScroller.END);
                 }});
             }});
             setVisible(true);
@@ -91,8 +86,10 @@ public class RemembranceAgentClient implements NativeKeyListener {
                     } else {
                         message = record.getMessage();
                     }
-                    mTextArea.append("\n");
-                    mTextArea.append(DateUtils.timestamp() + message);
+                    sTextArea.append(DateUtils.timestamp());
+                    sTextArea.append(" | ");
+                    sTextArea.append(message);
+                    sTextArea.append("\n");
                 }
 
                 @Override
@@ -141,7 +138,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
         remembranceAgentUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                String query = breakingBuffer.toString();
+                String query = sBreakingBuffer.toString();
                 Context context = new Context(null, "p13i", query, DateUtils.now());
                 final int numSuggestions = 2;
 
@@ -152,11 +149,13 @@ public class RemembranceAgentClient implements NativeKeyListener {
                     LOGGER.info("No suggestions :(");
                 } else {
                     LOGGER.info(String.format("Got %d suggestion(s):", suggestions.size()));
-                    mKeystrokeBuffer.setText(String.format("Got %d suggestion(s):", suggestions.size()));
 
+                    sSuggestionsPanel.removeAll();
                     for (ScoredDocument doc : suggestions) {
+                        sSuggestionsPanel.add(new JLabel(doc.getDocument().getContext().getSubject()));
                         LOGGER.info(" -> " + doc.toString());
                     }
+                    sSuggestionsPanel.validate();
                 }
             }
         }, 5000, 5000);
@@ -168,11 +167,16 @@ public class RemembranceAgentClient implements NativeKeyListener {
         LOGGER.info("Keystroke: " + keyText);
 
         Character characterToAdd = null;
-        if (e.isActionKey() && e.getKeyCode() != NativeKeyEvent.VC_SHIFT) {
-            characterToAdd = ' ';
+        if (e.isActionKey()) {
+            if (e.getKeyCode() != NativeKeyEvent.VC_SHIFT) {
+                characterToAdd = ' ';
+            }
         } else {
             if (keyText.length() == 1) {
-                characterToAdd = keyText.charAt(0);
+                char charToAdd = keyText.charAt(0);
+                if (CharacterUtils.isAlphanumeric(charToAdd)) {
+                    characterToAdd = charToAdd;
+                }
             } else {
                 if (keyText.equals("Space")) {
                     characterToAdd = ' ';
@@ -181,10 +185,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
         }
 
         if (characterToAdd != null) {
-            breakingBuffer.addCharacter(characterToAdd);
-            String bufferMessage = String.format("[Buffer count=%04d:] %s", breakingBuffer.getTotalTypedCharactersCount(), breakingBuffer.toString());
-            LOGGER.info(bufferMessage);
-            mKeystrokeBuffer.setText(bufferMessage);
+            sBreakingBuffer.addCharacter(characterToAdd);
+            LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
+            sKeystrokeBuffer.setText("$>" + sBreakingBuffer.toString());
         }
 
     }
