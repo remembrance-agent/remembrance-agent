@@ -34,11 +34,11 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
     @Override
     public void loadDocuments() {
         this.documents = new ArrayList<>();
-        List<String> documentsFilePaths = FileIO.listDirectory(this.directory);
+        List<String> documentsFilePaths = FileIO.listFolderFilesRecursive(this.directory);
         LOGGER.info("Found " + documentsFilePaths.size() + " documents in " + this.directory);
         for (String documentFilePath : documentsFilePaths) {
             LOGGER.info("Examining file: " + documentFilePath);
-            if (documentFilePath.endsWith(".txt")) {
+            if (documentFilePath.endsWith(".txt") || documentFilePath.endsWith(".md")) {
                 String fileName = FileIO.getFileName(documentFilePath);
                 String fileContents = FileIO.read(documentFilePath);
                 Date lastModified = FileIO.getLastModifiedDate(documentFilePath);

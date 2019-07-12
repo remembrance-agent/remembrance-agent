@@ -1,9 +1,6 @@
 package io.p13i.ra.utils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,12 +15,30 @@ public class FileIO {
      * @return entire file as a string
      */
     public static String read(String filePath) {
+        LOGGER.info("READ: " + filePath);
         try {
-            return Files.readString(new File(filePath).toPath());
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath),"utf-8"));
+
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+            return stringBuilder.toString();
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+    }
+
+    private static List<String> ls(String folderPath) {
+        List<String> items = new ArrayList<>();
+        File[] files = new File(folderPath).listFiles();
+        for (File file : files) {
+            items.add(file.getAbsolutePath());
+        }
+        return items;
     }
 
     /**
@@ -31,17 +46,49 @@ public class FileIO {
      * @param folderPath absolute folder path
      * @return list of absolute paths of folders/file in this directory
      */
-    public static List<String> listDirectory(String folderPath) {
-        LOGGER.info("Listing directory: " + folderPath);
+    public static List<String> listFiles(String folderPath) {
         List<String> filePaths = new ArrayList<>();
-        File folder = new File(folderPath);
-        File[] folderFiles = folder.listFiles();
-        for (File file : folderFiles) {
-            if (file.isFile()) {
-                filePaths.add(file.getAbsolutePath());
+        List<String> folderFilePaths = ls(folderPath);
+        for (String filePath : folderFilePaths) {
+            if (FileIO.isFile(filePath)) {
+                filePaths.add(filePath);
             }
         }
         return filePaths;
+    }
+
+    public static List<String> listFolders(String folderPath) {
+        List<String> filePaths = new ArrayList<>();
+        List<String> folderFilePaths = ls(folderPath);
+        for (String filePath : folderFilePaths) {
+            if (FileIO.isFolder(filePath)) {
+                filePaths.add(filePath);
+            }
+        }
+        return filePaths;
+    }
+
+    public static List<String> listFolderFilesRecursive(String folderPath) {
+        List<String> allFilesRecursively = new ArrayList<>();
+
+        List<String> rootSubItems = ls(folderPath);
+        for (String subItem : rootSubItems) {
+            if (isFile(subItem)) {
+                allFilesRecursively.add(subItem);
+            } else if (isFolder(subItem)) {
+                allFilesRecursively.addAll(listFolderFilesRecursive(subItem));
+            }
+        }
+
+        return allFilesRecursively;
+    }
+
+    public static boolean isFolder(String absolutePath) {
+        return new File(absolutePath).isDirectory();
+    }
+
+    public static boolean isFile(String absolutePath) {
+        return new File(absolutePath).isFile();
     }
 
     /**
