@@ -1,6 +1,11 @@
 plugins {
-    id 'java'
+    id 'application'
 }
+
+application {
+    mainClassName = 'io.p13i.ra.RemembranceAgentClient'
+}
+
 
 group 'io.p13i'
 version 'v1.0-beta.3'
