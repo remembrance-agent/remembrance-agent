@@ -36,4 +36,9 @@ public class DateUtils {
     public static String timestampOf(Date date) {
         return formatDate(date, TIMESTAMP_FORMAT);
     }
+
+    public static long deltaSeconds(Date d1, Date d2) {
+        long difference = d2.getTime() - d1.getTime();
+        return difference / 1000 % 60;
+    }
 }

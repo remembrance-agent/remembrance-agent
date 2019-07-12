@@ -14,7 +14,7 @@ import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.CharacterBuffer;
+import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
 import io.p13i.ra.utils.DateUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -25,7 +25,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
         private static final Logger LOGGER = Logger.getLogger( RemembranceAgentClient.class.getName() );
 
-        private static CharacterBuffer characterBuffer = new CharacterBuffer(30);
+        private static KeyboardLoggerBreakingBuffer breakingBuffer = new KeyboardLoggerBreakingBuffer(30);
         private static Timer remembranceAgentUpdateTimer = new Timer();
         private static RemembranceAgent remembranceAgent;
 
@@ -68,7 +68,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
             remembranceAgentUpdateTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    String query = characterBuffer.toString();
+                    String query = breakingBuffer.toString();
                     Context context = new Context(null, "p13i", query, DateUtils.now());
                     final int numSuggestions = 2;
 
@@ -102,8 +102,8 @@ public class RemembranceAgentClient implements NativeKeyListener {
                 }
             }
             if (characterToAdd != null) {
-                characterBuffer.add(characterToAdd);
-                LOGGER.info("Full buffer: " + characterBuffer.toString());
+                breakingBuffer.addCharacter(characterToAdd);
+                LOGGER.info("Full buffer: " + breakingBuffer.toString());
             }
 
         }
