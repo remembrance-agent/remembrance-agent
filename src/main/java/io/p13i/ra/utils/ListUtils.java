@@ -69,7 +69,7 @@ public class ListUtils {
 
     public static <T extends Comparable<T>> List<T> selectLargest(List<T> list, int maxCount, Comparator<T> comparator) {
         List<T> copy = copy(list);
-        Collections.sort(copy, comparator);
+        Collections.sort(copy, Collections.reverseOrder(comparator));
         return copy.subList(0, Math.min(maxCount, copy.size()));
     }
 }
