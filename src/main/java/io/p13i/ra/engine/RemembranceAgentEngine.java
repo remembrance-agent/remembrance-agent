@@ -4,6 +4,7 @@ import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
+import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.ResourceUtil;
 
@@ -29,18 +30,18 @@ public class RemembranceAgentEngine {
         return this.documentDatabase.getAllDocuments();
     }
 
-    public List<ScoredDocument> determineSuggestions(String query, Context queryContext, int numSuggestions) {
+    public List<ScoredDocument> determineSuggestions(Query query) {
         // PriorityQueue
-        PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(numSuggestions, Collections.reverseOrder());
+        PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
         List<Document> allDocuments = this.documentDatabase.getAllDocuments();
         for (Document document : allDocuments) {
-            ScoredDocument scoredDoc = RemembranceAgentSuggestionCalculator.compute(query, queryContext, document, allDocuments);
+            ScoredDocument scoredDoc = RemembranceAgentSuggestionCalculator.compute(query, document, allDocuments);
             scoredDocuments.add(scoredDoc);
         }
 
         // Get the top numSuggestions documents
-        List<ScoredDocument> suggestedDocuments = new ArrayList<>(numSuggestions);
-        while (suggestedDocuments.size() < numSuggestions && !scoredDocuments.isEmpty()) {
+        List<ScoredDocument> suggestedDocuments = new ArrayList<>(query.getNumSuggestions());
+        while (suggestedDocuments.size() < query.getNumSuggestions() && !scoredDocuments.isEmpty()) {
             ScoredDocument suggestedDocument = scoredDocuments.poll();
             if (!Double.isNaN(suggestedDocument.getScore()) && suggestedDocument.getScore() > 0.0) {
                 suggestedDocuments.add(suggestedDocument);
@@ -56,7 +57,8 @@ public class RemembranceAgentEngine {
 
         Context queryContext = new Context(null, null, null, null);
         final int numSuggestions = 2;
-        List<ScoredDocument> suggestedDocuments = ra.determineSuggestions("c", queryContext, numSuggestions);
+        Query query = new Query("jesus", queryContext, numSuggestions);
+        List<ScoredDocument> suggestedDocuments = ra.determineSuggestions(query);
 
         for (ScoredDocument doc : suggestedDocuments) {
             System.out.println(doc.toString());

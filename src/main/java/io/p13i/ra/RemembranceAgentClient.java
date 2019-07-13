@@ -17,6 +17,7 @@ import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
+import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
@@ -306,7 +307,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
             Context context = new Context(null, "p13i", query, DateUtils.now());
 
             LOGGER.info("Sending query to RA: '" + query + "'");
-            List<ScoredDocument> suggestions = sRemembranceAgentEngine.determineSuggestions(query, context, RA_NUMBER_SUGGESTIONS);
+            List<ScoredDocument> suggestions = sRemembranceAgentEngine.determineSuggestions(new Query(query, context, RA_NUMBER_SUGGESTIONS));
 
             sSuggestionsPanel.removeAll();
 
