@@ -50,13 +50,6 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
     }
 
     @Override
-    public void indexDocuments() {
-        for (Document document : this.documents) {
-            document.computeWordVector();
-        }
-    }
-
-    @Override
     public List<Document> getAllDocuments() {
         return this.documents;
     }

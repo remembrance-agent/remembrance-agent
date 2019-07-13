@@ -29,10 +29,8 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import io.p13i.ra.utils.ResourceUtil;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
@@ -46,7 +44,7 @@ public class DriveQuickStart {
      * Global instance of the scopes required by this quickstart.
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
-    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_METADATA_READONLY);
+    private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_READONLY);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     /**
@@ -80,20 +78,24 @@ public class DriveQuickStart {
                 .setApplicationName(APPLICATION_NAME)
                 .build();
 
-        // Print the names and IDs for up to 10 files.
         FileList result = service.files().list()
-                .setPageSize(10)
-                .setFields("nextPageToken, files(id, name)")
+                .setQ("'1uUf6inWnUcYmeEDmPg8dFJKQ56BIJA6H' in parents").setSpaces("drive")
+                .setFields("nextPageToken, files(id, name, parents)")
                 .execute();
-        List<File> files = result.getFiles();
-        if (files == null || files.isEmpty()) {
-            System.out.println("No files found.");
-        } else {
-            System.out.println("Files:");
-            for (File file : files) {
-                System.out.printf("%s (%s)\n", file.getName(), file.getId());
-            }
+
+        for (File file : result.getFiles()) {
+            System.out.println(file.getId());
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            service.files().export(file.getId(), "text/plain")
+                    .executeMediaAndDownloadTo(outputStream);
+
+
+            System.out.println(new String(outputStream.toByteArray(), Charset.defaultCharset()).length());
+
         }
+
     }
+
 }
 // [END drive_quickstart]

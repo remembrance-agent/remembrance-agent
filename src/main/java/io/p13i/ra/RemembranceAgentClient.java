@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,17 +14,14 @@ import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.DateUtils;
-import io.p13i.ra.utils.FileIO;
-import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
-import io.p13i.ra.utils.LoggerUtils;
-import io.p13i.ra.utils.ResourceUtil;
+import io.p13i.ra.utils.*;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -275,7 +273,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
     private static void initializeRemembranceAgent() {
         LOGGER.info("Got directory path: " + sLocalDiskDocumentsFolderPath);
-        DocumentDatabase database = new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath);
+//        DocumentDatabase database = new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath);
+
+        DocumentDatabase database = new GoogleDriveFolderDocumentDatabase("1uUf6inWnUcYmeEDmPg8dFJKQ56BIJA6H");
         LOGGER.info("Using " + database.getName());
 
         sRemembranceAgentEngine = new RemembranceAgentEngine(database);
@@ -327,10 +327,21 @@ public class RemembranceAgentClient implements NativeKeyListener {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
+
+                                boolean error = false;
                                 try {
                                     Desktop.getDesktop().open(new File(doc.getDocument().getUrl()));
-                                } catch (IOException ex) {
+                                } catch (Exception ex) {
                                     ex.printStackTrace();
+                                    error = true;
+                                }
+                                if (error) {
+                                    try {
+                                        Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getUrl()));
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                        error = true;
+                                    }
                                 }
                             }
                         });

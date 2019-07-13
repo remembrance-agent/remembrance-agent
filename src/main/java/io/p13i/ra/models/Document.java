@@ -1,5 +1,6 @@
 package io.p13i.ra.models;
 
+import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.WordVector;
 
 import java.util.List;
@@ -69,6 +70,6 @@ public class Document {
     }
 
     public String toTruncatedUrlString() {
-        return this.getUrl();
+        return StringUtils.truncateWithEllipse(this.getUrl(), CONTENT_TRUNCATED_MAX_LENGTH);
     }
 }

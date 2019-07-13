@@ -35,7 +35,7 @@ public class LocalDiskDocument extends Document {
     @Override
     public String toTruncatedUrlString() {
         String parentFolder = StringUtils.truncateWithEllipse(FileIO.getEnclosingFolderName(getUrl()), 10);
-        String fileName = StringUtils.truncateWithEllipse(FileIO.getFileName(getUrl()), 10);
+        String fileName = StringUtils.truncateWithEllipse(FileIO.getFileName(getUrl()), 9);
         return String.format("%s%s%s", parentFolder, File.separator, fileName);
     }
 }

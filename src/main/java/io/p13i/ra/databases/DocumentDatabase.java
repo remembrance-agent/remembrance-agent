@@ -19,7 +19,12 @@ public interface DocumentDatabase {
     /**
      * Indexes all the documents
      */
-    void indexDocuments();
+    default void indexDocuments() {
+        List<Document> documents = getAllDocuments();
+        for (Document document : documents) {
+            document.computeWordVector();
+        }
+    }
 
     /**
      * Fetches the documents from memory
