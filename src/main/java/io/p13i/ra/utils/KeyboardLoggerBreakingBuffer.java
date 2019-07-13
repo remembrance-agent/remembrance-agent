@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 public class KeyboardLoggerBreakingBuffer {
     private static final Logger LOGGER = LoggerUtils.getLogger(KeyboardLoggerBreakingBuffer.class);
     private static final long BREAKING_BUFFER_DURATION_SEC = 5;  // seconds
+    private static final char DEFAULT_BREAKER_CHARACTER = '␣';
     private LimitedCapacityBuffer<TimestampedCharacter> limitedCapacityBuffer;
 
     public KeyboardLoggerBreakingBuffer(int maximumCapacity) {
@@ -34,7 +35,7 @@ public class KeyboardLoggerBreakingBuffer {
                 // And, finally, the delta should be long enough
                 if (keystrokeDelta > BREAKING_BUFFER_DURATION_SEC) {
                     LOGGER.info("Added space after " + BREAKING_BUFFER_DURATION_SEC + " seconds.");
-                    limitedCapacityBuffer.add(new TimestampedCharacter(' '));
+                    limitedCapacityBuffer.add(new TimestampedCharacter(DEFAULT_BREAKER_CHARACTER));
                 }
             }
         }

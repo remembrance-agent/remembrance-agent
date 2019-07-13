@@ -163,20 +163,21 @@ public class RemembranceAgentClient implements NativeKeyListener {
         LOGGER.info("Keystroke: " + keyText);
 
         Character characterToAdd = null;
-        if (keyText.equals("Space") || keyText.equals("␣")) {
-            characterToAdd = ' ';
-        } else if (e.isActionKey()) {
-            if (e.getKeyCode() != NativeKeyEvent.VC_SHIFT) {
-                characterToAdd = ' ';
-            }
-        } else {
-            if (keyText.length() == 1) {
-                char charToAdd = keyText.charAt(0);
-                if (CharacterUtils.isAlphanumeric(charToAdd)) {
-                    characterToAdd = charToAdd;
-                }
-            }
-        }
+//        if (keyText.equals("Space") || keyText.equals("␣")) {
+//            characterToAdd = ' ';
+//        } else if (e.isActionKey()) {
+//            if (e.getKeyCode() != NativeKeyEvent.VC_SHIFT) {
+//                characterToAdd = ' ';
+//            }
+//        } else {
+//            if (keyText.length() == 1) {
+//                char charToAdd = keyText.charAt(0);
+//                if (CharacterUtils.isAlphanumeric(charToAdd)) {
+//                    characterToAdd = charToAdd;
+//                }
+//            }
+//        }
+        characterToAdd = keyText.charAt(0);
 
         if (characterToAdd != null) {
             sBreakingBuffer.addCharacter(characterToAdd);
@@ -241,7 +242,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
                 startY += 15;
             }
         }
+
         sSuggestionsPanel.validate();
+        sSuggestionsPanel.repaint();
     }
 
     public void nativeKeyReleased(NativeKeyEvent e) {

@@ -13,20 +13,26 @@ public class WordVector {
     };
 
     public static List<String> getWordVector(String content) {
-        List<String> wordVector = ListUtils.fromArray(content
-                .toLowerCase()
-                // Remove non (alphanumeric, :, space) characters
-                .replaceAll("[^a-zA-Z\\d\\s:]", "")
-                // Split on colon or space
-                .split("[ |:]"), new ListUtils.Filter<String>() {
-            @Override
-            public boolean shouldInclude(String item) {
-                return item != null && item.length() > 0;
-            }
-        });
 
-        if (wordVector.size() == 1 && wordVector.get(0).length() == 0) {
-            wordVector.remove(0);
+        List<String> wordVector = new ArrayList<>();
+        boolean wordMode = true;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Character c : content.toCharArray()) {
+            if (CharacterUtils.isAlphanumeric(c)) {
+                wordMode = true;
+                stringBuilder.append(c);
+            } else {
+                wordMode = false;
+                if (stringBuilder.length() > 0) {
+                    wordVector.add(stringBuilder.toString());
+                    stringBuilder = new StringBuilder();
+                }
+            }
+        }
+
+        if (wordMode) {
+            wordVector.add(stringBuilder.toString());
         }
 
         return wordVector;
