@@ -1,11 +1,20 @@
 plugins {
+    id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
 }
 
 application {
     mainClassName = 'io.p13i.ra.RemembranceAgentClient'
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'io.p13i.ra.RemembranceAgentClient'
+        )
+    }
+}
 
 group 'io.p13i'
 version 'v1.0-beta.3'
