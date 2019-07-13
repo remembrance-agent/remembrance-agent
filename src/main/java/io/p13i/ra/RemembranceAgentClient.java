@@ -118,6 +118,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                             Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
                                             prefs.put(LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME, sLocalDiskDocumentsFolderPath = fileChooser.getSelectedFile().toPath().toString());
                                             LOGGER.info("Selected directory: " + sLocalDiskDocumentsFolderPath);
+
                                             initializeRemembranceAgent();
                                             break;
                                     }
@@ -291,6 +292,10 @@ public class RemembranceAgentClient implements NativeKeyListener {
         for (Document document : documentsIndexed) {
             LOGGER.info(document.toString());
         }
+
+        sSuggestionsPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createTitledBorder("Suggestions (from " + sLocalDiskDocumentsFolderPath + ")"),
+                BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
     }
 
     private static void sendQueryToRemembranceAgent() {
