@@ -1,8 +1,10 @@
 package io.p13i.ra.models;
 
 import io.p13i.ra.utils.ListUtils;
+import io.p13i.ra.utils.TFIDFCalculator;
 
 import java.text.DecimalFormat;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -44,6 +46,20 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
     public List<String> getMatchingTermsInDocument() {
         List<String> queryWordVector = query.getWordVector();
         List<String> documentWordVector = document.getWordVector();
-        return ListUtils.intersection(queryWordVector, documentWordVector);
+        List<String> intersection = ListUtils.intersection(queryWordVector, documentWordVector);
+        return ListUtils.selectLargest(intersection, 3, new Comparator<String>() {
+            @Override
+            public int compare(String queryTerm1, String queryTerm2) {
+                double queryTerm1TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm1);
+                double queryTerm2TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm2);
+                if (queryTerm1TermFrequency > queryTerm2TermFrequency) {
+                    return 1;
+                } else if (queryTerm1TermFrequency < queryTerm2TermFrequency) {
+                    return -1;
+                } else {
+                    return 0;
+                }
+            }
+        });
     }
 }

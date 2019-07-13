@@ -1,8 +1,6 @@
 package io.p13i.ra.utils;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class ListUtils {
     /**
@@ -63,5 +61,15 @@ public class ListUtils {
             }
         }
         return intersection;
+    }
+
+    public static <T> List<T> copy(List<T> source) {
+        return new ArrayList<T>(source);
+    }
+
+    public static <T extends Comparable<T>> List<T> selectLargest(List<T> list, int maxCount, Comparator<T> comparator) {
+        List<T> copy = copy(list);
+        Collections.sort(copy, comparator);
+        return copy.subList(0, Math.min(maxCount, copy.size()));
     }
 }
