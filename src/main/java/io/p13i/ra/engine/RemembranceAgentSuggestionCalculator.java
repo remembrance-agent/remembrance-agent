@@ -62,6 +62,6 @@ public class RemembranceAgentSuggestionCalculator {
 
         double score = contentBiased + locationBiased + personBiased + subjectBiased + dateBiased;
 
-        return new ScoredDocument(score, document);
+        return new ScoredDocument(query, score, document);
     }
 }

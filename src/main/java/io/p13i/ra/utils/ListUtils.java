@@ -1,6 +1,7 @@
 package io.p13i.ra.utils;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class ListUtils {
@@ -52,5 +53,15 @@ public class ListUtils {
         default boolean shouldInclude(T item) {
             return true;
         }
+    }
+
+    public static <T> List<T> intersection(List<T> first, List<T> second) {
+        List<T> intersection = new LinkedList<>();
+        for(T stringFromFirst : first) {
+            if(second.contains(stringFromFirst)) {
+                intersection.add(stringFromFirst);
+            }
+        }
+        return intersection;
     }
 }

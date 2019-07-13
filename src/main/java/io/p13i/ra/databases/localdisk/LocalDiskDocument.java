@@ -6,6 +6,7 @@ import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
+import java.io.File;
 import java.util.Date;
 
 /**
@@ -32,10 +33,9 @@ public class LocalDiskDocument extends Document {
     }
 
     @Override
-    public String toShortString() {
+    public String toTruncatedUrlString() {
         String parentFolder = StringUtils.truncateWithEllipse(FileIO.getEnclosingFolderName(getUrl()), 10);
         String fileName = StringUtils.truncateWithEllipse(FileIO.getFileName(getUrl()), 10);
-        String contentTruncated = StringUtils.truncateWithEllipse(getContent(), 30);
-        return String.format("[%s/%s] %s", parentFolder, fileName, contentTruncated);
+        return String.format("%s%s%s", parentFolder, File.separator, fileName);
     }
 }

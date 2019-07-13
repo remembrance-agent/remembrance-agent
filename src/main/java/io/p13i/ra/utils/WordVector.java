@@ -21,7 +21,7 @@ public class WordVector {
         for (Character c : content.toCharArray()) {
             if (CharacterUtils.isAlphanumeric(c)) {
                 wordMode = true;
-                stringBuilder.append(c);
+                stringBuilder.append(c.toString().toLowerCase());
             } else {
                 wordMode = false;
                 if (stringBuilder.length() > 0) {

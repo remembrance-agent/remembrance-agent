@@ -68,7 +68,7 @@ public class Document {
         this.url = url;
     }
 
-    public String toShortString() {
-        return toString();
+    public String toTruncatedUrlString() {
+        return this.getUrl();
     }
 }
