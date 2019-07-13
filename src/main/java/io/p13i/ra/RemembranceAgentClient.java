@@ -5,18 +5,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
-import io.p13i.ra.gui.SmartScroller;
+import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.ScoredDocument;
@@ -31,10 +29,6 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-
-import static javax.swing.ScrollPaneConstants.*;
 
 public class RemembranceAgentClient implements NativeKeyListener {
 
@@ -77,7 +71,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static JLabel sKeystrokeBufferLabel;
     private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
     private static Timer sRemembranceAgentUpdateTimer = new Timer();
-    private static RemembranceAgent sRemembranceAgent;
+    private static RemembranceAgentEngine sRemembranceAgentEngine;
     private static JPanel sSuggestionsPanel;
     private static String sPriorQuery;
 
@@ -283,11 +277,11 @@ public class RemembranceAgentClient implements NativeKeyListener {
         DocumentDatabase database = new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath);
         LOGGER.info("Using " + database.getName());
 
-        sRemembranceAgent = new RemembranceAgent(database);
+        sRemembranceAgentEngine = new RemembranceAgentEngine(database);
         LOGGER.info("Initialized Remembrance Agent.");
 
         LOGGER.info("Loading/indexing documents...");
-        List<Document> documentsIndexed = sRemembranceAgent.indexDocuments();
+        List<Document> documentsIndexed = sRemembranceAgentEngine.indexDocuments();
         LOGGER.info(String.format("Indexing complete. Added %d documents:", documentsIndexed.size()));
         for (Document document : documentsIndexed) {
             LOGGER.info(document.toString());
@@ -312,7 +306,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
             Context context = new Context(null, "p13i", query, DateUtils.now());
 
             LOGGER.info("Sending query to RA: '" + query + "'");
-            List<ScoredDocument> suggestions = sRemembranceAgent.determineSuggestions(query, context, RA_NUMBER_SUGGESTIONS);
+            List<ScoredDocument> suggestions = sRemembranceAgentEngine.determineSuggestions(query, context, RA_NUMBER_SUGGESTIONS);
 
             sSuggestionsPanel.removeAll();
 

@@ -1,4 +1,4 @@
-package io.p13i.ra;
+package io.p13i.ra.engine;
 
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.models.Context;

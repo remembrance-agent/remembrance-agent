@@ -1,4 +1,4 @@
-package io.p13i.ra;
+package io.p13i.ra.engine;
 
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
@@ -16,10 +16,10 @@ import java.util.PriorityQueue;
 /**
  * Core RA implementation and wrapper functions
  */
-public class RemembranceAgent {
+public class RemembranceAgentEngine {
     private DocumentDatabase documentDatabase;
 
-    public RemembranceAgent(DocumentDatabase documentDatabase) {
+    public RemembranceAgentEngine(DocumentDatabase documentDatabase) {
         this.documentDatabase = documentDatabase;
     }
 
@@ -50,8 +50,8 @@ public class RemembranceAgent {
     }
 
     public static void main(String[] args) {
-        String directoryPath = ResourceUtil.getResourcePath(RemembranceAgent.class, "sample-documents");
-        RemembranceAgent ra = new RemembranceAgent(new LocalDiskDocumentDatabase(directoryPath));
+        String directoryPath = ResourceUtil.getResourcePath(RemembranceAgentEngine.class, "sample-documents");
+        RemembranceAgentEngine ra = new RemembranceAgentEngine(new LocalDiskDocumentDatabase(directoryPath));
         ra.indexDocuments();
 
         Context queryContext = new Context(null, null, null, null);
