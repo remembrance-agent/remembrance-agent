@@ -32,6 +32,38 @@ public class FileIO {
         }
     }
 
+    public static void write(String filePath, String text) {
+        LOGGER.info(String.format("Writing ~%d bytes to %s", text.length(), text));
+        if (!FileIO.fileExists(filePath)) {
+            FileIO.createFile(filePath);
+        }
+        try {
+            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
+            out.print(text);
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean createFile(String filePath) {
+        try {
+            new File(filePath).createNewFile();
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    private static boolean fileExists(String filePath) {
+        return new File(filePath).isFile();
+    }
+
+    public static void write(String filePath, Character c) {
+        write(filePath, c.toString());
+    }
+
     private static List<String> ls(String folderPath) {
         List<String> items = new ArrayList<>();
         File[] files = new File(folderPath).listFiles();

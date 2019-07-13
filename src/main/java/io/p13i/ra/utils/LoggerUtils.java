@@ -7,7 +7,7 @@ import java.util.logging.*;
 public class LoggerUtils {
     public static <T> Logger getLogger(Class<T> forClass) {
         Logger LOGGER = Logger.getLogger(forClass.getName());
-
+        LOGGER.setLevel(Level.INFO);
         LOGGER.addHandler(new ConsoleHandler());
         LOGGER.addHandler(new Handler() {
             @Override

@@ -33,6 +33,10 @@ public class DateUtils {
         return nowAs(TIMESTAMP_FORMAT);
     }
 
+    public static long longTimestamp() {
+        return now().getTime();
+    }
+
     public static String timestampOf(Date date) {
         return formatDate(date, TIMESTAMP_FORMAT);
     }

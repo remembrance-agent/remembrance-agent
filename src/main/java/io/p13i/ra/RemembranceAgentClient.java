@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.*;
+import java.util.prefs.Preferences;
 
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
@@ -24,6 +25,8 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 
 import static javax.swing.ScrollPaneConstants.*;
 
@@ -34,15 +37,37 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final int KEYBOARD_BUFFER_SIZE = 60;
     private static final int RA_UPDATE_PERIOD_MS = 5000;  // ms
 
+    private static final String KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME = "KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME";
+    private static String sKeystrokesLogFilePath;
+
+    private static final String LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME = "LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME";
+    private static String sLocalDiskDocumentsFolderPath;
+
     private static JFrame sJFrame;
     private static JLabel sKeystrokeBufferLabel;
     public static JTextArea sLogTextArea;
 
     private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
     private static Timer sRemembranceAgentUpdateTimer = new Timer();
-    private static String sSelectedDirectory;
     private static RemembranceAgent sRemembranceAgent;
     private static JPanel sSuggestionsPanel;
+
+    static {
+        // Load preferences
+        Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
+
+        // Set keystrokes log file location
+        sKeystrokesLogFilePath = prefs.get(KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME, null);
+        if (sKeystrokesLogFilePath == null) {
+            sKeystrokesLogFilePath = System.getProperty("user.home") + File.separator + "keystrokes.log";
+        }
+
+        // Set documents folder path preference
+        sLocalDiskDocumentsFolderPath = prefs.get(LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME, null);
+        if (sLocalDiskDocumentsFolderPath == null) {
+            sLocalDiskDocumentsFolderPath = ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents");
+        }
+    }
 
     public static void main(String[] args) {
 
@@ -53,6 +78,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
             setAlwaysOnTop(true);
             add(new JPanel() {{
                 setLayout(null);
+                add(Box.createHorizontalGlue());
                 setJMenuBar(new JMenuBar() {{
                     add(new JMenu("Settings") {{
                         add(new JMenuItem("Select document database directory...") {{
@@ -65,36 +91,74 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                     fileChooser.setAcceptAllFileFilterUsed(false);
                                     switch (fileChooser.showOpenDialog(sJFrame)) {
                                         case JFileChooser.APPROVE_OPTION:
-                                            sSelectedDirectory = fileChooser.getSelectedFile().toPath().toString();
-                                            LOGGER.info("Selected directory: " + sSelectedDirectory);
-                                            initializeRemembranceAgent(sSelectedDirectory);
+                                            Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
+                                            prefs.put(LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME, sLocalDiskDocumentsFolderPath = fileChooser.getSelectedFile().toPath().toString());
+                                            LOGGER.info("Selected directory: " + sLocalDiskDocumentsFolderPath);
+                                            initializeRemembranceAgent();
                                             break;
                                     }
                                 }
                             });
                         }});
-                        add(new JMenuItem("Reinitialize") {{
+                        add(new JMenuItem("Reinitialize remembrance agent") {{
                             addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    initializeRemembranceAgent(sSelectedDirectory);
+                                    initializeRemembranceAgent();
+                                }
+                            });
+                        }});
+                        add(new JSeparator());
+                        add(new JMenuItem("Select keystrokes.log directory...") {{
+                            addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    JFileChooser fileChooser = new JFileChooser();
+                                    fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                                    // disable the "All files" option.
+                                    fileChooser.setAcceptAllFileFilterUsed(false);
+                                    switch (fileChooser.showOpenDialog(sJFrame)) {
+                                        case JFileChooser.APPROVE_OPTION:
+                                            Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
+                                            prefs.put(KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME, sKeystrokesLogFilePath = fileChooser.getSelectedFile().toPath().toString() + File.separator + "keystrokes.log");
+                                            LOGGER.info("Selected keystrokes.log file directory: " + sKeystrokesLogFilePath);
+                                            sKeystrokeBufferLabel.setText("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")");
+                                            break;
+                                    }
                                 }
                             });
                         }});
                     }});
-                    add(new JMenu("© Pramod Kotipalli"));
+                    add(new JMenu("About") {{
+                        addMenuListener(new MenuListener() {
+                            @Override
+                            public void menuSelected(MenuEvent e) {
+                                JOptionPane.showMessageDialog(sJFrame, "© Pramod Kotipalli, http://remem.p13i.io/");
+                            }
+
+                            @Override
+                            public void menuDeselected(MenuEvent e) {
+
+                            }
+
+                            @Override
+                            public void menuCanceled(MenuEvent e) {
+
+                            }
+                        });
+                    }});
                 }});
                 add(sSuggestionsPanel = new JPanel() {{
                     setBounds(10, 10, 580, 75);
                     setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createTitledBorder("Suggestions"),
+                            BorderFactory.createTitledBorder("Suggestions (from " + sLocalDiskDocumentsFolderPath + ")"),
                             BorderFactory.createEmptyBorder(5,5,5,5)));
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                 }});
                 add(sKeystrokeBufferLabel = new JLabel() {{
                     setBounds(10, 85, 580, 50);
                     setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createTitledBorder("Keylogger Buffer"),
+                            BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")"),
                             BorderFactory.createEmptyBorder(5,5,5,5)));
                     setFont(new Font("monospaced", Font.PLAIN, 12));
                 }});
@@ -134,8 +198,8 @@ public class RemembranceAgentClient implements NativeKeyListener {
         Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.WARNING);
 
-        sSelectedDirectory = ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents");
-        initializeRemembranceAgent(sSelectedDirectory);
+        // init!
+        initializeRemembranceAgent();
 
         // Add the key logger
         try {
@@ -160,38 +224,24 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
     public void nativeKeyPressed(NativeKeyEvent e) {
         String keyText = NativeKeyEvent.getKeyText(e.getKeyCode());
+
+        FileIO.write(sKeystrokesLogFilePath, DateUtils.longTimestamp() + " " + keyText + "\n");
+
         LOGGER.info("Keystroke: " + keyText);
 
-        Character characterToAdd = null;
-//        if (keyText.equals("Space") || keyText.equals("␣")) {
-//            characterToAdd = ' ';
-//        } else if (e.isActionKey()) {
-//            if (e.getKeyCode() != NativeKeyEvent.VC_SHIFT) {
-//                characterToAdd = ' ';
-//            }
-//        } else {
-//            if (keyText.length() == 1) {
-//                char charToAdd = keyText.charAt(0);
-//                if (CharacterUtils.isAlphanumeric(charToAdd)) {
-//                    characterToAdd = charToAdd;
-//                }
-//            }
-//        }
-        characterToAdd = keyText.charAt(0);
+        Character characterToAdd = keyText.charAt(0);
 
-        if (characterToAdd != null) {
-            sBreakingBuffer.addCharacter(characterToAdd);
-            LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
-            sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
+        sBreakingBuffer.addCharacter(characterToAdd);
+        LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
+        sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
 
-            sendQueryToRemembranceAgent();
-        }
+//            sendQueryToRemembranceAgent();
 
     }
 
-    private static void initializeRemembranceAgent(String folderPath) {
-        LOGGER.info("Got directory path: " + folderPath);
-        DocumentDatabase database = new LocalDiskDocumentDatabase(folderPath);
+    private static void initializeRemembranceAgent() {
+        LOGGER.info("Got directory path: " + sLocalDiskDocumentsFolderPath);
+        DocumentDatabase database = new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath);
         LOGGER.info("Using " + database.getName());
 
         sRemembranceAgent = new RemembranceAgent(database);
