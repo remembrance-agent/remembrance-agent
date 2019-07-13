@@ -60,4 +60,8 @@ public class LimitedCapacityBuffer<T> {
     int getTotalAddedElementsCount() {
         return totalAddedElementsCount;
     }
+
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
 }

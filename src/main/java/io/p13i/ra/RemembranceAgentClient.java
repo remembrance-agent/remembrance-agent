@@ -1,6 +1,8 @@
 package io.p13i.ra;
 
-import java.awt.*;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -9,7 +11,9 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import io.p13i.ra.databases.DocumentDatabase;
@@ -18,13 +22,30 @@ import io.p13i.ra.gui.SmartScroller;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.*;
+import io.p13i.ra.utils.DateUtils;
+import io.p13i.ra.utils.FileIO;
+import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
+import io.p13i.ra.utils.LoggerUtils;
+import io.p13i.ra.utils.ResourceUtil;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 
@@ -34,8 +55,22 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
+    /**
+     * GUI settings
+     */
+    private static final int GUI_WIDTH = 600;
+    private static final int GUI_HEIGHT = 290;
+    private static final int GUI_LINE_HEIGHT = 25;
+    private static final int GUI_PADDING_LEFT = 10;
+    private static final int GUI_PADDING_TOP = 10;
+    private static final int GUI_PADDING_RIGHT = 10;
+    private static final int GUI_BORDER_PADDING = 5;
+    private static final Font GUI_FONT = new Font("monospaced", Font.PLAIN, 12);
+    private static final int GUI_CLEAR_BUFFER_BUTTON_WIDTH = 120;
+
     private static final int KEYBOARD_BUFFER_SIZE = 60;
-    private static final int RA_UPDATE_PERIOD_MS = 5000;  // ms
+    private static final int RA_UPDATE_PERIOD_MS = 100;
+    private static final int RA_NUMBER_SUGGESTIONS = 2;
 
     private static final String KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME = "KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME";
     private static String sKeystrokesLogFilePath;
@@ -43,37 +78,36 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final String LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME = "LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME";
     private static String sLocalDiskDocumentsFolderPath;
 
+    /**
+     * "local" variables
+     */
     private static JFrame sJFrame;
     private static JLabel sKeystrokeBufferLabel;
     public static JTextArea sLogTextArea;
-
     private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
     private static Timer sRemembranceAgentUpdateTimer = new Timer();
     private static RemembranceAgent sRemembranceAgent;
     private static JPanel sSuggestionsPanel;
+    private static String sPriorQuery;
 
-    static {
+    public static void main(String[] args) {
+
         // Load preferences
         Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
 
         // Set keystrokes log file location
-        sKeystrokesLogFilePath = prefs.get(KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME, null);
-        if (sKeystrokesLogFilePath == null) {
-            sKeystrokesLogFilePath = System.getProperty("user.home") + File.separator + "keystrokes.log";
-        }
+        sKeystrokesLogFilePath = prefs.get(
+                KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME,
+                /* default: */ System.getProperty("user.home") + File.separator + "keystrokes.log");
 
         // Set documents folder path preference
-        sLocalDiskDocumentsFolderPath = prefs.get(LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME, null);
-        if (sLocalDiskDocumentsFolderPath == null) {
-            sLocalDiskDocumentsFolderPath = ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents");
-        }
-    }
-
-    public static void main(String[] args) {
+        sLocalDiskDocumentsFolderPath = prefs.get(
+                LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME,
+                /* default: */ ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents"));
 
         sJFrame = new JFrame("Remembrance Agent") {{
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(600, 260);
+            setSize(GUI_WIDTH, GUI_HEIGHT);
             setResizable(false);
             setAlwaysOnTop(true);
             add(new JPanel() {{
@@ -149,39 +183,45 @@ public class RemembranceAgentClient implements NativeKeyListener {
                     }});
                 }});
                 add(sSuggestionsPanel = new JPanel() {{
-                    setBounds(10, 10, 580, 75);
+                    setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), 75);
                     setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createTitledBorder("Suggestions (from " + sLocalDiskDocumentsFolderPath + ")"),
-                            BorderFactory.createEmptyBorder(5,5,5,5)));
-                    setFont(new Font("monospaced", Font.PLAIN, 12));
+                            BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
+                    setFont(GUI_FONT);
                 }});
                 add(sKeystrokeBufferLabel = new JLabel() {{
-                    setBounds(10, 85, 580, 50);
+                    setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP + 75, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT);
                     setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")"),
-                            BorderFactory.createEmptyBorder(5,5,5,5)));
-                    setFont(new Font("monospaced", Font.PLAIN, 12));
+                            BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
+                    setFont(GUI_FONT);
                 }});
                 add(new JButton("Clear buffer") {{
-                    setBounds(600 - 120 - 10 - 10, 100, 120, 25);
-                    setFont(new Font("monospaced", Font.PLAIN, 12));
+                    setBounds(GUI_WIDTH - GUI_CLEAR_BUFFER_BUTTON_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), GUI_PADDING_TOP + RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT + GUI_BORDER_PADDING * 3 + 25, GUI_CLEAR_BUFFER_BUTTON_WIDTH, GUI_LINE_HEIGHT);
+                    setFont(GUI_FONT);
+                    setSelected(false);
                     addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            sBreakingBuffer.clear();
-                            sKeystrokeBufferLabel.setText("<cleared>");
+                            if (sBreakingBuffer.isEmpty()) {
+                                JOptionPane.showMessageDialog(sJFrame, "Buffer is empty. No clearing required.");
+                            } else {
+                                sBreakingBuffer.clear();
+                                JOptionPane.showMessageDialog(sJFrame, "Cleared keyboard buffer.");
+                                sKeystrokeBufferLabel.setText("");
+                            }
                         }
                     });
                 }});
                 add(new JScrollPane(sLogTextArea = new JTextArea() {{
-                    setFont(new Font("monospaced", Font.PLAIN, 12));
+                    setFont(GUI_FONT);
                     setEditable(false);
                 }}, VERTICAL_SCROLLBAR_ALWAYS, HORIZONTAL_SCROLLBAR_ALWAYS) {{
-                    getViewport().setPreferredSize(new Dimension(580, 50 + 150));
-                    setBounds(10, 140, 580, 100);
+                    getViewport().setPreferredSize(new Dimension(GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), GUI_LINE_HEIGHT * 4));
+                    setBounds(GUI_PADDING_LEFT, 140, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), GUI_LINE_HEIGHT * 4);
                     setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createTitledBorder("Logs"),
-                            BorderFactory.createEmptyBorder(5,5,5,5)));
+                            BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
                     new SmartScroller(this, SmartScroller.VERTICAL, SmartScroller.END);
                 }});
             }});
@@ -235,8 +275,6 @@ public class RemembranceAgentClient implements NativeKeyListener {
         LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
         sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
 
-//            sendQueryToRemembranceAgent();
-
     }
 
     private static void initializeRemembranceAgent() {
@@ -257,11 +295,16 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
     private static void sendQueryToRemembranceAgent() {
         String query = sBreakingBuffer.toString();
+
+        if (query.equals(sPriorQuery)) {
+            LOGGER.info("Skipping prior query: '" + sPriorQuery + "'");
+            return;
+        }
+
         Context context = new Context(null, "p13i", query, DateUtils.now());
-        final int numSuggestions = 2;
 
         LOGGER.info("Sending query to RA: '" + query + "'");
-        List<ScoredDocument> suggestions = sRemembranceAgent.determineSuggestions(query, context, numSuggestions);
+        List<ScoredDocument> suggestions = sRemembranceAgent.determineSuggestions(query, context, RA_NUMBER_SUGGESTIONS);
 
         sSuggestionsPanel.removeAll();
 
@@ -270,11 +313,11 @@ public class RemembranceAgentClient implements NativeKeyListener {
         } else {
             LOGGER.info(String.format("Got %d suggestion(s):", suggestions.size()));
 
-            int startY = 10;
+            int startY = GUI_PADDING_TOP;
 
             for (ScoredDocument doc : suggestions) {
                 final int yPos = startY;
-                sSuggestionsPanel.add(new JButton(doc.getDocument().getContext().getSubject()) {{
+                sSuggestionsPanel.add(new JButton(doc.getDocument().getUrl()) {{
                     setBounds(25, yPos, 540, 15);
                     setPreferredSize(new Dimension(540, 15));
                     addActionListener(new ActionListener() {
@@ -295,13 +338,11 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
         sSuggestionsPanel.validate();
         sSuggestionsPanel.repaint();
+
+        sPriorQuery = query;
     }
 
-    public void nativeKeyReleased(NativeKeyEvent e) {
-        // Nothing
-    }
+    public void nativeKeyReleased(NativeKeyEvent e) { /***/}
 
-    public void nativeKeyTyped(NativeKeyEvent e) {
-        // Nothing here
-    }
+    public void nativeKeyTyped(NativeKeyEvent e) { /***/}
 }

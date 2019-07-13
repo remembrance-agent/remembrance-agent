@@ -44,6 +44,8 @@ public class KeyboardLoggerBreakingBuffer {
         limitedCapacityBuffer.add(newTimestamp);
     }
 
+    public boolean isEmpty() { return limitedCapacityBuffer.isEmpty(); }
+
     public void clear() {
         limitedCapacityBuffer.clear();
     }
