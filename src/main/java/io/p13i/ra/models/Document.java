@@ -38,8 +38,12 @@ public class Document {
     }
 
     public String getContentTruncated() {
-        boolean includeEllipses = this.content.length() > CONTENT_TRUNCATED_MAX_LENGTH;
-        return content.substring(0, Math.min(this.content.length(), CONTENT_TRUNCATED_MAX_LENGTH)) + (includeEllipses ? "..." : "");
+        return getContentTruncated(CONTENT_TRUNCATED_MAX_LENGTH);
+    }
+
+    public String getContentTruncated(int maxLength) {
+        boolean includeEllipses = this.content.length() > maxLength;
+        return content.substring(0, Math.min(this.content.length(), maxLength)) + (includeEllipses ? "..." : "");
     }
 
     public void computeWordVector() {
@@ -62,5 +66,9 @@ public class Document {
 
     public void setURL(String url) {
         this.url = url;
+    }
+
+    public String toShortString() {
+        return toString();
     }
 }

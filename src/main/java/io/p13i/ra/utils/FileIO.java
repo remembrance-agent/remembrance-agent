@@ -132,6 +132,10 @@ public class FileIO {
         return new File(fromAbsolutePath).getName();
     }
 
+    public static String getEnclosingFolderName(String absolutePath) {
+        return new File(absolutePath).getParentFile().getName();
+    }
+
     /**
      * Gets the last modified date
      * @param absoluteFilePath of the given file at this path

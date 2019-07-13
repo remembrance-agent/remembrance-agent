@@ -3,6 +3,7 @@ package io.p13i.ra;
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
+import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.similarity.DateSimilarityIndex;
 import io.p13i.ra.similarity.StringSimilarityIndex;
 import io.p13i.ra.utils.*;
@@ -24,7 +25,7 @@ public class RemembranceAgentSuggestionCalculator {
         Assert.equal(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);
     }
 
-    public static double compute(String query, Context queryContext, Document document, List<Document> allDocuments) {
+    public static ScoredDocument compute(String query, Context queryContext, Document document, List<Document> allDocuments) {
         List<String> wordVector = WordVector.getWordVector(query);
         wordVector = WordVector.removeMostCommonWords(wordVector);
 
@@ -59,6 +60,8 @@ public class RemembranceAgentSuggestionCalculator {
         double subjectBiased = subjectScore * SUBJECT_BIAS;
         double dateBiased = dateScore * DATE_BIAS;
 
-        return contentBiased + locationBiased + personBiased + subjectBiased + dateBiased;
+        double score = contentBiased + locationBiased + personBiased + subjectBiased + dateBiased;
+
+        return new ScoredDocument(score, document);
     }
 }

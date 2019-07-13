@@ -296,6 +296,8 @@ public class RemembranceAgentClient implements NativeKeyListener {
         sSuggestionsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Suggestions (from " + sLocalDiskDocumentsFolderPath + ")"),
                 BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
+        sSuggestionsPanel.invalidate();
+        sSuggestionsPanel.repaint();
     }
 
     private static void sendQueryToRemembranceAgent() {
@@ -323,7 +325,8 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
                 for (ScoredDocument doc : suggestions) {
                     final int yPos = startY;
-                    sSuggestionsPanel.add(new JButton(doc.getDocument().getUrl()) {{
+                    sSuggestionsPanel.add(new JButton() {{
+                        setText(doc.toShortString());
                         setBounds(25, yPos, 540, 15);
                         setPreferredSize(new Dimension(540, 15));
                         addActionListener(new ActionListener() {

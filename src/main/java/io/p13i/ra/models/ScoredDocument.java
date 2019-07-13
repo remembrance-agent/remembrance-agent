@@ -31,4 +31,8 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
     public String toString() {
         return "<ScoredDocument score=" + new DecimalFormat("#0.0000").format(getScore()) + ", document=" + getDocument().toString() + ">";
     }
+
+    public String toShortString() {
+        return String.format("(%04f) - %s", getScore(), getDocument().toShortString());
+    }
 }

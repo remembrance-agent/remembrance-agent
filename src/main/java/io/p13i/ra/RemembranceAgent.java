@@ -34,8 +34,8 @@ public class RemembranceAgent {
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(numSuggestions, Collections.reverseOrder());
         List<Document> allDocuments = this.documentDatabase.getAllDocuments();
         for (Document document : allDocuments) {
-            double score = RemembranceAgentSuggestionCalculator.compute(query, queryContext, document, allDocuments);
-            scoredDocuments.add(new ScoredDocument(score, document));
+            ScoredDocument scoredDoc = RemembranceAgentSuggestionCalculator.compute(query, queryContext, document, allDocuments);
+            scoredDocuments.add(scoredDoc);
         }
 
         // Get the top numSuggestions documents
