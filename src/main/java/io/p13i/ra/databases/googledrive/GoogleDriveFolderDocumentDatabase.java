@@ -32,7 +32,7 @@ import java.util.logging.Logger;
 
 public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
 
-    private static Logger LOGGER = LoggerUtils.getLogger(GoogleDriveFolderDocumentDatabase.class);
+    private static final Logger LOGGER = LoggerUtils.getLogger(GoogleDriveFolderDocumentDatabase.class);
 
     private static final String APPLICATION_NAME = "Remembrance Agent";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -70,8 +70,8 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, Cach
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
 
-    private String rootFolderID;
-    private List<GoogleDriveDocument> googleDriveDocuments;
+    private final String rootFolderID;
+    private final List<GoogleDriveDocument> googleDriveDocuments;
 
     public GoogleDriveFolderDocumentDatabase(String rootFolderID) {
         this.rootFolderID = rootFolderID;
@@ -140,12 +140,12 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, Cach
 
     @Override
     public List<Document> getAllDocuments() {
-        return ListUtils.castUp(this.googleDriveDocuments, Document.class);
+        return ListUtils.castUp(this.googleDriveDocuments);
     }
 
 
     @Override
     public List<CachableDocument> getDocumentsForSavingToCache() {
-        return ListUtils.castUp(this.googleDriveDocuments, CachableDocument.class);
+        return ListUtils.castUp(this.googleDriveDocuments);
     }
 }

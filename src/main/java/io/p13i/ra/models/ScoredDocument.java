@@ -5,16 +5,15 @@ import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.TFIDFCalculator;
 
 import java.text.DecimalFormat;
-import java.util.Comparator;
 import java.util.List;
 
 /**
  * Used in the document ranking process to hold both the document and the corresponding score for a given query
  */
 public final class ScoredDocument implements Comparable<ScoredDocument> {
-    private Query query;
-    private double score;
-    private Document document;
+    private final Query query;
+    private final double score;
+    private final Document document;
 
     public ScoredDocument(Query query, double score, Document document) {
         this.query = query;
@@ -44,7 +43,7 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
         return String.format("(%04f) [%s]: %s", getScore(), StringUtils.truncateWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.asString(getMatchingTermsInDocument()));
     }
 
-    public List<String> getMatchingTermsInDocument() {
+    private List<String> getMatchingTermsInDocument() {
         List<String> queryWordVector = query.getWordVector();
         List<String> documentWordVector = document.getWordVector();
         List<String> intersection = ListUtils.intersection(queryWordVector, documentWordVector);

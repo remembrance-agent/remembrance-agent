@@ -29,7 +29,7 @@ public class TFIDFCalculator {
      * @param term String represents a term
      * @return the inverse term frequency of term in documents
      */
-    public static double idf(Iterable<Document> docs, String term) {
+    private static double idf(Iterable<Document> docs, String term) {
         int n = 0;
         int N = 0;
         for (Document doc : docs) {

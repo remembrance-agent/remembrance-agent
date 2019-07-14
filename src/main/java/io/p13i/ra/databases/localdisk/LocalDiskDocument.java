@@ -14,8 +14,8 @@ import java.util.Date;
  * Represents one document on the local disk
  */
 public class LocalDiskDocument extends Document implements CachableDocument {
-    private Date lastModified;
-    private String filename;
+    private final Date lastModified;
+    private final String filename;
 
     public LocalDiskDocument(String content, String documentFilePath, String filename, Date lastModified) {
         super(content, new Context(null, null, filename, lastModified));
@@ -24,7 +24,7 @@ public class LocalDiskDocument extends Document implements CachableDocument {
         this.setURL(documentFilePath);
     }
 
-    public String getFilename() {
+    private String getFilename() {
         return filename;
     }
 

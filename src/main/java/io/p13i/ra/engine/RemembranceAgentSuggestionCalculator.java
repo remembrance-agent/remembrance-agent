@@ -11,7 +11,7 @@ import io.p13i.ra.utils.*;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class RemembranceAgentSuggestionCalculator {
+class RemembranceAgentSuggestionCalculator {
 
     private static final Logger LOGGER = LoggerUtils.getLogger( RemembranceAgentClient.class);
 

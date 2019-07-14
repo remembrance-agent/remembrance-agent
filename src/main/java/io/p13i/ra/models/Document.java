@@ -38,11 +38,11 @@ public class Document {
         return content;
     }
 
-    public String getContentTruncated() {
+    protected String getContentTruncated() {
         return getContentTruncated(CONTENT_TRUNCATED_MAX_LENGTH);
     }
 
-    public String getContentTruncated(int maxLength) {
+    private String getContentTruncated(int maxLength) {
         boolean includeEllipses = this.content.length() > maxLength;
         return content.substring(0, Math.min(this.content.length(), maxLength)) + (includeEllipses ? "..." : "");
     }

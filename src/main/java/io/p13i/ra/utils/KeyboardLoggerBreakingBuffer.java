@@ -12,7 +12,7 @@ public class KeyboardLoggerBreakingBuffer {
     private static final Logger LOGGER = LoggerUtils.getLogger(KeyboardLoggerBreakingBuffer.class);
     private static final long BREAKING_BUFFER_DURATION_SEC = 5;  // seconds
     private static final char DEFAULT_BREAKER_CHARACTER = '␣';
-    private LimitedCapacityBuffer<TimestampedCharacter> limitedCapacityBuffer;
+    private final LimitedCapacityBuffer<TimestampedCharacter> limitedCapacityBuffer;
 
     public KeyboardLoggerBreakingBuffer(int maximumCapacity) {
         this.limitedCapacityBuffer = new LimitedCapacityBuffer<>(maximumCapacity);
@@ -60,8 +60,8 @@ public class KeyboardLoggerBreakingBuffer {
     }
 
     class TimestampedCharacter {
-        Character character;
-        Date timestamp;
+        final Character character;
+        final Date timestamp;
 
         TimestampedCharacter(Character c) {
             this.character = c;

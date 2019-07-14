@@ -9,9 +9,9 @@ import java.util.List;
 
 public class MultiClassDocumentDatabase implements DocumentDatabase {
 
-    private List<DocumentDatabase> documentDatabases;
+    private final List<DocumentDatabase> documentDatabases;
 
-    public MultiClassDocumentDatabase() {
+    private MultiClassDocumentDatabase() {
         this.documentDatabases = new LinkedList<>();
     }
 

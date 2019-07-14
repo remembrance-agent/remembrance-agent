@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 public class LocalDiskDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(LocalDiskDocumentDatabase.class);
-    private String directory;
+    private final String directory;
     private List<LocalDiskDocument> documents;
 
     /**
@@ -58,7 +58,7 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase, CachableDocu
 
     @Override
     public List<Document> getAllDocuments() {
-        return ListUtils.castUp(this.documents, Document.class);
+        return ListUtils.castUp(this.documents);
     }
 
     public static void main(String[] args) {
@@ -73,6 +73,6 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase, CachableDocu
 
     @Override
     public List<CachableDocument> getDocumentsForSavingToCache() {
-        return ListUtils.castUp(this.documents, CachableDocument.class);
+        return ListUtils.castUp(this.documents);
     }
 }

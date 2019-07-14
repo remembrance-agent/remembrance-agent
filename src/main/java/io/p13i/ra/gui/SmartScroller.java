@@ -30,12 +30,13 @@ import java.awt.event.AdjustmentListener;
  *
  *  Similiar logic would apply for horizontal scrolling.
  */
-public class SmartScroller implements AdjustmentListener {
-    public final static int HORIZONTAL = 0;
-    public final static int VERTICAL = 1;
+@SuppressWarnings("FieldCanBeLocal")
+class SmartScroller implements AdjustmentListener {
+    private final static int HORIZONTAL = 0;
+    private final static int VERTICAL = 1;
 
-    public final static int START = 0;
-    public final static int END = 1;
+    private final static int START = 0;
+    private final static int END = 1;
 
     private int viewportPosition;
 
@@ -76,7 +77,7 @@ public class SmartScroller implements AdjustmentListener {
      *                         positioned as data is added.
      *                         Valid values are START and END
      */
-    public SmartScroller(JScrollPane scrollPane, int scrollDirection, int viewportPosition) {
+    private SmartScroller(JScrollPane scrollPane, int scrollDirection, int viewportPosition) {
         if (scrollDirection != HORIZONTAL
                 && scrollDirection != VERTICAL)
             throw new IllegalArgumentException("invalid scroll direction specified");

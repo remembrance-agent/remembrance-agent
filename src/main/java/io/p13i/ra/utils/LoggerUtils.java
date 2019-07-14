@@ -11,7 +11,7 @@ public class LoggerUtils {
     private static ConsoleHandler sDefaultConsoleHandler;
     private static FileHandler sDefaultFileHandler;
 
-    public static FileHandler getDefaultFileHandlerInstance() {
+    private static FileHandler getDefaultFileHandlerInstance() {
         if (sDefaultFileHandler == null) {
             try {
                 sDefaultFileHandler = new FileHandler(RemembranceAgentClient.sRAClientLogFilePath) {{
@@ -24,7 +24,7 @@ public class LoggerUtils {
         return sDefaultFileHandler;
     }
 
-    public static ConsoleHandler getDefaultConsoleHandlerInstance() {
+    private static ConsoleHandler getDefaultConsoleHandlerInstance() {
         if (sDefaultConsoleHandler == null) {
             sDefaultConsoleHandler = new ConsoleHandler() {{
                 setFormatter(new LoggerUtils.DefaultTimestampedFormatter());

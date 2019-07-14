@@ -37,7 +37,7 @@ public class ListUtils {
      * @param <T> of a given type
      * @return into a new ArrayList
      */
-    public static <T> List<T> fromArray(T[] array, Filter<T> filter) {
+    private static <T> List<T> fromArray(T[] array, Filter<T> filter) {
         List<T> list = new ArrayList<>(array.length);
         for (T t : array) {
             if (filter.shouldInclude(t)) {
@@ -48,6 +48,7 @@ public class ListUtils {
     }
 
     interface Filter<T> {
+        @SuppressWarnings("SameReturnValue")
         default boolean shouldInclude(T item) {
             return true;
         }
@@ -63,7 +64,7 @@ public class ListUtils {
         return intersection;
     }
 
-    public static <T> List<T> copy(List<T> source) {
+    private static <T> List<T> copy(List<T> source) {
         return new ArrayList<>(source);
     }
 
@@ -73,9 +74,8 @@ public class ListUtils {
         return copy.subList(0, Math.min(maxCount, copy.size()));
     }
 
-    public static <TSubClass extends TSuperClass, TSuperClass> List<TSuperClass> castUp(List<TSubClass> source, Class<TSuperClass> klass) {
-        List<TSuperClass> newList = new ArrayList<>();
-        newList.addAll(source);
+    public static <TSubClass extends TSuperClass, TSuperClass> List<TSuperClass> castUp(List<TSubClass> source) {
+        List<TSuperClass> newList = new ArrayList<>(source);
         return newList;
     }
 }

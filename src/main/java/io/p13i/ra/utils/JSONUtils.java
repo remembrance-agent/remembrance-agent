@@ -2,7 +2,7 @@ package io.p13i.ra.utils;
 
 import com.google.gson.*;
 
-public class JSONUtils {
+class JSONUtils {
     private static Gson getGson() {
         return new GsonBuilder()
                 .create();

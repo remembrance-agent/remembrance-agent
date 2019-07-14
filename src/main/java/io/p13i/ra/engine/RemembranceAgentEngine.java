@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 public class RemembranceAgentEngine {
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentEngine.class);
 
-    private DocumentDatabase documentDatabase;
+    private final DocumentDatabase documentDatabase;
 
     public RemembranceAgentEngine(DocumentDatabase documentDatabase) {
         this.documentDatabase = documentDatabase;

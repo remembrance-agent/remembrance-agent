@@ -5,10 +5,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -72,11 +71,11 @@ public class RemembranceAgentClient implements NativeKeyListener {
      * "local" variables
      */
     private static JFrame sJFrame;
-    private static JLabel sKeystrokeBufferLabel;
-    private static KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
+    private static final JLabel sKeystrokeBufferLabel;
+    private static final KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
     private static Timer sRemembranceAgentUpdateTimer = new Timer();
     private static RemembranceAgentEngine sRemembranceAgentEngine;
-    private static JPanel sSuggestionsPanel;
+    private static final JPanel sSuggestionsPanel;
     private static String sPriorQuery;
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
@@ -373,10 +372,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
                             }
                             if (error) {
                                 try {
-                                    Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getUrl()));
+                                    Desktop.getDesktop().browse(Objects.requireNonNull(URIUtils.get(doc.getDocument().getUrl())));
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
-                                    error = true;
                                 }
                             }
                         });

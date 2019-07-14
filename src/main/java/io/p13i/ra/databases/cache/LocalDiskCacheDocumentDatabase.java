@@ -11,9 +11,9 @@ import java.util.List;
 
 public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDiskCache {
 
-    public String cacheLocalDirectory;
-    public List<CachableDocument> cachableDocuments;
-    public List<Document> documents;
+    private final String cacheLocalDirectory;
+    private List<CachableDocument> cachableDocuments;
+    private List<Document> documents;
 
     public LocalDiskCacheDocumentDatabase(String cacheLocalDirectory) {
         this.cacheLocalDirectory = cacheLocalDirectory;

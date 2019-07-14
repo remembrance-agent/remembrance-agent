@@ -14,7 +14,7 @@ public class DateUtils {
     public static final String MINUTE_FORMAT = "mm";
     public static final String SECOND_FORMAT = "ss";
 
-    public static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
+    private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
 
     public static String formatDate(Date date, String pattern) {
@@ -25,7 +25,7 @@ public class DateUtils {
         return Calendar.getInstance().getTime();
     }
 
-    public static String nowAs(String pattern) {
+    private static String nowAs(String pattern) {
         return formatDate(now(), pattern);
     }
 

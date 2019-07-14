@@ -48,12 +48,11 @@ public class FileIO {
         }
     }
 
-    private static boolean createFile(String filePath) {
+    private static void createFile(String filePath) {
         try {
-            return new File(filePath).createNewFile();
+            new File(filePath).createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
-            return false;
         }
     }
 
@@ -116,11 +115,11 @@ public class FileIO {
         return allFilesRecursively;
     }
 
-    public static boolean isFolder(String absolutePath) {
+    private static boolean isFolder(String absolutePath) {
         return new File(absolutePath).isDirectory();
     }
 
-    public static boolean isFile(String absolutePath) {
+    private static boolean isFile(String absolutePath) {
         return new File(absolutePath).isFile();
     }
 
@@ -150,7 +149,7 @@ public class FileIO {
         return dirtyName.replaceAll("[^a-zA-Z0-9]", "");
     }
 
-    public static boolean delete(String cacheFileName) {
-        return new File(cacheFileName).delete();
+    public static void delete(String cacheFileName) {
+        new File(cacheFileName).delete();
     }
 }

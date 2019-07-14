@@ -6,10 +6,10 @@ import io.p13i.ra.models.Document;
 
 import java.util.Date;
 
-public class GoogleDriveDocument extends Document implements CachableDocument {
-    private String id;
-    private Date lastModified;
-    private String filename;
+class GoogleDriveDocument extends Document implements CachableDocument {
+    private final String id;
+    private final Date lastModified;
+    private final String filename;
 
     public GoogleDriveDocument(String id, String content, String filename, Date lastModified) {
         super(content, new Context(null, null, filename, lastModified));
