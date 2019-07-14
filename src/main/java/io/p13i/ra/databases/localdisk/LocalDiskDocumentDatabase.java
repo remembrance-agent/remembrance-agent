@@ -7,9 +7,7 @@ import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.LoggerUtils;
-import jdk.vm.ci.meta.Local;
 
-import javax.print.Doc;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +36,7 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase, CachableDocu
 
     @Override
     public void loadDocuments() {
-        this.documents = new ArrayList<LocalDiskDocument>();
+        this.documents = new ArrayList<>();
         try {
             List<String> documentsFilePaths = FileIO.listFolderFilesRecursive(this.directory);
             LOGGER.info("Found " + documentsFilePaths.size() + " documents in " + this.directory);

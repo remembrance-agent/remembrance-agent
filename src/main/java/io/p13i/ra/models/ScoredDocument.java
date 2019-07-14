@@ -48,19 +48,10 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
         List<String> queryWordVector = query.getWordVector();
         List<String> documentWordVector = document.getWordVector();
         List<String> intersection = ListUtils.intersection(queryWordVector, documentWordVector);
-        return ListUtils.selectLargest(intersection, 3, (new Comparator<String>() {
-            @Override
-            public int compare(String queryTerm1, String queryTerm2) {
-                double queryTerm1TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm1);
-                double queryTerm2TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm2);
-                if (queryTerm1TermFrequency > queryTerm2TermFrequency) {
-                    return 1;
-                } else if (queryTerm1TermFrequency < queryTerm2TermFrequency) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            }
+        return ListUtils.selectLargest(intersection, 3, ((queryTerm1, queryTerm2) -> {
+            double queryTerm1TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm1);
+            double queryTerm2TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm2);
+            return Double.compare(queryTerm1TermFrequency, queryTerm2TermFrequency);
         }));
     }
 }

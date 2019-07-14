@@ -6,18 +6,22 @@ import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
+import io.p13i.ra.utils.LoggerUtils;
 import io.p13i.ra.utils.ResourceUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.logging.Logger;
 
 
 /**
  * Core RA implementation and wrapper functions
  */
 public class RemembranceAgentEngine {
+    private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentEngine.class);
+
     private DocumentDatabase documentDatabase;
 
     public RemembranceAgentEngine(DocumentDatabase documentDatabase) {
@@ -31,13 +35,17 @@ public class RemembranceAgentEngine {
     }
 
     public List<ScoredDocument> determineSuggestions(Query query) {
-        // PriorityQueue
+        // PriorityQueue sorts low -> high, we need to invert that
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
+
+        ConfusionMatrix confusionMatrix = new ConfusionMatrix();
         List<Document> allDocuments = this.documentDatabase.getAllDocuments();
         for (Document document : allDocuments) {
-            ScoredDocument scoredDoc = RemembranceAgentSuggestionCalculator.compute(query, document, allDocuments);
+            ScoredDocument scoredDoc = RemembranceAgentSuggestionCalculator.compute(query, document, allDocuments, confusionMatrix);
             scoredDocuments.add(scoredDoc);
         }
+
+        LOGGER.info("\n" + confusionMatrix.toString());
 
         // Get the top numSuggestions documents
         List<ScoredDocument> suggestedDocuments = new ArrayList<>(query.getNumSuggestions());

@@ -17,7 +17,7 @@ public class LimitedCapacityBuffer<T> {
 
     public LimitedCapacityBuffer(int maximumSize) {
         this.maximumSize = maximumSize;
-        queue = new LinkedList<T>();
+        queue = new LinkedList<>();
     }
 
     public void add(T element) {

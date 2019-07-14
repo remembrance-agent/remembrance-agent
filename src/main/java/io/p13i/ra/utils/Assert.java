@@ -1,7 +1,5 @@
 package io.p13i.ra.utils;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class Assert {
     public static void that(boolean condition) {
         that(condition, "Assertion rejected");

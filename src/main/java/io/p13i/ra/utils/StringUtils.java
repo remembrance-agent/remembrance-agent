@@ -1,6 +1,6 @@
 package io.p13i.ra.utils;
 
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -17,14 +17,14 @@ public class StringUtils {
 
     /**
      * https://javarevisited.blogspot.com/2013/03/generate-md5-hash-in-java-string-byte-array-example-tutorial.html
-     * @param message
-     * @return
+     * @param message The longer string to process
+     * @return The MD5 digest
      */
     public static String md5(String message) {
         String digest;
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(message.getBytes("UTF-8"));
+            byte[] hash = md.digest(message.getBytes(StandardCharsets.UTF_8));
 
             //converting byte array to Hexadecimal String
             StringBuilder sb = new StringBuilder(2 * hash.length);
@@ -34,7 +34,7 @@ public class StringUtils {
 
             digest = sb.toString();
 
-        } catch (UnsupportedEncodingException | NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
 

@@ -8,9 +8,10 @@ import java.util.logging.*;
 
 public class LoggerUtils {
 
+    private static ConsoleHandler sDefaultConsoleHandler;
     private static FileHandler sDefaultFileHandler;
 
-    public static FileHandler getDefaultFileHandler() {
+    public static FileHandler getDefaultFileHandlerInstance() {
         if (sDefaultFileHandler == null) {
             try {
                 sDefaultFileHandler = new FileHandler(RemembranceAgentClient.sRAClientLogFilePath) {{
@@ -23,13 +24,21 @@ public class LoggerUtils {
         return sDefaultFileHandler;
     }
 
+    public static ConsoleHandler getDefaultConsoleHandlerInstance() {
+        if (sDefaultConsoleHandler == null) {
+            sDefaultConsoleHandler = new ConsoleHandler() {{
+                setFormatter(new LoggerUtils.DefaultTimestampedFormatter());
+            }};
+        }
+        return sDefaultConsoleHandler;
+    }
+
+
     public static <T> Logger getLogger(Class<T> forClass) {
         Logger LOGGER = Logger.getLogger(forClass.getName());
         LOGGER.setLevel(Level.INFO);
-        LOGGER.addHandler(new ConsoleHandler() {{
-            setFormatter(new LoggerUtils.DefaultTimestampedFormatter());
-        }});
-        LOGGER.addHandler(getDefaultFileHandler());
+        LOGGER.addHandler(getDefaultConsoleHandlerInstance());
+        LOGGER.addHandler(getDefaultFileHandlerInstance());
         return LOGGER;
     }
 
@@ -38,11 +47,7 @@ public class LoggerUtils {
 
         @Override
         public synchronized String format(LogRecord lr) {
-            return String.format(format,
-                    new Date(lr.getMillis()),
-                    lr.getLevel().getLocalizedName(),
-                    lr.getMessage()
-            );
+            return String.format(format, new Date(lr.getMillis()), lr.getLevel().getLocalizedName(), lr.getMessage());
         }
     }
 }

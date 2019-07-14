@@ -97,10 +97,9 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, Cach
         try {
             // Build a new authorized API client service.
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+            return new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
-            return service;
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

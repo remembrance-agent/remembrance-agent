@@ -1,7 +1,6 @@
 package io.p13i.ra.engine;
 
 import io.p13i.ra.RemembranceAgentClient;
-import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
@@ -26,7 +25,7 @@ public class RemembranceAgentSuggestionCalculator {
         Assert.equal(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);
     }
 
-    public static ScoredDocument compute(Query query, Document document, List<Document> allDocuments) {
+    public static ScoredDocument compute(Query query, Document document, List<Document> allDocuments, ConfusionMatrix confusionMatrix) {
         List<String> wordVector = query.getWordVector();
 
         LOGGER.info("Computed query word vector: '" + ListUtils.asString(wordVector) + "'");
@@ -34,14 +33,17 @@ public class RemembranceAgentSuggestionCalculator {
         double wordScoreSum = 0.0;
         for (String word : wordVector) {
             double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
-            LOGGER.info(String.format("Ranked word '%s' as %04f in %s", word, wordScore, document.getContext().getSubject()));
+
+            confusionMatrix.add(word, document.getContext().getSubject(), wordScore);
 
             if (Double.isNaN(wordScore)) {
-                wordScore = 0.0;
+                // adding NaN to a double will cause the double to become NaN
+                continue;
             }
 
             wordScoreSum += wordScore;
         }
+
 
         // Normalize
         double contentScore = wordScoreSum / (double) wordVector.size();

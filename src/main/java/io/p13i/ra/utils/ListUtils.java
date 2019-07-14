@@ -38,10 +38,10 @@ public class ListUtils {
      * @return into a new ArrayList
      */
     public static <T> List<T> fromArray(T[] array, Filter<T> filter) {
-        List<T> list = new ArrayList<T>(array.length);
-        for (int i = 0; i < array.length; i++) {
-            if (filter.shouldInclude(array[i])) {
-                list.add(array[i]);
+        List<T> list = new ArrayList<>(array.length);
+        for (T t : array) {
+            if (filter.shouldInclude(t)) {
+                list.add(t);
             }
         }
         return list;
@@ -64,20 +64,18 @@ public class ListUtils {
     }
 
     public static <T> List<T> copy(List<T> source) {
-        return new ArrayList<T>(source);
+        return new ArrayList<>(source);
     }
 
     public static <T extends Comparable<T>> List<T> selectLargest(List<T> list, int maxCount, Comparator<T> comparator) {
         List<T> copy = copy(list);
-        Collections.sort(copy, Collections.reverseOrder(comparator));
+        copy.sort(Collections.reverseOrder(comparator));
         return copy.subList(0, Math.min(maxCount, copy.size()));
     }
 
     public static <TSubClass extends TSuperClass, TSuperClass> List<TSuperClass> castUp(List<TSubClass> source, Class<TSuperClass> klass) {
         List<TSuperClass> newList = new ArrayList<>();
-        for (TSubClass item : source) {
-            newList.add((TSuperClass) item);
-        }
+        newList.addAll(source);
         return newList;
     }
 }

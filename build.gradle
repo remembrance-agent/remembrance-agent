@@ -37,4 +37,7 @@ dependencies {
     
     // GSON
     compile 'com.google.code.gson:gson:2.8.5'
+
+    // ASCII tables
+    compile 'de.vandermeer:asciitable:0.3.2'
 }

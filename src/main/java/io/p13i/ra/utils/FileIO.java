@@ -1,9 +1,11 @@
 package io.p13i.ra.utils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 public class FileIO {
@@ -17,7 +19,7 @@ public class FileIO {
     public static String read(String filePath) {
         LOGGER.info("READ: " + filePath);
         try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath),"utf-8"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8));
 
             StringBuilder stringBuilder = new StringBuilder();
             String line;
@@ -48,8 +50,7 @@ public class FileIO {
 
     private static boolean createFile(String filePath) {
         try {
-            new File(filePath).createNewFile();
-            return true;
+            return new File(filePath).createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -67,7 +68,7 @@ public class FileIO {
     private static List<String> ls(String folderPath) {
         List<String> items = new ArrayList<>();
         File[] files = new File(folderPath).listFiles();
-        for (File file : files) {
+        for (File file : Objects.requireNonNull(files)) {
             items.add(file.getAbsolutePath());
         }
         return items;
