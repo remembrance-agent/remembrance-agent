@@ -34,18 +34,22 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase {
     @Override
     public void loadDocuments() {
         this.documents = new ArrayList<>();
-        List<String> documentsFilePaths = FileIO.listFolderFilesRecursive(this.directory);
-        LOGGER.info("Found " + documentsFilePaths.size() + " documents in " + this.directory);
-        for (String documentFilePath : documentsFilePaths) {
-            LOGGER.info("Examining file: " + documentFilePath);
-            if (documentFilePath.endsWith(".txt") || documentFilePath.endsWith(".md")) {
-                String fileName = FileIO.getFileName(documentFilePath);
-                String fileContents = FileIO.read(documentFilePath);
-                Date lastModified = FileIO.getLastModifiedDate(documentFilePath);
-                this.documents.add(new LocalDiskDocument(fileContents, documentFilePath, fileName, lastModified));
-            } else {
-                LOGGER.info("Skipping file because it doesn't end with .txt: " + documentFilePath);
+        try {
+            List<String> documentsFilePaths = FileIO.listFolderFilesRecursive(this.directory);
+            LOGGER.info("Found " + documentsFilePaths.size() + " documents in " + this.directory);
+            for (String documentFilePath : documentsFilePaths) {
+                LOGGER.info("Examining file: " + documentFilePath);
+                if (documentFilePath.endsWith(".txt") || documentFilePath.endsWith(".md")) {
+                    String fileName = FileIO.getFileName(documentFilePath);
+                    String fileContents = FileIO.read(documentFilePath);
+                    Date lastModified = FileIO.getLastModifiedDate(documentFilePath);
+                    this.documents.add(new LocalDiskDocument(fileContents, documentFilePath, fileName, lastModified));
+                } else {
+                    LOGGER.info("Skipping file because it doesn't end with .txt: " + documentFilePath);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

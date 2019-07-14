@@ -16,6 +16,7 @@ import java.util.prefs.Preferences;
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
+import io.p13i.ra.databases.multiclass.MultiClassDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
@@ -42,10 +43,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final int GUI_PADDING_RIGHT = 10;
     private static final int GUI_BORDER_PADDING = 5;
     private static final Font GUI_FONT = new Font("monospaced", Font.PLAIN, 12);
-    private static final int GUI_CLEAR_BUFFER_BUTTON_WIDTH = 120;
 
     private static final int KEYBOARD_BUFFER_SIZE = 60;
-    private static final int RA_UPDATE_PERIOD_MS = 500;
+    private static final int RA_UPDATE_PERIOD_MS = 5000;
     private static final int RA_NUMBER_SUGGESTIONS = 2;
 
     private static final String KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME = "KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME";
@@ -63,6 +63,12 @@ public class RemembranceAgentClient implements NativeKeyListener {
             LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME,
             /* default: */ ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents"));
 
+    private static final String GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME = "GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME";
+    private static String sGoogleDriveFolderID= Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
+            GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME,
+            /* default: */ null
+    );
+
     /**
      * "local" variables
      */
@@ -75,6 +81,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static String sPriorQuery;
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
+    private static JTextField sGoogleDriveFolderIDTextField;
 
     public static void main(String[] args) {
 
@@ -111,9 +118,20 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                             Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
                                             prefs.put(LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME, sLocalDiskDocumentsFolderPath = fileChooser.getSelectedFile().toPath().toString());
                                             LOGGER.info("Selected directory: " + sLocalDiskDocumentsFolderPath);
-
-                                            initializeRemembranceAgent();
                                             break;
+                                    }
+                                }
+                            });
+                        }});
+                        add(new JMenuItem("Set Google Drive folder ID...") {{
+                            addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder ID (leave blank to cancel):", sGoogleDriveFolderID);
+                                    if (inputId != null && inputId.length() > 0) {
+                                        Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
+                                        prefs.put(GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME, sGoogleDriveFolderID = inputId);
+                                        LOGGER.info("Set Google Drive Folder ID: " + sGoogleDriveFolderID);
                                     }
                                 }
                             });
@@ -244,15 +262,6 @@ public class RemembranceAgentClient implements NativeKeyListener {
         }
         LOGGER.info("Added native key logger.");
 
-        // Start the RA task
-        sRemembranceAgentUpdateTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sendQueryToRemembranceAgent();
-            }
-        }, RA_UPDATE_PERIOD_MS, RA_UPDATE_PERIOD_MS);
-        LOGGER.info("Scheduled Remembrance Agent update task.");
-
         sJFrame.setVisible(true);
     }
 
@@ -275,7 +284,16 @@ public class RemembranceAgentClient implements NativeKeyListener {
         LOGGER.info("Got directory path: " + sLocalDiskDocumentsFolderPath);
 //        DocumentDatabase database = new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath);
 
-        DocumentDatabase database = new GoogleDriveFolderDocumentDatabase("1uUf6inWnUcYmeEDmPg8dFJKQ56BIJA6H");
+        MultiClassDocumentDatabase database = new MultiClassDocumentDatabase();
+
+        if (sGoogleDriveFolderID != null) {
+            database.addDocumentDatabase(new GoogleDriveFolderDocumentDatabase(sGoogleDriveFolderID));
+        }
+
+        if (sLocalDiskDocumentsFolderPath != null) {
+            database.addDocumentDatabase(new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath));
+        }
+
         LOGGER.info("Using " + database.getName());
 
         sRemembranceAgentEngine = new RemembranceAgentEngine(database);
@@ -289,10 +307,26 @@ public class RemembranceAgentClient implements NativeKeyListener {
         }
 
         sSuggestionsPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Suggestions (from " + sLocalDiskDocumentsFolderPath + ")"),
+                BorderFactory.createTitledBorder("Suggestions (from " + database.getName() + ")"),
                 BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
         sSuggestionsPanel.invalidate();
         sSuggestionsPanel.repaint();
+
+        // Start the RA task
+        if (sRemembranceAgentUpdateTimer != null) {
+            sRemembranceAgentUpdateTimer.cancel();
+            sRemembranceAgentUpdateTimer.purge();
+            sRemembranceAgentUpdateTimer = null;
+        }
+
+        sRemembranceAgentUpdateTimer = new Timer();
+        sRemembranceAgentUpdateTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                sendQueryToRemembranceAgent();
+            }
+        }, RA_UPDATE_PERIOD_MS, RA_UPDATE_PERIOD_MS);
+        LOGGER.info("Scheduled Remembrance Agent update task.");
     }
 
     private static void sendQueryToRemembranceAgent() {
