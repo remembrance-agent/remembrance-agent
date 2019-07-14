@@ -9,19 +9,13 @@ Java package for Remembrance Agents! Based on Rhodes/Starner
 ./gradlew assemble
 ```
 
-### Running
-
-#### Running for the first time
+### Installing as Launch Daemon (macOS)
 
 ```bash
-java -jar build/libs/remembrance-agent-v1.0-all.jar
+sudo bash ./bin/install
 ```
 
-#### Running from cache
-
-```bash
-java -jar build/libs/remembrance-agent-v1.0-all.jar --use-cache
-```
+Now you can run `ra-desktop` from any where. Use the flag `--use-cache` to save on redundant calls to time-expensive data stores like Google Drive.
 
 ## Screenshots
 

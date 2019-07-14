@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e -o pipefail
+
+sudo java -jar /usr/local/bin/remembrance-agent-v1.0-all.jar $@

@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e -o pipefail
+
+JAR_PATH='./build/libs/remembrance-agent-v1.0-all.jar'
+INSTALL_DIR='/usr/local/bin'
+RUN_EXEC='./bin/ra-desktop'
+LAUNCH_DAEMONS_DIR='/Library/LaunchDaemons'
+PLIST='io.p13i.ra.plist'
+
+echo ">>> BUILDING WITH GRADLE"
+./gradlew build
+
+echo ">>> MAKING INSTALL DIRECTORIES"
+mkdir -p ${INSTALL_DIR}
+mkdir -p ${LAUNCH_DAEMONS_DIR}
+
+echo ">>> COPYING JAR FILE AND RUN COMMAND"
+cp ${JAR_PATH} ${INSTALL_DIR}
+sudo cp ${RUN_EXEC} ${INSTALL_DIR}
+sudo chmod +x /usr/local/bin/ra-desktop
+
+echo ">>> COPYING PLIST TO INSTALL DIRECTORY"
+cp ${PLIST} ${INSTALL_DIR}
+
+echo ">>> INSTALLED"

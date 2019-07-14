@@ -67,7 +67,7 @@ public class FileIO {
     private static List<String> ls(String folderPath) {
         List<String> items = new ArrayList<>();
         File[] files = new File(folderPath).listFiles();
-        for (File file : Objects.requireNonNull(files)) {
+        for (File file : files) {
             items.add(file.getAbsolutePath());
         }
         return items;

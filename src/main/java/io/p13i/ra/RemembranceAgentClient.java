@@ -372,7 +372,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                             }
                             if (error) {
                                 try {
-                                    Desktop.getDesktop().browse(Objects.requireNonNull(URIUtils.get(doc.getDocument().getUrl())));
+                                    Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getUrl()));
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
