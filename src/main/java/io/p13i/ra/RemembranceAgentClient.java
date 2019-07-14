@@ -71,11 +71,11 @@ public class RemembranceAgentClient implements NativeKeyListener {
      * "local" variables
      */
     private static JFrame sJFrame;
-    private static final JLabel sKeystrokeBufferLabel;
+    private static JLabel sKeystrokeBufferLabel;
     private static final KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
     private static Timer sRemembranceAgentUpdateTimer = new Timer();
     private static RemembranceAgentEngine sRemembranceAgentEngine;
-    private static final JPanel sSuggestionsPanel;
+    private static JPanel sSuggestionsPanel;
     private static String sPriorQuery;
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
