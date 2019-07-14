@@ -15,8 +15,6 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import io.p13i.ra.databases.DocumentDatabase;
-import io.p13i.ra.databases.localdisk.LocalDiskDocument;
-import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.LoggerUtils;
 
@@ -32,56 +30,78 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
 
     private static Logger LOGGER = LoggerUtils.getLogger(GoogleDriveFolderDocumentDatabase.class);
 
-    private String parentFolderID;
+    private String rootFolderID;
     private List<Document> documents;
 
-    public GoogleDriveFolderDocumentDatabase(String parentFolderID) {
-        this.parentFolderID = parentFolderID;
+    public GoogleDriveFolderDocumentDatabase(String rootFolderID) {
+        this.rootFolderID = rootFolderID;
         this.documents = new ArrayList<>();
     }
 
     @Override
     public String getName() {
-        return "Google Drive folder: " + this.parentFolderID;
+        return "Google Drive folder: " + this.rootFolderID;
     }
 
     @Override
     public void loadDocuments() {
+        try {
+            this.loadDocumentsRecursive(getClient(), this.documents, this.rootFolderID, /* recursive: */ true);
+        } catch (IOException e) {
+            LOGGER.warning(e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    private Drive getClient() {
         try {
             // Build a new authorized API client service.
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
+            return service;
+        } catch (IOException | GeneralSecurityException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 
-            FileList result = service.files().list()
-                    .setQ("'" + this.parentFolderID + "' in parents")
+    private static void loadDocumentsRecursive(Drive service, List<Document> documents, String parentFolderID, boolean recursive) throws IOException {
+        FileList filesList = service.files().list()
+                .setQ("'" + parentFolderID + "' in parents and mimeType != 'application/vnd.google-apps.folder'")
+                .setSpaces("drive")
+                .setFields("nextPageToken, files(id, name, parents)")
+                .execute();
+
+        for (File file : filesList.getFiles()) {
+
+            LOGGER.info("Loading: " + file.getName());
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            service.files().export(file.getId(), "text/plain")
+                    .executeMediaAndDownloadTo(outputStream);
+            LOGGER.info("Done.");
+
+            String fileContents = new String(outputStream.toByteArray(), Charset.defaultCharset());
+
+            Document document = new Document(fileContents);
+            document.setURL(String.format("https://docs.google.com/document/d/" + file.getId() + "/edit"));
+
+            documents.add(document);
+        }
+
+        if (recursive) {
+            FileList foldersList = service.files().list()
+                    .setQ("'" + parentFolderID + "' in parents and mimeType = 'application/vnd.google-apps.folder'")
                     .setSpaces("drive")
                     .setFields("nextPageToken, files(id, name, parents)")
                     .execute();
-
-            for (File file : result.getFiles()) {
-
-                LOGGER.info("Loading: " + file.getName());
-                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-                service.files().export(file.getId(), "text/plain")
-                        .executeMediaAndDownloadTo(outputStream);
-                LOGGER.info("Done.");
-
-                String fileContents = new String(outputStream.toByteArray(), Charset.defaultCharset());
-
-                Document document = new Document(fileContents);
-                document.setURL(String.format("https://docs.google.com/document/d/" + file.getId() + "/edit"));
-
-                this.documents.add(document);
-
+            for (File file : foldersList.getFiles()) {
+                // recurse
+                loadDocumentsRecursive(service, documents, file.getId(), /* recursive: */ true);
             }
-
-        } catch (IOException e) {
-
-        } catch (GeneralSecurityException e) {
-
         }
+
     }
 
     @Override
