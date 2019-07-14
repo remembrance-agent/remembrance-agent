@@ -45,8 +45,8 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final Font GUI_FONT = new Font("monospaced", Font.PLAIN, 12);
 
     private static final int KEYBOARD_BUFFER_SIZE = 60;
-    private static final int RA_UPDATE_PERIOD_MS = 5000;
-    private static final int RA_NUMBER_SUGGESTIONS = 2;
+    private static final int RA_UPDATE_PERIOD_MS = 2500;
+    private static final int RA_NUMBER_SUGGESTIONS = 3;
 
     private static final String KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME = "KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME";
     private static String sKeystrokesLogFilePath = Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
