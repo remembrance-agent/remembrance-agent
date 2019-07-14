@@ -97,8 +97,19 @@ public class RemembranceAgentClient implements NativeKeyListener {
                             addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    initializeRemembranceAgent(false);
+                                    initializeRemembranceAgent(true);
                                     JOptionPane.showMessageDialog(sJFrame, "Reinitialized!");
+                                }
+                            });
+                        }});
+                        add(new JSeparator());
+                        add(new JMenuItem("Invalidate/reload cache") {{
+                            addActionListener(new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent e) {
+                                    initializeRemembranceAgent(false);
+                                    sJFrame.setEnabled(false);
+                                    JOptionPane.showMessageDialog(sJFrame, "Reinitialized with new cache!");
                                 }
                             });
                         }});
@@ -196,7 +207,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                             Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
                                             prefs.put(KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME, sKeystrokesLogFilePath = fileChooser.getSelectedFile().toPath().toString() + File.separator + "keystrokes.log");
                                             LOGGER.info("Selected keystrokes.log file directory: " + sKeystrokesLogFilePath);
-                                            sKeystrokeBufferLabel.setText("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")");
+                                            sKeystrokeBufferLabel.setBorder(BorderFactory.createCompoundBorder(
+                                                    BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")"),
+                                                    BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
                                             break;
                                     }
                                 }
@@ -282,11 +295,16 @@ public class RemembranceAgentClient implements NativeKeyListener {
         sBreakingBuffer.addCharacter(characterToAdd);
         LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
         sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
-
     }
 
     private static void initializeRemembranceAgent(boolean useCache) {
-        LOGGER.info("Got directory path: " + sLocalDiskDocumentsFolderPath);
+
+        // Clear the timer
+        if (sRemembranceAgentUpdateTimer != null) {
+            sRemembranceAgentUpdateTimer.cancel();
+            sRemembranceAgentUpdateTimer.purge();
+            sRemembranceAgentUpdateTimer = null;
+        }
 
         LocalDiskCacheDocumentDatabase database = new LocalDiskCacheDocumentDatabase("/Users/p13i/Documents/RA/~cache");
 
@@ -318,12 +336,6 @@ public class RemembranceAgentClient implements NativeKeyListener {
         sSuggestionsPanel.repaint();
 
         // Start the RA task
-        if (sRemembranceAgentUpdateTimer != null) {
-            sRemembranceAgentUpdateTimer.cancel();
-            sRemembranceAgentUpdateTimer.purge();
-            sRemembranceAgentUpdateTimer = null;
-        }
-
         sRemembranceAgentUpdateTimer = new Timer();
         sRemembranceAgentUpdateTimer.schedule(new TimerTask() {
             @Override
