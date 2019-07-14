@@ -1,10 +1,10 @@
 package io.p13i.ra.models;
 
 import io.p13i.ra.utils.ListUtils;
+import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.TFIDFCalculator;
 
 import java.text.DecimalFormat;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -41,7 +41,7 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
     }
 
     public String toShortString() {
-        return String.format("(%04f) [%s]: %s", getScore(), getDocument().toTruncatedUrlString(), ListUtils.asString(getMatchingTermsInDocument()));
+        return String.format("(%04f) [%s]: %s", getScore(), StringUtils.truncateWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.asString(getMatchingTermsInDocument()));
     }
 
     public List<String> getMatchingTermsInDocument() {

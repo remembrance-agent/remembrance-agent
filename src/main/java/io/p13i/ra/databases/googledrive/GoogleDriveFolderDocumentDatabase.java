@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -46,7 +47,7 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
     @Override
     public void loadDocuments() {
         try {
-            this.loadDocumentsRecursive(getClient(), this.documents, this.rootFolderID, /* recursive: */ true);
+            this.loadDocumentsRecursive(getClient(), this.documents, this.rootFolderID /* recursive: */);
         } catch (IOException e) {
             LOGGER.warning(e.toString());
             e.printStackTrace();
@@ -67,11 +68,11 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
         }
     }
 
-    private static void loadDocumentsRecursive(Drive service, List<Document> documents, String parentFolderID, boolean recursive) throws IOException {
+    private static void loadDocumentsRecursive(Drive service, List<Document> documents, String parentFolderID) throws IOException {
         FileList filesList = service.files().list()
                 .setQ("'" + parentFolderID + "' in parents and mimeType != 'application/vnd.google-apps.folder'")
                 .setSpaces("drive")
-                .setFields("nextPageToken, files(id, name, parents)")
+                .setFields("nextPageToken, files(id, name, parents, modifiedTime)")
                 .execute();
 
         for (File file : filesList.getFiles()) {
@@ -84,22 +85,19 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
 
             String fileContents = new String(outputStream.toByteArray(), Charset.defaultCharset());
 
-            Document document = new Document(fileContents);
-            document.setURL(String.format("https://docs.google.com/document/d/" + file.getId() + "/edit"));
+            Document document = new GoogleDriveDocument(file.getId(), fileContents, file.getName(), new Date(file.getModifiedTime().getValue()));
 
             documents.add(document);
         }
 
-        if (recursive) {
-            FileList foldersList = service.files().list()
-                    .setQ("'" + parentFolderID + "' in parents and mimeType = 'application/vnd.google-apps.folder'")
-                    .setSpaces("drive")
-                    .setFields("nextPageToken, files(id, name, parents)")
-                    .execute();
-            for (File file : foldersList.getFiles()) {
-                // recurse
-                loadDocumentsRecursive(service, documents, file.getId(), /* recursive: */ true);
-            }
+        FileList foldersList = service.files().list()
+                .setQ("'" + parentFolderID + "' in parents and mimeType = 'application/vnd.google-apps.folder'")
+                .setSpaces("drive")
+                .setFields("nextPageToken, files(id)")
+                .execute();
+        for (File file : foldersList.getFiles()) {
+            // recurse
+            loadDocumentsRecursive(service, documents, file.getId() /* recursive: */);
         }
 
     }

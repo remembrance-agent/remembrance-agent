@@ -37,7 +37,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
      */
     private static final int GUI_WIDTH = 600;
     private static final int GUI_HEIGHT = 220;
-    private static final int GUI_LINE_HEIGHT = 50;
+    private static final int GUI_LINE_HEIGHT = 40;
     private static final int GUI_PADDING_LEFT = 10;
     private static final int GUI_PADDING_TOP = 10;
     private static final int GUI_PADDING_RIGHT = 10;
