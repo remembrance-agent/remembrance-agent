@@ -5,7 +5,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 public class FileIO {
@@ -25,6 +24,7 @@ public class FileIO {
             String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
+                stringBuilder.append("\n");
             }
 
             return stringBuilder.toString();
