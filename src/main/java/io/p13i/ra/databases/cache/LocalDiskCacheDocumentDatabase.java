@@ -2,19 +2,14 @@ package io.p13i.ra.databases.cache;
 
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
-import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.FileIO;
-import io.p13i.ra.utils.JSONUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDiskCache {
-
-    public static final String METADATA_FILENAME = "~metadata.json";
 
     public String cacheLocalDirectory;
     public List<CachableDocument> cachableDocuments;
