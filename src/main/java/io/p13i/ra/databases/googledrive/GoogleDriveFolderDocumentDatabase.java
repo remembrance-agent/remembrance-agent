@@ -15,7 +15,10 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.cache.CachableDocument;
+import io.p13i.ra.databases.cache.CachableDocumentDatabase;
 import io.p13i.ra.models.Document;
+import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.LoggerUtils;
 
 import java.io.*;
@@ -27,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
+public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
 
     private static Logger LOGGER = LoggerUtils.getLogger(GoogleDriveFolderDocumentDatabase.class);
 
@@ -68,11 +71,11 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
     }
 
     private String rootFolderID;
-    private List<Document> documents;
+    private List<GoogleDriveDocument> googleDriveDocuments;
 
     public GoogleDriveFolderDocumentDatabase(String rootFolderID) {
         this.rootFolderID = rootFolderID;
-        this.documents = new ArrayList<>();
+        this.googleDriveDocuments = new ArrayList<>();
     }
 
     @Override
@@ -83,7 +86,7 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
     @Override
     public void loadDocuments() {
         try {
-            this.loadDocumentsRecursive(getClient(), this.documents, this.rootFolderID /* recursive: */);
+            loadDocumentsRecursive(getClient(), this.googleDriveDocuments, this.rootFolderID /* recursive: */);
         } catch (IOException e) {
             LOGGER.warning(e.toString());
             e.printStackTrace();
@@ -104,7 +107,7 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
         }
     }
 
-    private static void loadDocumentsRecursive(Drive service, List<Document> documents, String parentFolderID) throws IOException {
+    private static void loadDocumentsRecursive(Drive service, List<GoogleDriveDocument> documents, String parentFolderID) throws IOException {
         FileList filesList = service.files().list()
                 .setQ("'" + parentFolderID + "' in parents and mimeType != 'application/vnd.google-apps.folder'")
                 .setSpaces("drive")
@@ -121,9 +124,7 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
 
             String fileContents = new String(outputStream.toByteArray(), Charset.defaultCharset());
 
-            Document document = new GoogleDriveDocument(file.getId(), fileContents, file.getName(), new Date(file.getModifiedTime().getValue()));
-
-            documents.add(document);
+            documents.add(new GoogleDriveDocument(file.getId(), fileContents, file.getName(), new Date(file.getModifiedTime().getValue())));
         }
 
         FileList foldersList = service.files().list()
@@ -140,8 +141,12 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase {
 
     @Override
     public List<Document> getAllDocuments() {
-        return this.documents;
+        return ListUtils.castUp(this.googleDriveDocuments, Document.class);
     }
 
 
+    @Override
+    public List<CachableDocument> getDocumentsForSavingToCache() {
+        return ListUtils.castUp(this.googleDriveDocuments, CachableDocument.class);
+    }
 }

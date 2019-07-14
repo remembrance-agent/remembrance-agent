@@ -1,5 +1,6 @@
 package io.p13i.ra.databases.localdisk;
 
+import io.p13i.ra.databases.cache.CachableDocument;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.DateUtils;
@@ -12,7 +13,7 @@ import java.util.Date;
 /**
  * Represents one document on the local disk
  */
-public class LocalDiskDocument extends Document {
+public class LocalDiskDocument extends Document implements CachableDocument {
     private Date lastModified;
     private String filename;
 

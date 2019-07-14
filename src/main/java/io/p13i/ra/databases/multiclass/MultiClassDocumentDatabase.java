@@ -1,7 +1,10 @@
 package io.p13i.ra.databases.multiclass;
 
 import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.cache.CachableDocument;
+import io.p13i.ra.databases.cache.CachableDocumentDatabase;
 import io.p13i.ra.models.Document;
+import io.p13i.ra.utils.ListUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

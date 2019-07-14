@@ -5,7 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,10 +13,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
-import io.p13i.ra.databases.multiclass.MultiClassDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
@@ -64,7 +63,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
             /* default: */ ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents"));
 
     private static final String GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME = "GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME";
-    private static String sGoogleDriveFolderID= Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
+    private static String sGoogleDriveFolderID = Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
             GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME,
             /* default: */ null
     );
@@ -81,7 +80,6 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static String sPriorQuery;
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
-    private static JTextField sGoogleDriveFolderIDTextField;
 
     public static void main(String[] args) {
 
@@ -99,7 +97,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                             addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    initializeRemembranceAgent();
+                                    initializeRemembranceAgent(false);
                                     JOptionPane.showMessageDialog(sJFrame, "Reinitialized!");
                                 }
                             });
@@ -251,7 +249,14 @@ public class RemembranceAgentClient implements NativeKeyListener {
         logger.setLevel(Level.WARNING);
 
         // init!
-        initializeRemembranceAgent();
+        System.out.println(ListUtils.asString(Arrays.asList(args)));
+
+        boolean useCache = false;
+        if (args.length > 0 && args[0].equals("--use-cache")) {
+            useCache = true;
+        }
+
+        initializeRemembranceAgent(useCache);
 
         // Add the key logger
         try {
@@ -280,18 +285,18 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
     }
 
-    private static void initializeRemembranceAgent() {
+    private static void initializeRemembranceAgent(boolean useCache) {
         LOGGER.info("Got directory path: " + sLocalDiskDocumentsFolderPath);
-//        DocumentDatabase database = new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath);
 
-        MultiClassDocumentDatabase database = new MultiClassDocumentDatabase();
+        LocalDiskCacheDocumentDatabase database = new LocalDiskCacheDocumentDatabase("/Users/p13i/Documents/RA/~cache");
 
-        if (sGoogleDriveFolderID != null) {
-            database.addDocumentDatabase(new GoogleDriveFolderDocumentDatabase(sGoogleDriveFolderID));
-        }
-
-        if (sLocalDiskDocumentsFolderPath != null) {
-            database.addDocumentDatabase(new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath));
+        if (!useCache) {
+            database.saveDocumentsToCache(new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath) {{
+                loadDocuments();
+            }}.getDocumentsForSavingToCache());
+            database.saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(sGoogleDriveFolderID) {{
+                loadDocuments();
+            }}.getDocumentsForSavingToCache());
         }
 
         LOGGER.info("Using " + database.getName());

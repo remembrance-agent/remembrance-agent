@@ -8,7 +8,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LocalDiskCacheDocumentDatabase implements DocumentDatabase {
+public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDiskCache {
 
     public static final String METADATA_FILENAME = "~metadata.json";
 
@@ -32,17 +32,19 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase {
         this.loadDocumentsFromCache();
     }
 
+    @Override
     public void loadDocumentsFromCache() {
         this.documents = new ArrayList<>();
-        for (CachableDocument cachableDocument : this.cachableDocuments) {
-            String content = FileIO.read(this.cacheLocalDirectory + File.separator + cachableDocument.getCacheUUID());
+        for (String cachedFilePath : FileIO.listFiles(this.cacheLocalDirectory)) {
+            String content = FileIO.read(cachedFilePath);
             this.documents.add(new Document(content));
         }
     }
 
     public void saveDocumentsToCache(List<CachableDocument> cachableDocuments) {
+        this.cachableDocuments = cachableDocuments;
         for (CachableDocument cachableDocument : cachableDocuments) {
-            FileIO.write(this.cacheLocalDirectory + File.separator + cachableDocument.getCacheUUID(), cachableDocument.getContent());
+            FileIO.write(this.cacheLocalDirectory + File.separator + cachableDocument.getCacheHashCode() + ".txt", cachableDocument.getContent());
         }
     }
 

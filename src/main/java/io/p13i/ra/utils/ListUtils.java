@@ -72,4 +72,12 @@ public class ListUtils {
         Collections.sort(copy, Collections.reverseOrder(comparator));
         return copy.subList(0, Math.min(maxCount, copy.size()));
     }
+
+    public static <TSubClass extends TSuperClass, TSuperClass> List<TSuperClass> castUp(List<TSubClass> source, Class<TSuperClass> klass) {
+        List<TSuperClass> newList = new ArrayList<>();
+        for (TSubClass item : source) {
+            newList.add((TSuperClass) item);
+        }
+        return newList;
+    }
 }

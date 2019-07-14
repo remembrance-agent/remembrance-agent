@@ -4,5 +4,4 @@ import java.util.List;
 
 public interface CachableDocumentDatabase {
     List<CachableDocument> getDocumentsForSavingToCache();
-    List<CachableDocument> getDocumentsFromCache();
 }

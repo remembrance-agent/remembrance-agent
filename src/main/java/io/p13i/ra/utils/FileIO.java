@@ -144,4 +144,8 @@ public class FileIO {
     public static Date getLastModifiedDate(String absoluteFilePath) {
         return new Date(new File(absoluteFilePath).lastModified() * 1000L);
     }
+
+    public static String getCleanName(String dirtyName) {
+        return dirtyName.replaceAll("[^a-zA-Z0-9]", "");
+    }
 }

@@ -58,7 +58,7 @@ public class Document {
 
     @Override
     public String toString() {
-        return "<" + Document.class.getSimpleName() + " content='" + getContentTruncated() + "', word vector size=" + getWordVector().size() + ">";
+        return "<" + Document.class.getSimpleName() + " content='" + getContentTruncated() + "'>";
     }
 
     public String getUrl() {
