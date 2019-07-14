@@ -148,4 +148,8 @@ public class FileIO {
     public static String getCleanName(String dirtyName) {
         return dirtyName.replaceAll("[^a-zA-Z0-9]", "");
     }
+
+    public static boolean delete(String cacheFileName) {
+        return new File(cacheFileName).delete();
+    }
 }

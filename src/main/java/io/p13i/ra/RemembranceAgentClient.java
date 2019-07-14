@@ -107,9 +107,11 @@ public class RemembranceAgentClient implements NativeKeyListener {
                             addActionListener(new ActionListener() {
                                 @Override
                                 public void actionPerformed(ActionEvent e) {
-                                    initializeRemembranceAgent(false);
+                                    JOptionPane.showMessageDialog(sJFrame, "Reloading with new cache! GUI will freeze");
                                     sJFrame.setEnabled(false);
+                                    initializeRemembranceAgent(false);
                                     JOptionPane.showMessageDialog(sJFrame, "Reinitialized with new cache!");
+                                    sJFrame.setEnabled(true);
                                 }
                             });
                         }});
@@ -396,6 +398,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                 }
                             }
                         });
+                        setEnabled(true);
                     }});
                     LOGGER.info(" -> " + doc.toString());
                     startY += 15;

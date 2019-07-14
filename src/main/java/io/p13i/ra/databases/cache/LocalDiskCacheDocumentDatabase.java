@@ -42,7 +42,9 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
     public void saveDocumentsToCache(List<CachableDocument> cachableDocuments) {
         this.cachableDocuments = cachableDocuments;
         for (CachableDocument cachableDocument : cachableDocuments) {
-            FileIO.write(this.cacheLocalDirectory + File.separator + cachableDocument.getCacheHashCode() + ".txt", cachableDocument.getContent());
+            String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheHashCode() + ".txt";
+            FileIO.delete(cacheFileName);
+            FileIO.write(cacheFileName, cachableDocument.getContent());
         }
     }
 
