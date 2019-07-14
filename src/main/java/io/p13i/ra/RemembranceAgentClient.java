@@ -92,7 +92,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                 setLayout(null);
                 add(Box.createHorizontalGlue());
                 setJMenuBar(new JMenuBar() {{
-                    add(new JMenu("Remembrance Agent") {{
+                    add(new JMenu("RA Settings") {{
                         add(new JMenuItem("Reinitialize remembrance agent") {{
                             addActionListener(new ActionListener() {
                                 @Override
