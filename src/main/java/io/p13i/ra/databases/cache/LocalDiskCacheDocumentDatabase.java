@@ -4,6 +4,7 @@ import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.FileIO;
+import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,7 +22,8 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
 
     @Override
     public String getName() {
-        return LocalDiskCacheDocumentDatabase.class.getSimpleName();
+        return LocalDiskCacheDocumentDatabase.class.getSimpleName() +
+                "(" + StringUtils.truncateBeginningWithEllipse(this.cacheLocalDirectory, 20)+ ")";
     }
 
     @Override

@@ -15,6 +15,14 @@ public class StringUtils {
         return str.substring(0, Math.min(str.length(), maxLength)) + (includeEllipses ? "..." : "");
     }
 
+    public static String truncateBeginningWithEllipse(String str, int maxLength) {
+        if (str == null) {
+            return NULL;
+        }
+        boolean includeEllipses = str.length() > maxLength;
+        return (includeEllipses ? "..." : "") + str.substring(Math.max(0, str.length() - maxLength));
+    }
+
     /**
      * https://javarevisited.blogspot.com/2013/03/generate-md5-hash-in-java-string-byte-array-example-tutorial.html
      * @param message The longer string to process
