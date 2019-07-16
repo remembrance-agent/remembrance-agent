@@ -1,6 +1,8 @@
 # remembrance-agent
 Java package for Remembrance Agents! Based on Rhodes/Starner
 
+[![Build Status](https://travis-ci.org/glass-notes/remembrance-agent.svg?branch=master)](https://travis-ci.org/glass-notes/remembrance-agent)
+
 ## Commands
 
 ### Building
