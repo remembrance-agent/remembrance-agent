@@ -35,7 +35,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
      */
     private static final int GUI_WIDTH = 600;
     private static final int GUI_HEIGHT = 220;
-    private static final int GUI_LINE_HEIGHT = 40;
+    private static final int GUI_LINE_HEIGHT = 30;
     private static final int GUI_PADDING_LEFT = 10;
     private static final int GUI_PADDING_TOP = 10;
     private static final int GUI_PADDING_RIGHT = 10;
@@ -44,7 +44,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
     private static final int KEYBOARD_BUFFER_SIZE = 75;
     private static final int RA_UPDATE_PERIOD_MS = 2500;
-    private static final int RA_NUMBER_SUGGESTIONS = 3;
+    private static final int RA_NUMBER_SUGGESTIONS = 4;
 
     private static final String KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME = "KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME";
     private static String sKeystrokesLogFilePath = Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
@@ -234,7 +234,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                     setFont(GUI_FONT);
                 }});
                 add(sKeystrokeBufferLabel = new JLabel() {{
-                    setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP + RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), GUI_LINE_HEIGHT);
+                    setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP + RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), GUI_LINE_HEIGHT + GUI_BORDER_PADDING * 2);
                     setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")"),
                             BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
