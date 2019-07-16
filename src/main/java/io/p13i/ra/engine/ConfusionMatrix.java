@@ -79,7 +79,7 @@ class ConfusionMatrix {
                 return false;
             }
 
-            Index otherIndex = (Index<T1, T2>) obj;
+            Index otherIndex = (Index) obj;
 
             return first.equals(otherIndex.first) && second.equals(otherIndex.second);
         }

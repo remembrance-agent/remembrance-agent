@@ -21,6 +21,7 @@ public class LocalDiskCacheMetadataParser {
                             JsonObject fileObj = new JsonObject();
                             fileObj.addProperty("fileName", entry.getValue().fileName);
                             fileObj.addProperty("subject", entry.getValue().subject);
+                            fileObj.addProperty("url", entry.getValue().url);
 //                            fileObj.addProperty("created", DateUtils.formatTimestamp(entry.getValue().created));
 //                            fileObj.addProperty("lastModified", DateUtils.formatTimestamp(entry.getValue().lastModified));
                             obj.getAsJsonObject("fileNamesToMetadata").add(entry.getKey(), fileObj);

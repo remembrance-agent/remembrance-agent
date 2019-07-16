@@ -17,11 +17,11 @@ public class LocalDiskDocument extends Document implements CachableDocument {
     private final Date lastModified;
     private final String filename;
 
-    public LocalDiskDocument(String content, String documentFilePath, String filename, String subject, Date lastModified) {
+    public LocalDiskDocument(String content, String filename, String subject, Date lastModified, String url) {
         super(content, new Context(null, null, subject, lastModified));
         this.filename = filename;
         this.lastModified = lastModified;
-        this.setURL(documentFilePath);
+        this.url = url;
     }
 
     private String getFilename() {
@@ -35,8 +35,8 @@ public class LocalDiskDocument extends Document implements CachableDocument {
 
     @Override
     public String toTruncatedUrlString() {
-        String parentFolder = StringUtils.truncateWithEllipse(FileIO.getEnclosingFolderName(getUrl()), 10);
-        String fileName = StringUtils.truncateWithEllipse(FileIO.getFileName(getUrl()), 9);
+        String parentFolder = StringUtils.truncateWithEllipse(FileIO.getEnclosingFolderName(this.getURL()), 10);
+        String fileName = StringUtils.truncateWithEllipse(FileIO.getFileName(this.getURL()), 9);
         return String.format("%s%s%s", parentFolder, File.separator, fileName);
     }
 }

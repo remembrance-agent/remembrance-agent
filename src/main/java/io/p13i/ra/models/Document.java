@@ -17,7 +17,7 @@ public class Document {
     private final String content;
     private final Context context;
 
-    private String url = null;
+    protected String url = null;
 
     private List<String> cachedDocumentVector = null;
 
@@ -61,15 +61,11 @@ public class Document {
         return "<" + Document.class.getSimpleName() + " content='" + getContentTruncated() + "'>";
     }
 
-    public String getUrl() {
+    public String getURL() {
         return url;
     }
 
-    public void setURL(String url) {
-        this.url = url;
-    }
-
     public String toTruncatedUrlString() {
-        return StringUtils.truncateWithEllipse(this.getUrl(), CONTENT_TRUNCATED_MAX_LENGTH);
+        return StringUtils.truncateWithEllipse(this.getURL(), CONTENT_TRUNCATED_MAX_LENGTH);
     }
 }

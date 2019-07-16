@@ -18,4 +18,6 @@ public interface CachableDocument {
     String getContent();
 
     Context getContext();
+
+    String getURL();
 }

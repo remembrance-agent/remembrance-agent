@@ -1,19 +1,15 @@
 package io.p13i.ra.databases.cache;
 
-import com.google.gson.*;
-import com.google.gson.reflect.TypeToken;
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheDocumentMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadataParser;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
 import io.p13i.ra.models.Document;
-import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,8 +55,9 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
         for (String cachedFilePath : cachedFilePaths) {
             String fileName = FileIO.getFileName(cachedFilePath);
             String subject = metadata.fileNamesToMetadata.get(fileName).subject;
+            String url = metadata.fileNamesToMetadata.get(fileName).url;
             String content = FileIO.read(cachedFilePath);
-            Document document = new LocalDiskDocument(content, cachedFilePath, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath));
+            Document document = new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url);
             this.documents.add(document);
         }
     }
@@ -78,6 +75,7 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
             fileNamesToMetadata.put(cachableDocument.getCacheFileName(), new LocalDiskCacheDocumentMetadata() {{
                 fileName = cachableDocument.getCacheFileName();
                 subject = cachableDocument.getContext().getSubject();
+                url = cachableDocument.getURL();
             }});
         }
         FileIO.write(getMetadataJSONFilePath(), LocalDiskCacheMetadataParser.asString(new LocalDiskCacheMetadata(fileNamesToMetadata)));

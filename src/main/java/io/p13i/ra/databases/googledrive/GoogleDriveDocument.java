@@ -16,7 +16,7 @@ class GoogleDriveDocument extends Document implements CachableDocument {
         this.id = id;
         this.filename = filename;
         this.lastModified = lastModified;
-        this.setURL("https://docs.google.com/document/d/" + id + "/view");
+        this.url = "https://docs.google.com/document/d/" + id + "/view";
     }
 
     public String getId() {

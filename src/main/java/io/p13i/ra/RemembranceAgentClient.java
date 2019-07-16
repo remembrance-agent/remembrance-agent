@@ -365,14 +365,14 @@ public class RemembranceAgentClient implements NativeKeyListener {
 
                             boolean error = false;
                             try {
-                                Desktop.getDesktop().open(new File(doc.getDocument().getUrl()));
+                                Desktop.getDesktop().open(new File(doc.getDocument().getURL()));
                             } catch (Exception ex) {
                                 ex.printStackTrace();
                                 error = true;
                             }
                             if (error) {
                                 try {
-                                    Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getUrl()));
+                                    Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getURL()));
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }
