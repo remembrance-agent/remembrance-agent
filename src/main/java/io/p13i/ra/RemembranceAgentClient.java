@@ -30,7 +30,7 @@ import javax.swing.*;
 
 public class RemembranceAgentClient implements NativeKeyListener {
 
-    /**
+    /**f
      * GUI settings
      */
     private static final int GUI_WIDTH = 600;
@@ -42,7 +42,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final int GUI_BORDER_PADDING = 5;
     private static final Font GUI_FONT = new Font("monospaced", Font.PLAIN, 12);
 
-    private static final int KEYBOARD_BUFFER_SIZE = 60;
+    private static final int KEYBOARD_BUFFER_SIZE = 75;
     private static final int RA_UPDATE_PERIOD_MS = 2500;
     private static final int RA_NUMBER_SUGGESTIONS = 3;
 

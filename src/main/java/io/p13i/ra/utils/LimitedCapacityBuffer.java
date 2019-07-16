@@ -10,7 +10,7 @@ import java.util.Queue;
  */
 class LimitedCapacityBuffer<T> {
 
-    private final Queue<T> queue;
+    private final LinkedList<T> queue;
     private int totalAddedElementsCount = 0;
     private T lastAddedElement;
     private final int maximumSize;
@@ -55,6 +55,14 @@ class LimitedCapacityBuffer<T> {
 
     T getLastAddedElement() {
         return lastAddedElement;
+    }
+
+    public T removeLast() {
+        if (queue.isEmpty()) {
+            return null;
+        }
+
+        return queue.removeLast();
     }
 
     int getTotalAddedElementsCount() {

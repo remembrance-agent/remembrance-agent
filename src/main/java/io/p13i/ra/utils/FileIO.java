@@ -35,7 +35,7 @@ public class FileIO {
     }
 
     public static void write(String filePath, String text) {
-        LOGGER.info(String.format("Writing ~%d bytes to %s", text.length(), text));
+        LOGGER.info(String.format("Writing ~%d bytes to %s", text.length(), filePath));
         if (!FileIO.fileExists(filePath)) {
             FileIO.createFile(filePath);
         }

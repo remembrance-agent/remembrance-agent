@@ -23,6 +23,16 @@ public class KeyboardLoggerBreakingBuffer {
      * @param c the character to add
      */
     public void addCharacter(char c) {
+
+        if (c == '⌫') {
+            limitedCapacityBuffer.removeLast();
+            return;
+        }
+
+        if (!isCharacterAllowedIntoBuffer(c)) {
+            return;
+        }
+
         TimestampedCharacter newTimestamp = new TimestampedCharacter(c);
 
         // There must already be an element...
@@ -40,8 +50,16 @@ public class KeyboardLoggerBreakingBuffer {
             }
         }
 
+        if (c == '␣') {
+            newTimestamp.character = DEFAULT_BREAKER_CHARACTER;
+        }
+
         // Add a new time stamp too
         limitedCapacityBuffer.add(newTimestamp);
+    }
+
+    private static boolean isCharacterAllowedIntoBuffer(char c) {
+        return CharacterUtils.isAlphanumeric(c) || c == '␣' || c == '.' || c == '\'';
     }
 
     public boolean isEmpty() { return limitedCapacityBuffer.isEmpty(); }
@@ -60,7 +78,7 @@ public class KeyboardLoggerBreakingBuffer {
     }
 
     class TimestampedCharacter {
-        final Character character;
+        Character character;
         final Date timestamp;
 
         TimestampedCharacter(Character c) {
