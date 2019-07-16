@@ -40,7 +40,7 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
     }
 
     public String toShortString() {
-        return String.format("(%04f) [%s]: %s", getScore(), StringUtils.truncateWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.asString(getMatchingTermsInDocument()));
+        return String.format("(%04f) [%s]: %s", getScore(), StringUtils.truncateBeginningWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.asString(getMatchingTermsInDocument()));
     }
 
     private List<String> getMatchingTermsInDocument() {

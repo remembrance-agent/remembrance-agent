@@ -45,4 +45,8 @@ public class DateUtils {
         long difference = d2.getTime() - d1.getTime();
         return difference / 1000 % 60;
     }
+
+    public static String formatTimestamp(Date date) {
+        return formatDate(date, TIMESTAMP_FORMAT);
+    }
 }

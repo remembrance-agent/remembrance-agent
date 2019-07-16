@@ -17,8 +17,8 @@ public class LocalDiskDocument extends Document implements CachableDocument {
     private final Date lastModified;
     private final String filename;
 
-    public LocalDiskDocument(String content, String documentFilePath, String filename, Date lastModified) {
-        super(content, new Context(null, null, filename, lastModified));
+    public LocalDiskDocument(String content, String documentFilePath, String filename, String subject, Date lastModified) {
+        super(content, new Context(null, null, subject, lastModified));
         this.filename = filename;
         this.lastModified = lastModified;
         this.setURL(documentFilePath);

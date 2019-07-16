@@ -1,20 +1,33 @@
 package io.p13i.ra.databases.cache;
 
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.cache.metadata.LocalDiskCacheDocumentMetadata;
+import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadata;
+import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadataParser;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
 import io.p13i.ra.models.Document;
+import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDiskCache {
 
     private final String cacheLocalDirectory;
     private List<CachableDocument> cachableDocuments;
     private List<Document> documents;
+
+    public String getMetadataJSONFilePath() {
+        return this.cacheLocalDirectory + File.separator + "~metadata.json";
+    }
 
     public LocalDiskCacheDocumentDatabase(String cacheLocalDirectory) {
         this.cacheLocalDirectory = cacheLocalDirectory;
@@ -34,9 +47,20 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
     @Override
     public void loadDocumentsFromCache() {
         this.documents = new ArrayList<>();
-        for (String cachedFilePath : FileIO.listFiles(this.cacheLocalDirectory)) {
+
+        String metadataContents = FileIO.read(getMetadataJSONFilePath());
+        LocalDiskCacheMetadata metadata = LocalDiskCacheMetadataParser.fromString(metadataContents);
+        if (metadata == null) {
+            return;
+        }
+
+        List<String> cachedFilePaths = FileIO.listFiles(this.cacheLocalDirectory);
+        cachedFilePaths.remove(getMetadataJSONFilePath());
+        for (String cachedFilePath : cachedFilePaths) {
+            String fileName = FileIO.getFileName(cachedFilePath);
+            String subject = metadata.fileNamesToMetadata.get(fileName).subject;
             String content = FileIO.read(cachedFilePath);
-            Document document = new LocalDiskDocument(content, cachedFilePath, FileIO.getFileName(cachedFilePath), FileIO.getLastModifiedDate(cachedFilePath));
+            Document document = new LocalDiskDocument(content, cachedFilePath, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath));
             this.documents.add(document);
         }
     }
@@ -48,9 +72,20 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
             FileIO.delete(documentPath);
         }
 
+        // Save metadata file
+        Map<String, LocalDiskCacheDocumentMetadata> fileNamesToMetadata = new HashMap<>();
+        for (CachableDocument cachableDocument : cachableDocuments) {
+            fileNamesToMetadata.put(cachableDocument.getCacheFileName(), new LocalDiskCacheDocumentMetadata() {{
+                fileName = cachableDocument.getCacheFileName();
+                subject = cachableDocument.getContext().getSubject();
+            }});
+        }
+        FileIO.write(getMetadataJSONFilePath(), LocalDiskCacheMetadataParser.asString(new LocalDiskCacheMetadata(fileNamesToMetadata)));
+
+        // Write each cache file
         this.cachableDocuments = cachableDocuments;
         for (CachableDocument cachableDocument : cachableDocuments) {
-            String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheHashCode() + ".txt";
+            String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
             FileIO.write(cacheFileName, cachableDocument.getContent());
         }
     }
@@ -59,4 +94,5 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
     public List<Document> getAllDocuments() {
         return this.documents;
     }
+
 }
