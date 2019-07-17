@@ -10,7 +10,7 @@ import java.util.logging.Logger;
  */
 public class KeyboardLoggerBreakingBuffer {
     private static final Logger LOGGER = LoggerUtils.getLogger(KeyboardLoggerBreakingBuffer.class);
-    private static final long BREAKING_BUFFER_DURATION_SEC = 5;  // seconds
+    private static final long BREAKING_BUFFER_DURATION_SEC = 2;  // seconds
     private static final char DEFAULT_BREAKER_CHARACTER = '␣';
     private final LimitedCapacityBuffer<TimestampedCharacter> limitedCapacityBuffer;
 
@@ -77,7 +77,7 @@ public class KeyboardLoggerBreakingBuffer {
         return this.limitedCapacityBuffer.toString();
     }
 
-    class TimestampedCharacter {
+    private class TimestampedCharacter {
         Character character;
         final Date timestamp;
 
