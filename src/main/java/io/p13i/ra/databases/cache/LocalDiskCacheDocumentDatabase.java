@@ -18,10 +18,9 @@ import java.util.Map;
 public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDiskCache {
 
     private final String cacheLocalDirectory;
-    private List<CachableDocument> cachableDocuments;
     private List<Document> documents;
 
-    public String getMetadataJSONFilePath() {
+    private String getMetadataJSONFilePath() {
         return this.cacheLocalDirectory + File.separator + "~metadata.json";
     }
 
@@ -81,7 +80,6 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
         FileIO.write(getMetadataJSONFilePath(), LocalDiskCacheMetadataParser.asString(new LocalDiskCacheMetadata(fileNamesToMetadata)));
 
         // Write each cache file
-        this.cachableDocuments = cachableDocuments;
         for (CachableDocument cachableDocument : cachableDocuments) {
             String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
             FileIO.write(cacheFileName, cachableDocument.getContent());
