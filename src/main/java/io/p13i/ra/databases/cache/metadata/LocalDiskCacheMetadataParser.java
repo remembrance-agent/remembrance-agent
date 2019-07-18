@@ -6,6 +6,9 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.Map;
 
+/**
+ * Helper class for parsing metadata to an object and serializing it to a string
+ */
 public class LocalDiskCacheMetadataParser {
 
     private static Gson getMetadataGson() {

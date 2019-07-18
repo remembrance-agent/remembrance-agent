@@ -5,10 +5,15 @@ import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
 
+/**
+ * Represents one object that can be cached
+ */
 public interface CachableDocument {
 
+    String CACHE_FILE_EXTENSION = "cache.txt";
+
     default String getCacheFileName() {
-        return getCacheHashCode() + ".txt";
+        return getCacheHashCode() + "." + CACHE_FILE_EXTENSION;
     }
 
     default String getCacheHashCode() {
