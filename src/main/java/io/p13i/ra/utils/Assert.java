@@ -23,12 +23,4 @@ public class Assert {
     public static void inRange(Double value, Double lower, Double upper) {
         Assert.that(lower <= value && value <= upper, String.format("%04f not in [%04f, %04f]", value, lower, upper));
     }
-
-
-    public static void inRangeOrNan(Double value, Double lower, Double upper) {
-        if (Double.isNaN(value)) {
-            return;
-        }
-        Assert.inRange(value, lower, upper);
-    }
 }

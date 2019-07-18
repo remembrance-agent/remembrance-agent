@@ -3,6 +3,9 @@ package io.p13i.ra.databases.cache.metadata;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * Maps a file name to metadata information
+ */
 public class LocalDiskCacheMetadata implements Serializable {
     public Map<String, LocalDiskCacheDocumentMetadata> fileNamesToMetadata;
 

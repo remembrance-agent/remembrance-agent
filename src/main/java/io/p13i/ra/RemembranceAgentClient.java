@@ -1,13 +1,18 @@
 package io.p13i.ra;
 
-import java.awt.*;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.List;
 import java.util.Timer;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -20,13 +25,30 @@ import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.*;
+import io.p13i.ra.utils.DateUtils;
+import io.p13i.ra.utils.FileIO;
+import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
+import io.p13i.ra.utils.ListUtils;
+import io.p13i.ra.utils.LoggerUtils;
+import io.p13i.ra.utils.ResourceUtil;
+import io.p13i.ra.utils.URIUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 
 public class RemembranceAgentClient implements NativeKeyListener {
 
