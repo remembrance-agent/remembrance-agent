@@ -272,12 +272,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
         // init!
         System.out.println(ListUtils.asString(Arrays.asList(args)));
 
-        boolean useCache = false;
-        if (args.length > 0 && args[0].equals("--use-cache")) {
-            useCache = true;
-        }
-
-        initializeRemembranceAgent(useCache);
+        initializeRemembranceAgent(true);
 
         // Add the key logger
         try {

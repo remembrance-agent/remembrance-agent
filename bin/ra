@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e -o pipefail
+
+# $@ passes arguments from the command line to the JAR
+sudo java -jar /usr/local/bin/remembrance-agent-v1.0-all.jar $@
