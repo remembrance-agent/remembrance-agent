@@ -1,10 +1,12 @@
 package io.p13i.ra.utils;
 
-import io.p13i.ra.RemembranceAgentClient;
+import io.p13i.ra.gui.User;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.*;
+
+import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
 
 public class LoggerUtils {
 
@@ -14,7 +16,7 @@ public class LoggerUtils {
     private static FileHandler getDefaultFileHandlerInstance() {
         if (sDefaultFileHandler == null) {
             try {
-                sDefaultFileHandler = new FileHandler(RemembranceAgentClient.sRAClientLogFilePath) {{
+                sDefaultFileHandler = new FileHandler(User.Preferences.get(RAClientLogFile)) {{
                     setFormatter(new DefaultTimestampedFormatter());
                 }};
             } catch (IOException e) {

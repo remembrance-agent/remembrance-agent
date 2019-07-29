@@ -7,10 +7,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
-import java.util.List;
-import java.util.Timer;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -21,6 +18,7 @@ import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
+import io.p13i.ra.gui.User;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
@@ -28,9 +26,7 @@ import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
-import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.LoggerUtils;
-import io.p13i.ra.utils.ResourceUtil;
 import io.p13i.ra.utils.URIUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -50,9 +46,15 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-public class RemembranceAgentClient implements NativeKeyListener {
+import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
+import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
+import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
+import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
 
-    /**f
+public class RemembranceAgentClient {
+
+    /**
+     * f
      * GUI settings
      */
     private static final int GUI_WIDTH = 600;
@@ -67,27 +69,6 @@ public class RemembranceAgentClient implements NativeKeyListener {
     private static final int KEYBOARD_BUFFER_SIZE = 75;
     private static final int RA_UPDATE_PERIOD_MS = 2500;
     private static final int RA_NUMBER_SUGGESTIONS = 4;
-
-    private static final String KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME = "KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME";
-    private static String sKeystrokesLogFilePath = Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
-            KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME,
-            /* default: */ System.getProperty("user.home") + File.separator + "keystrokes.log");
-
-    private static final String RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME = "RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME";
-    public static String sRAClientLogFilePath = Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
-            RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME,
-            /* default: */ System.getProperty("user.home") + File.separator + "ra-client.log");
-
-    private static final String LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME = "LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME";
-    private static String sLocalDiskDocumentsFolderPath = Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
-            LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME,
-            /* default: */ ResourceUtil.getResourcePath(RemembranceAgentClient.class, "sample-documents"));
-
-    private static final String GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME = "GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME";
-    private static String sGoogleDriveFolderID = Preferences.userNodeForPackage(RemembranceAgentClient.class).get(
-            GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME,
-            /* default: */ null
-    );
 
     /**
      * "local" variables
@@ -146,20 +127,18 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                     // disable the "All files" option.
                                     fileChooser.setAcceptAllFileFilterUsed(false);
                                     if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
-                                        Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
-                                        prefs.put(LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME, sLocalDiskDocumentsFolderPath = fileChooser.getSelectedFile().toPath().toString());
-                                        LOGGER.info("Selected directory: " + sLocalDiskDocumentsFolderPath);
+                                        User.Preferences.set(LocalDiskDocumentsFolderPath, fileChooser.getSelectedFile().toPath().toString());
+                                        LOGGER.info("Selected directory: " + User.Preferences.get(LocalDiskDocumentsFolderPath));
                                     }
                                 }
                             });
                         }});
                         add(new JMenuItem("Set Google Drive folder ID...") {{
                             addActionListener(e -> {
-                                String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder ID (leave blank to cancel):", sGoogleDriveFolderID);
+                                String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder ID (leave blank to cancel):", User.Preferences.get(GoogleDriveFolderID));
                                 if (inputId != null && inputId.length() > 0) {
-                                    Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
-                                    prefs.put(GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME, sGoogleDriveFolderID = inputId);
-                                    LOGGER.info("Set Google Drive Folder ID: " + sGoogleDriveFolderID);
+                                    User.Preferences.set(GoogleDriveFolderID, inputId);
+                                    LOGGER.info("Set Google Drive Folder ID: " + User.Preferences.get(GoogleDriveFolderID));
                                 }
                             });
                         }});
@@ -173,10 +152,9 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                     // disable the "All files" option.
                                     fileChooser.setAcceptAllFileFilterUsed(false);
                                     if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
-                                        Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
-                                        prefs.put(RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME, sRAClientLogFilePath = fileChooser.getSelectedFile().toPath().toString() + File.separator + "ra-client.log");
-                                        LOGGER.info("Selected ra-client.log file: " + sRAClientLogFilePath);
-                                        JOptionPane.showMessageDialog(sJFrame, "Selected ra-client.log file: " + sRAClientLogFilePath);
+                                        User.Preferences.set(RAClientLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "ra-client.log");
+                                        LOGGER.info("Selected ra-client.log file: " + User.Preferences.get(RAClientLogFile));
+                                        JOptionPane.showMessageDialog(sJFrame, "Selected ra-client.log file: " + User.Preferences.get(RAClientLogFile));
                                     }
                                 }
                             });
@@ -184,7 +162,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                         add(new JMenuItem("Open ra-client.log log...") {{
                             addActionListener(e -> {
                                 try {
-                                    Desktop.getDesktop().open(new File(sRAClientLogFilePath));
+                                    Desktop.getDesktop().open(new File(User.Preferences.get(RAClientLogFile)));
                                 } catch (IOException ex) {
                                     ex.printStackTrace();
                                 }
@@ -216,11 +194,10 @@ public class RemembranceAgentClient implements NativeKeyListener {
                                     // disable the "All files" option.
                                     fileChooser.setAcceptAllFileFilterUsed(false);
                                     if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
-                                        Preferences prefs = Preferences.userNodeForPackage(RemembranceAgentClient.class);
-                                        prefs.put(KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME, sKeystrokesLogFilePath = fileChooser.getSelectedFile().toPath().toString() + File.separator + "keystrokes.log");
-                                        LOGGER.info("Selected keystrokes.log file directory: " + sKeystrokesLogFilePath);
+                                        User.Preferences.set(User.Preferences.Pref.KeystrokesLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "keystrokes.log");
+                                        LOGGER.info("Selected keystrokes.log file directory: " + User.Preferences.get(KeystrokesLogFile));
                                         sKeystrokeBufferLabel.setBorder(BorderFactory.createCompoundBorder(
-                                                BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")"),
+                                                BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.get(KeystrokesLogFile) + ")"),
                                                 BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
                                     }
                                 }
@@ -229,7 +206,7 @@ public class RemembranceAgentClient implements NativeKeyListener {
                         add(new JMenuItem("Open keystrokes.log log...") {{
                             addActionListener(e -> {
                                 try {
-                                    Desktop.getDesktop().open(new File(sKeystrokesLogFilePath));
+                                    Desktop.getDesktop().open(new File(User.Preferences.get(KeystrokesLogFile)));
                                 } catch (IOException ex) {
                                     ex.printStackTrace();
                                 }
@@ -251,14 +228,14 @@ public class RemembranceAgentClient implements NativeKeyListener {
                 add(sSuggestionsPanel = new JPanel() {{
                     setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT);
                     setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createTitledBorder("Suggestions (from " + sLocalDiskDocumentsFolderPath + ")"),
+                            BorderFactory.createTitledBorder("Suggestions (from " + User.Preferences.get(LocalDiskDocumentsFolderPath) + ")"),
                             BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
                     setFont(GUI_FONT);
                 }});
                 add(sKeystrokeBufferLabel = new JLabel() {{
                     setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP + RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), GUI_LINE_HEIGHT + GUI_BORDER_PADDING * 2);
                     setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + sKeystrokesLogFilePath + ")"),
+                            BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.get(KeystrokesLogFile) + ")"),
                             BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
                     setFont(GUI_FONT);
                 }});
@@ -266,38 +243,46 @@ public class RemembranceAgentClient implements NativeKeyListener {
         }};
 
         // jnativehook produces a lot of logs
-        Logger logger = java.util.logging.Logger.getLogger(GlobalScreen.class.getPackage().getName());
-        logger.setLevel(Level.WARNING);
+        Logger.getLogger(GlobalScreen.class.getPackage().getName()).setLevel(Level.WARNING);
 
         // init!
-        System.out.println(ListUtils.asString(Arrays.asList(args)));
-
         initializeRemembranceAgent(true);
 
         // Add the key logger
         try {
             GlobalScreen.registerNativeHook();
-            GlobalScreen.addNativeKeyListener(new RemembranceAgentClient());
+            GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
+                @Override
+                public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
+
+                }
+
+                @Override
+                public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
+                    String keyText = NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode());
+
+                    FileIO.write(User.Preferences.get(KeystrokesLogFile), DateUtils.longTimestamp() + " " + keyText + "\n");
+
+                    LOGGER.info("Keystroke: " + keyText);
+
+                    char characterToAdd = keyText.charAt(0);
+
+                    sBreakingBuffer.addCharacter(characterToAdd);
+                    LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
+                    sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
+                }
+
+                @Override
+                public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
+
+                }
+            });
         } catch (NativeHookException e) {
             throw new RuntimeException(e);
         }
         LOGGER.info("Added native key logger.");
 
         sJFrame.setVisible(true);
-    }
-
-    public void nativeKeyPressed(NativeKeyEvent e) {
-        String keyText = NativeKeyEvent.getKeyText(e.getKeyCode());
-
-        FileIO.write(sKeystrokesLogFilePath, DateUtils.longTimestamp() + " " + keyText + "\n");
-
-        LOGGER.info("Keystroke: " + keyText);
-
-        char characterToAdd = keyText.charAt(0);
-
-        sBreakingBuffer.addCharacter(characterToAdd);
-        LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
-        sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
     }
 
     private static void initializeRemembranceAgent(boolean useCache) {
@@ -312,10 +297,10 @@ public class RemembranceAgentClient implements NativeKeyListener {
         LocalDiskCacheDocumentDatabase database = new LocalDiskCacheDocumentDatabase("/Users/p13i/Documents/RA/~cache");
 
         if (!useCache) {
-            database.saveDocumentsToCache(new LocalDiskDocumentDatabase(sLocalDiskDocumentsFolderPath) {{
+            database.saveDocumentsToCache(new LocalDiskDocumentDatabase(User.Preferences.get(LocalDiskDocumentsFolderPath)) {{
                 loadDocuments();
             }}.getDocumentsForSavingToCache());
-            database.saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(sGoogleDriveFolderID) {{
+            database.saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(User.Preferences.get(GoogleDriveFolderID)) {{
                 loadDocuments();
             }}.getDocumentsForSavingToCache());
         }
@@ -409,11 +394,5 @@ public class RemembranceAgentClient implements NativeKeyListener {
         }
 
         sJFrame.setTitle("REMEMBRANCE AGENT");
-    }
-
-    public void nativeKeyReleased(NativeKeyEvent e) {
-    }
-
-    public void nativeKeyTyped(NativeKeyEvent e) {
     }
 }
