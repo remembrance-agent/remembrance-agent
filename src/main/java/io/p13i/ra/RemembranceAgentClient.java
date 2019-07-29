@@ -2,7 +2,6 @@ package io.p13i.ra;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,12 +11,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
 import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
+import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
@@ -53,41 +52,32 @@ import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
 
 public class RemembranceAgentClient {
 
-    /**
-     * f
-     * GUI settings
-     */
-    private static final int GUI_WIDTH = 600;
-    private static final int GUI_HEIGHT = 220;
-    private static final int GUI_LINE_HEIGHT = 30;
-    private static final int GUI_PADDING_LEFT = 10;
-    private static final int GUI_PADDING_TOP = 10;
-    private static final int GUI_PADDING_RIGHT = 10;
-    private static final int GUI_BORDER_PADDING = 5;
-    private static final Font GUI_FONT = new Font("monospaced", Font.PLAIN, 12);
+    private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
+    // Settings
     private static final int KEYBOARD_BUFFER_SIZE = 75;
-    private static final int RA_UPDATE_PERIOD_MS = 2500;
-    private static final int RA_NUMBER_SUGGESTIONS = 4;
+    private static final int RA_CLIENT_UPDATE_PERIOD_MS = 2500;
+
+    // Swing elements
+    private static JFrame sJFrame;
+    private static JLabel sKeystrokeBufferLabel;
+    private static JPanel sSuggestionsPanel;
 
     /**
      * "local" variables
      */
-    private static JFrame sJFrame;
-    private static JLabel sKeystrokeBufferLabel;
     private static final KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
     private static Timer sRemembranceAgentUpdateTimer = new Timer();
-    private static RemembranceAgentEngine sRemembranceAgentEngine;
-    private static JPanel sSuggestionsPanel;
-    private static String sPriorQuery;
 
-    private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
+    // RA variables
+    private static RemembranceAgentEngine sRemembranceAgentEngine;
+    private static String sPriorQuery;
 
     public static void main(String[] args) {
 
         sJFrame = new JFrame("REMEMBRANCE AGENT") {{
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            setSize(GUI_WIDTH, GUI_HEIGHT);
+            setSize(GUI.WIDTH, GUI.HEIGHT);
             setResizable(false);
             setAlwaysOnTop(true);
             add(new JPanel() {{
@@ -198,7 +188,7 @@ public class RemembranceAgentClient {
                                         LOGGER.info("Selected keystrokes.log file directory: " + User.Preferences.get(KeystrokesLogFile));
                                         sKeystrokeBufferLabel.setBorder(BorderFactory.createCompoundBorder(
                                                 BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.get(KeystrokesLogFile) + ")"),
-                                                BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
+                                                BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
                                     }
                                 }
                             });
@@ -226,18 +216,18 @@ public class RemembranceAgentClient {
                     }});
                 }});
                 add(sSuggestionsPanel = new JPanel() {{
-                    setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT);
+                    setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT);
                     setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createTitledBorder("Suggestions (from " + User.Preferences.get(LocalDiskDocumentsFolderPath) + ")"),
-                            BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
-                    setFont(GUI_FONT);
+                            BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
+                    setFont(GUI.FONT);
                 }});
                 add(sKeystrokeBufferLabel = new JLabel() {{
-                    setBounds(GUI_PADDING_LEFT, GUI_PADDING_TOP + RA_NUMBER_SUGGESTIONS * GUI_LINE_HEIGHT, GUI_WIDTH - (GUI_PADDING_LEFT + GUI_PADDING_RIGHT), GUI_LINE_HEIGHT + GUI_BORDER_PADDING * 2);
+                    setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP + GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
                     setBorder(BorderFactory.createCompoundBorder(
                             BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.get(KeystrokesLogFile) + ")"),
-                            BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
-                    setFont(GUI_FONT);
+                            BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
+                    setFont(GUI.FONT);
                 }});
             }});
         }};
@@ -319,7 +309,7 @@ public class RemembranceAgentClient {
 
         sSuggestionsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Suggestions (from " + database.getName() + ")"),
-                BorderFactory.createEmptyBorder(GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING, GUI_BORDER_PADDING)));
+                BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
         sSuggestionsPanel.invalidate();
         sSuggestionsPanel.repaint();
 
@@ -330,7 +320,7 @@ public class RemembranceAgentClient {
             public void run() {
                 sendQueryToRemembranceAgent();
             }
-        }, RA_UPDATE_PERIOD_MS, RA_UPDATE_PERIOD_MS);
+        }, RA_CLIENT_UPDATE_PERIOD_MS, RA_CLIENT_UPDATE_PERIOD_MS);
         LOGGER.info("Scheduled Remembrance Agent update task.");
     }
 
@@ -346,7 +336,7 @@ public class RemembranceAgentClient {
             Context context = new Context(null, "p13i", query, DateUtils.now());
 
             LOGGER.info("Sending query to RA: '" + query + "'");
-            List<ScoredDocument> suggestions = sRemembranceAgentEngine.determineSuggestions(new Query(query, context, RA_NUMBER_SUGGESTIONS));
+            List<ScoredDocument> suggestions = sRemembranceAgentEngine.determineSuggestions(new Query(query, context, GUI.RA_NUMBER_SUGGESTIONS));
 
             sSuggestionsPanel.removeAll();
 
@@ -355,7 +345,7 @@ public class RemembranceAgentClient {
             } else {
                 LOGGER.info(String.format("Got %d suggestion(s):", suggestions.size()));
 
-                int startY = GUI_PADDING_TOP;
+                int startY = GUI.PADDING_TOP;
 
                 for (ScoredDocument doc : suggestions) {
                     final int yPos = startY;
