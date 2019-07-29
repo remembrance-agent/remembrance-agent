@@ -42,6 +42,17 @@ java -jar ./build/libs/remembrance-agent-v1.0-all.jar
 
 ![](./docs/img/textedit-opened-suggestion.png)
 
+## Developing
+
+### Versioning
+
+1. Update the version number in `build.gradle` 
+2. Issue a build with `./gradlew build`
+3. Commit the resulting JAR file to source
+4. Update the version number in `bin/install`
+4. Update the version number in `bin/ra`
+
+
 ---
 
 Pramod Kotipalli  
