@@ -184,7 +184,6 @@ public class RemembranceAgentClient {
                                         JOptionPane.showMessageDialog(sJFrame, "Buffer is empty. No clearing required.");
                                     } else {
                                         sBreakingBuffer.clear();
-                                        JOptionPane.showMessageDialog(sJFrame, "Cleared keyboard buffer.");
                                         sKeystrokeBufferLabel.setText("");
                                     }
                                 }
