@@ -10,16 +10,19 @@ Java package for Remembrance Agents! Based on Rhodes/Starner
 ### Building
 
 ```bash
-./gradlew build
+VERSION="1.1" ./gradlew build
 ```
 
 ### Installing as Launch Daemon (macOS)
 
 ```bash
-sudo bash ./bin/install
+sudo VERSION="1.1" bash ./bin/install
 ```
 
-Now you can run `ra-desktop` from any where. Use the flag `--use-cache` to save on redundant calls to time-expensive data stores like Google Drive.
+Now you can run the following from anywhere:
+```bash
+VERSION="1.1" ra
+```
 
 ### Running (cross platform)
 
@@ -46,12 +49,7 @@ java -jar ./build/libs/remembrance-agent-v1.0-all.jar
 
 ### Versioning
 
-1. Update the version number in `build.gradle` 
-2. Issue a build with `./gradlew build`
-3. Commit the resulting JAR file to source
-4. Update the version number in `bin/install`
-4. Update the version number in `bin/ra`
-
+Increment the version numbers in this README.
 
 ---
 

@@ -17,7 +17,7 @@ jar {
 }
 
 group 'io.p13i'
-version 'v1.0'
+version "v" + System.getenv('VERSION')
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8
