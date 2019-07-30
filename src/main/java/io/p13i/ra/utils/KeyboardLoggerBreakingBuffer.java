@@ -1,6 +1,7 @@
 package io.p13i.ra.utils;
 
 import java.util.Date;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -59,7 +60,7 @@ public class KeyboardLoggerBreakingBuffer {
     }
 
     private static boolean isCharacterAllowedIntoBuffer(char c) {
-        return CharacterUtils.isAlphanumeric(c) || c == '␣' || c == '.' || c == '\'';
+        return CharacterUtils.isAlphanumeric(c) || c == '␣' || c == '.' || c == '\'' || c == '-';
     }
 
     public boolean isEmpty() { return limitedCapacityBuffer.isEmpty(); }
