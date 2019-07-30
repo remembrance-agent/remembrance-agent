@@ -34,18 +34,24 @@ public class FileIO {
         }
     }
 
+    public static PrintWriter openPrintWriter(String filePath) {
+        try {
+            return new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static void write(String filePath, String text) {
         LOGGER.info(String.format("Writing ~%d bytes to %s", text.length(), filePath));
         if (!FileIO.fileExists(filePath)) {
             FileIO.createFile(filePath);
         }
-        try {
-            PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
-            out.print(text);
-            out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        PrintWriter out = openPrintWriter(filePath);
+        out.print(text);
+        out.close();
     }
 
     private static void createFile(String filePath) {

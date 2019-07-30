@@ -22,11 +22,7 @@ import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.DateUtils;
-import io.p13i.ra.utils.FileIO;
-import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
-import io.p13i.ra.utils.LoggerUtils;
-import io.p13i.ra.utils.URIUtils;
+import io.p13i.ra.utils.*;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -67,6 +63,7 @@ public class RemembranceAgentClient {
      * "local" variables
      */
     private static final KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
+    private static BufferingLogFileWriter sKeyLoggerBufferLogFileWriter;
     private static Timer sRemembranceAgentUpdateTimer = new Timer();
 
     // RA variables
@@ -74,6 +71,25 @@ public class RemembranceAgentClient {
     private static String sPriorQuery;
 
     public static void main(String[] args) {
+
+        sKeyLoggerBufferLogFileWriter = new BufferingLogFileWriter(User.Preferences.get(KeystrokesLogFile));
+        sKeyLoggerBufferLogFileWriter.open();
+
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                try {
+                    System.out.println("Shutting down ...");
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                } finally {
+                    sKeyLoggerBufferLogFileWriter.flush();
+                    sKeyLoggerBufferLogFileWriter.close();
+                    sKeyLoggerBufferLogFileWriter = null;
+                }
+            }
+        });
 
         sJFrame = new JFrame("REMEMBRANCE AGENT") {{
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -242,6 +258,7 @@ public class RemembranceAgentClient {
         try {
             GlobalScreen.registerNativeHook();
             GlobalScreen.addNativeKeyListener(new NativeKeyListener() {
+
                 @Override
                 public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
 
@@ -251,7 +268,7 @@ public class RemembranceAgentClient {
                 public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
                     String keyText = NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode());
 
-                    FileIO.write(User.Preferences.get(KeystrokesLogFile), DateUtils.longTimestamp() + " " + keyText + "\n");
+                    RemembranceAgentClient.sKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + keyText + "\n");
 
                     LOGGER.info("Keystroke: " + keyText);
 
