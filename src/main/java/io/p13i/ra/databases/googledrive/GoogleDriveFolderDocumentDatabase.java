@@ -115,6 +115,10 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, Cach
 
         for (File file : filesList.getFiles()) {
 
+            if (file.getName().contains("ra:no-index")) {
+                continue;
+            }
+
             LOGGER.info("Loading: " + file.getName());
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             service.files().export(file.getId(), "text/plain")
