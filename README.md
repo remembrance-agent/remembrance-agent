@@ -3,7 +3,7 @@ Java package for Remembrance Agents! Based on Rhodes/Starner
 
 [![Build Status](https://travis-ci.org/remembrance-agent/remembrance-agent.svg?branch=master)](https://travis-ci.org/glass-notes/remembrance-agent)
 
-![Logo](./img/logo-01.png)
+![Logo](./docs/img/logo.png)
 
 ## Commands
 
@@ -41,9 +41,9 @@ java -jar ./build/libs/remembrance-agent-v1.0-all.jar
 
 ![](./docs/img/ra-client-with-suggestion.png)
 
-### TextEdit opened suggestion
+### Chrome opened suggestion
 
-![](./docs/img/textedit-opened-suggestion.png)
+![](./docs/img/chrome-opened-suggestion.png)
 
 ## Developing
 
