@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 public class StringUtils {
     private static final String NULL = "<null>";
 
-    public static String truncateWithEllipse(String str, int maxLength) {
+    public static String truncateEndWithEllipse(String str, int maxLength) {
         if (str == null) {
             return NULL;
         }

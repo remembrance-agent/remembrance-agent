@@ -35,8 +35,13 @@ public class LocalDiskDocument extends Document implements CachableDocument {
 
     @Override
     public String toTruncatedUrlString() {
-        String parentFolder = StringUtils.truncateWithEllipse(FileIO.getEnclosingFolderName(this.getURL()), 10);
-        String fileName = StringUtils.truncateWithEllipse(FileIO.getFileName(this.getURL()), 9);
+        String parentFolder = StringUtils.truncateEndWithEllipse(FileIO.getEnclosingFolderName(this.getURL()), 10);
+        String fileName = StringUtils.truncateEndWithEllipse(FileIO.getFileName(this.getURL()), 9);
         return String.format("%s%s%s", parentFolder, File.separator, fileName);
+    }
+
+    @Override
+    public String getDocumentTypeName() {
+        return LocalDiskDocument.class.getSimpleName();
     }
 }

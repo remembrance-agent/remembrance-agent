@@ -29,18 +29,7 @@ import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
+import javax.swing.*;
 
 import static io.p13i.ra.gui.User.Preferences.Pref.*;
 
@@ -314,15 +303,9 @@ public class RemembranceAgentClient {
 
         if (!useCache) {
             localDiskCacheDatabase
-                    .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
-                        loadDocuments();
-                    }}.getDocumentsForSavingToCache())
-                    .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{
-                        loadDocuments();
-                    }}.getDocumentsForSavingToCache())
-                    .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
-                        loadDocuments();
-                    }}.getDocumentsForSavingToCache())
+                    .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{ loadDocuments(); }}.getDocumentsForSavingToCache())
+                    .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{ loadDocuments(); }}.getDocumentsForSavingToCache())
+                    .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{ loadDocuments(); }}.getDocumentsForSavingToCache())
                     .saveDocumentsInMemoryToDisk();
         }
 
@@ -380,10 +363,18 @@ public class RemembranceAgentClient {
 
                 for (ScoredDocument doc : suggestions) {
                     final int yPos = startY;
+
+                    sSuggestionsPanel.add(new JLabel() {{
+                        setText(Double.toString(doc.getScore()));
+                        setBounds(GUI.SUGGESTION_PADDING_LEFT, yPos, GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
+                        setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
+                    }});
+
                     sSuggestionsPanel.add(new JButton() {{
                         setText(doc.toShortString());
-                        setBounds(25, yPos, 540, 15);
-                        setPreferredSize(new Dimension(540, 15));
+                        setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, yPos, GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
+                        setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
+                        setHorizontalAlignment(SwingConstants.LEFT);
                         addActionListener(e -> {
 
                             boolean error = false;
@@ -403,8 +394,8 @@ public class RemembranceAgentClient {
                         });
                         setEnabled(true);
                     }});
-                    LOGGER.info(" -> " + doc.toString());
-                    startY += 15;
+
+                    startY += GUI.SUGGESTION_HEIGHT;
                 }
             }
 

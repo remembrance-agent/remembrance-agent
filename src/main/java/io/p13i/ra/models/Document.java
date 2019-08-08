@@ -66,6 +66,10 @@ public class Document {
     }
 
     public String toTruncatedUrlString() {
-        return StringUtils.truncateWithEllipse(this.getURL(), CONTENT_TRUNCATED_MAX_LENGTH);
+        return StringUtils.truncateEndWithEllipse(this.getURL(), CONTENT_TRUNCATED_MAX_LENGTH);
+    }
+
+    public String getDocumentTypeName() {
+        return Document.class.getSimpleName();
     }
 }

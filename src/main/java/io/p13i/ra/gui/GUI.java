@@ -12,4 +12,8 @@ public class GUI {
     public static final int BORDER_PADDING = 5;
     public static final Font FONT = new Font("monospaced", Font.PLAIN, 12);
     public static final int RA_NUMBER_SUGGESTIONS = 4;
+    public static final int SUGGESTION_HEIGHT = 15;
+    public static final int SUGGESTION_PADDING_LEFT = 25;
+    public static final int SCORE_WIDTH = 100;
+    public static final int SUGGESTION_BUTTON_WIDTH = 440;
 }

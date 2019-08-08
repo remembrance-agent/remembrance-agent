@@ -13,4 +13,8 @@ public class GmailDocument extends Document implements CachableDocument {
         this.url = "https://mail.google.com/mail/u/0/#inbox/" + id;
     }
 
+    @Override
+    public String getDocumentTypeName() {
+        return GmailDocument.class.getSimpleName();
+    }
 }

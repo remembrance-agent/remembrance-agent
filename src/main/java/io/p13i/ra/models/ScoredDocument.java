@@ -40,14 +40,14 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
     }
 
     public String toShortString() {
-        return String.format("(%04f) [%s]: %s", getScore(), StringUtils.truncateBeginningWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.asString(getMatchingTermsInDocument()));
+        return String.format("%s [%s] -- %s", this.document.getDocumentTypeName(), StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.asString(getMatchingTermsInDocument(5)));
     }
 
-    private List<String> getMatchingTermsInDocument() {
+    private List<String> getMatchingTermsInDocument(int maxCount) {
         List<String> queryWordVector = query.getWordVector();
         List<String> documentWordVector = document.getWordVector();
         List<String> intersection = ListUtils.intersection(queryWordVector, documentWordVector);
-        return ListUtils.selectLargest(intersection, 3, ((queryTerm1, queryTerm2) -> {
+        return ListUtils.selectLargest(intersection, maxCount, ((queryTerm1, queryTerm2) -> {
             double queryTerm1TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm1);
             double queryTerm2TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm2);
             return Double.compare(queryTerm1TermFrequency, queryTerm2TermFrequency);

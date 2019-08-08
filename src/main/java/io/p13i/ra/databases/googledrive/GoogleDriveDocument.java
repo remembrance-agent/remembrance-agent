@@ -30,4 +30,9 @@ class GoogleDriveDocument extends Document implements CachableDocument {
     public String getFilename() {
         return filename;
     }
+
+    @Override
+    public String getDocumentTypeName() {
+        return GoogleDriveDocument.class.getSimpleName();
+    }
 }
