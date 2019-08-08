@@ -151,11 +151,16 @@ public class FileIO {
         return new Date(new File(absoluteFilePath).lastModified() * 1000L);
     }
 
+    /**
+     * Remove non-alpha numeric characters from the string
+     * @param dirtyName A string with all sorts of characters
+     * @return with only alpha numeric characters
+     */
     public static String getCleanName(String dirtyName) {
         return dirtyName.replaceAll("[^a-zA-Z0-9]", "");
     }
 
-    public static void delete(String cacheFileName) {
-        new File(cacheFileName).delete();
+    public static void delete(String fileName) {
+        new File(fileName).delete();
     }
 }
