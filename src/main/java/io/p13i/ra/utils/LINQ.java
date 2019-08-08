@@ -21,7 +21,7 @@ public class LINQ<T> {
                 result.add(item);
             }
         }
-        return new LINQ<T>(result);
+        return new LINQ<>(result);
     }
 
     public <TSelected> LINQ<TSelected> select(Function<T, TSelected> selector) {
@@ -41,7 +41,7 @@ public class LINQ<T> {
         return this;
     }
 
-    public T first() {
+    public T first() throws NoSuchElementException {
         return this.iterable.iterator().next();
     }
 

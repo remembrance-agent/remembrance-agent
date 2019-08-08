@@ -10,69 +10,7 @@ public class ListUtils {
      * @return into a string
      */
     public static <T> String asString(List<T> list) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('[');
-        int i = 0;
-        for (T item : list) {
-            stringBuilder.append("'");
-            stringBuilder.append(item.toString());
-            stringBuilder.append("'");
-            if (i < list.size() - 1) {
-                stringBuilder.append(", ");
-            }
-            i++;
-        }
-        stringBuilder.append(']');
-        return stringBuilder.toString();
-    }
-
-    public static <T> List<T> fromArray(T[] array) {
-        return fromArray(array, new Filter<T>() {/* use default implementation */});
-    }
-
-    /**
-     * Gets a list
-     * @param array from the given array
-     * @param filter filtering certain elements
-     * @param <T> of a given type
-     * @return into a new ArrayList
-     */
-    private static <T> List<T> fromArray(T[] array, Filter<T> filter) {
-        List<T> list = new ArrayList<>(array.length);
-        for (T t : array) {
-            if (filter.shouldInclude(t)) {
-                list.add(t);
-            }
-        }
-        return list;
-    }
-
-    public static <T> T[] asArray(List<T> list) {
-        T[] array = (T[]) new Object[list.size()];
-
-        int i = 0;
-        for (T item : list) {
-            array[i++] = item;
-        }
-
-        return array;
-    }
-
-    public static <T> List<T> filter(List<T> list, Filter<T> filter) {
-        List<T> filteredList = new ArrayList<>(list.size());
-        for (T item : list) {
-            if (filter.shouldInclude(item)) {
-                filteredList.add(item);
-            }
-        }
-        return filteredList;
-    }
-
-    public interface Filter<T> {
-        @SuppressWarnings("SameReturnValue")
-        default boolean shouldInclude(T item) {
-            return true;
-        }
+        return new LINQ<>(list).toString();
     }
 
     public static <T> List<T> intersection(List<T> first, List<T> second) {
@@ -96,7 +34,6 @@ public class ListUtils {
     }
 
     public static <TSubClass extends TSuperClass, TSuperClass> List<TSuperClass> castUp(List<TSubClass> source) {
-        List<TSuperClass> newList = new ArrayList<>(source);
-        return newList;
+        return new ArrayList<>(source);
     }
 }
