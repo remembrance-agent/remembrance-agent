@@ -48,7 +48,7 @@ public class Document {
     }
 
     public void computeWordVector() {
-        cachedDocumentVector = WordVector.getWordVector(this.content);
+        cachedDocumentVector = WordVector.getWordVector(getContent());
         cachedDocumentVector = WordVector.removeMostCommonWords(cachedDocumentVector);
     }
 
