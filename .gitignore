@@ -25,3 +25,7 @@ hs_err_pid*
 # Google Drive API secret credentials
 credentials.json
 StoredCredential
+
+.idea/
+.gradle/
+
