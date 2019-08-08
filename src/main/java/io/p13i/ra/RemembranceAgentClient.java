@@ -50,6 +50,8 @@ public class RemembranceAgentClient {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
+    public static final String APPLICATION_NAME = "Remembrance Agent (v" + System.getenv("VERSION") + ")";
+
     // Settings
     private static final int KEYBOARD_BUFFER_SIZE = 75;
     private static final int RA_CLIENT_UPDATE_PERIOD_MS = 2500;

@@ -15,7 +15,7 @@ public class LoggerUtils {
             return getLoggerInternal(forClass);
         } catch (IOException e) {
             e.printStackTrace();
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
