@@ -15,6 +15,7 @@ import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.GoogleAPIUtils;
 import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.LINQ;
+import io.p13i.ra.utils.LoggerUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -23,10 +24,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 
 public class GmailDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
+
+    private static final Logger LOGGER = LoggerUtils.getLogger(GmailDocumentDatabase.class);
 
     private static final DateFormat MESSAGE_DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
 
@@ -50,19 +54,37 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
 
         // Print the labels in the user's account.
         try {
-            List<Message> response = service.users().messages().list("me").setMaxResults(this.gmailResultsLimit)
-                    .execute().getMessages();
+            List<Message> response = service
+                    .users()
+                    .messages()
+                    .list("me")
+                    .setMaxResults(this.gmailResultsLimit)
+                    .execute()
+                    .getMessages();
+
+            LOGGER.info("Loaded " + response.size() + " messages from Gmail API.");
+
             for (Message message : response) {
-                Message r = service.users().messages().get("me", message.getId()).setFormat("full")
+                Message fullMessage = service
+                        .users()
+                        .messages()
+                        .get("me", message.getId())
+                        .setFormat("full")
                         .execute();
-                if (r == null) {
+
+                LOGGER.info("Got message: " + fullMessage);
+
+                if (fullMessage == null) {
                     continue;
                 }
 
-                this.gmailDocuments.add(new GmailDocument(r.getId(), getMessageContent(r), getMessageSubject(r), getMessageSender(r), getReceivedDate(r)));
+                GmailDocument gmailDocument = new GmailDocument(fullMessage.getId(), getMessageContent(fullMessage), getMessageSubject(fullMessage), getMessageSender(fullMessage), getReceivedDate(fullMessage));
+                this.gmailDocuments.add(gmailDocument);
+
+                LOGGER.info("Added Gmail Document: " + gmailDocument.toString());
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.throwing(GmailDocumentDatabase.class.getSimpleName(), "loadDocuments", e);
             throw new RuntimeException(e);
         }
     }

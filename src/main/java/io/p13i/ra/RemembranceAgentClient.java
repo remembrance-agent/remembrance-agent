@@ -149,6 +149,16 @@ public class RemembranceAgentClient {
                             });
                         }});
                         add(new JSeparator());
+                        add(new JMenuItem("Set max Gmail email index count...") {{
+                            addActionListener(e -> {
+                                String inputId = JOptionPane.showInputDialog("Enter a count for recent emails to index (leave blank to cancel):", User.Preferences.getInt(GmailMaxEmailsCount));
+                                if (inputId != null && inputId.length() > 0 && IntegerUtils.isInt(inputId)) {
+                                    User.Preferences.set(GmailMaxEmailsCount, inputId);
+                                    LOGGER.info("Set GmailMaxEmailsCount: " + User.Preferences.getInt(GmailMaxEmailsCount));
+                                }
+                            });
+                        }});
+                        add(new JSeparator());
                         add(new JMenuItem("Select ra-client.log directory...") {{
                             addActionListener(new ActionListener() {
                                 @Override

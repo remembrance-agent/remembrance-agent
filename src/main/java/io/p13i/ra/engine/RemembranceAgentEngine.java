@@ -9,10 +9,7 @@ import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.LoggerUtils;
 import io.p13i.ra.utils.ResourceUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.logging.Logger;
 
 
@@ -35,11 +32,16 @@ public class RemembranceAgentEngine {
     }
 
     public List<ScoredDocument> determineSuggestions(Query query) {
+        if (query.getWordVector().size() == 0) {
+            return new ArrayList<>();
+        }
+
         // PriorityQueue sorts low -> high, we need to invert that
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
         ConfusionMatrix confusionMatrix = new ConfusionMatrix();
         List<Document> allDocuments = this.documentDatabase.getAllDocuments();
+        LOGGER.info("Searching " + allDocuments.size() + " documents.");
         for (Document document : allDocuments) {
             ScoredDocument scoredDoc = RemembranceAgentSuggestionCalculator.compute(query, document, allDocuments, confusionMatrix);
             scoredDocuments.add(scoredDoc);

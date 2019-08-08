@@ -15,7 +15,7 @@ public class Query {
         this.numSuggestions = numSuggestions;
     }
 
-    private String getQuery() {
+    public String getQuery() {
         return query;
     }
 
