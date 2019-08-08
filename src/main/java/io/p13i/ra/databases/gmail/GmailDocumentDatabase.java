@@ -15,6 +15,7 @@ import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
+import com.google.api.services.gmail.model.MessagePartHeader;
 import io.p13i.ra.databases.DocumentDatabase;
 import io.p13i.ra.databases.cache.CachableDocument;
 import io.p13i.ra.databases.cache.CachableDocumentDatabase;
@@ -25,9 +26,12 @@ import io.p13i.ra.utils.ListUtils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
 
 public class GmailDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
 
@@ -70,10 +74,33 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
                 }
 
                 String body = getMessageContent(r);
-                this.gmailDocuments.add(new GmailDocument(body, null, null, null));
+                String subject = getMessageSubject(r);
+                String sender = getMessageSender(r);
+                Date receivedDate = getReceivedDate(r);
+                this.gmailDocuments.add(new GmailDocument(body, subject, sender, receivedDate));
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private Date getReceivedDate(Message message) {
+        try {
+            List<String> received = getHeaderValues(message, "Received");
+            List<String> utcIncludingHeaders = ListUtils.filter(received, new ListUtils.Filter<String>() {
+                @Override
+                public boolean shouldInclude(String item) {
+                    return item.contains("+0000");
+                }
+            });
+            String[] receivedHeaderParts = utcIncludingHeaders.get(0).split(";");
+            String dateString = receivedHeaderParts[1].trim();
+            dateString = dateString.substring(0, dateString.indexOf("+0000") + "+0000".length());
+            DateFormat format = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
+            return format.parse(dateString);
+        } catch (ParseException | IndexOutOfBoundsException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -121,8 +148,26 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
         GmailDocumentDatabase database = new GmailDocumentDatabase();
         database.loadDocuments();
         for (Document document : database.getAllDocuments()) {
-            System.out.println(document.getContent());
+            System.out.println(document.getContext().getDate());
         }
+    }
+
+    private static List<String> getHeaderValues(Message message, String headerName) {
+        List<String> matchingValues = new ArrayList<>();
+        for (MessagePartHeader header : message.getPayload().getHeaders()) {
+            if (header.getName().equals(headerName)) {
+                matchingValues.add(header.getValue());
+            }
+        }
+        return matchingValues;
+    }
+
+    private String getMessageSender(Message message) {
+        return getHeaderValues(message, "From").get(0);
+    }
+
+    private static String getMessageSubject(Message message) {
+        return getHeaderValues(message, "Subject").get(0);
     }
 
     /*

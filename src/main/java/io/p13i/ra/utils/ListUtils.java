@@ -47,7 +47,28 @@ public class ListUtils {
         return list;
     }
 
-    interface Filter<T> {
+    public static <T> T[] asArray(List<T> list) {
+        T[] array = (T[]) new Object[list.size()];
+
+        int i = 0;
+        for (T item : list) {
+            array[i++] = item;
+        }
+
+        return array;
+    }
+
+    public static <T> List<T> filter(List<T> list, Filter<T> filter) {
+        List<T> filteredList = new ArrayList<>(list.size());
+        for (T item : list) {
+            if (filter.shouldInclude(item)) {
+                filteredList.add(item);
+            }
+        }
+        return filteredList;
+    }
+
+    public interface Filter<T> {
         @SuppressWarnings("SameReturnValue")
         default boolean shouldInclude(T item) {
             return true;
