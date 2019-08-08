@@ -120,12 +120,13 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
+    private static final String TOKENS_DIRECTORY_PATH = "gmail-tokens";
 
     private Gmail getGmailService() {
         try {
             // Build a new authorized API client service.
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            return new Gmail.Builder(HTTP_TRANSPORT, GoogleAPIUtils.JSON_FACTORY,  GoogleAPIUtils.getCredentials(HTTP_TRANSPORT, SCOPES))
+            return new Gmail.Builder(HTTP_TRANSPORT, GoogleAPIUtils.JSON_FACTORY,  GoogleAPIUtils.getCredentials(HTTP_TRANSPORT, SCOPES, TOKENS_DIRECTORY_PATH))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
         } catch (IOException | GeneralSecurityException e) {

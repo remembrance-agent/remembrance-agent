@@ -19,7 +19,6 @@ import java.util.List;
 
 public class GoogleAPIUtils {
 
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
     public static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
@@ -30,7 +29,7 @@ public class GoogleAPIUtils {
      * @return An authorized Credential object.
      * @throws IOException If the credentials.json file cannot be found.
      */
-    public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, List<String> scopes) throws IOException {
+    public static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, List<String> scopes, String tokensDirectoryPath) throws IOException {
         // Load client secrets.
         InputStream in = GoogleDriveFolderDocumentDatabase.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
         if (in == null) {
@@ -41,7 +40,7 @@ public class GoogleAPIUtils {
         // Build flow and trigger user authorization request.
         GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
                 HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, scopes)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(tokensDirectoryPath)))
                 .setAccessType("offline")
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();

@@ -3,8 +3,9 @@ package io.p13i.ra.databases.cache;
 import java.util.List;
 
 interface LocalDiskCache {
-    void loadDocumentsFromCache();
+    void loadDocumentsFromDiskIntoMemory();
     // Allow method chaining
-    LocalDiskCacheDocumentDatabase saveDocumentsToCache(List<CachableDocument> cachableDocuments);
+    void saveDocumentsInMemoryToDisk();
+    LocalDiskCacheDocumentDatabase addDocumentsToMemory(List<CachableDocument> cachableDocuments);
 }
 

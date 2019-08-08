@@ -314,15 +314,16 @@ public class RemembranceAgentClient {
 
         if (!useCache) {
             localDiskCacheDatabase
-                    .saveDocumentsToCache(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
+                    .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
                         loadDocuments();
                     }}.getDocumentsForSavingToCache())
-                    .saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{
+                    .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{
                         loadDocuments();
                     }}.getDocumentsForSavingToCache())
-                    .saveDocumentsToCache(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
+                    .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
                         loadDocuments();
-                    }}.getDocumentsForSavingToCache());
+                    }}.getDocumentsForSavingToCache())
+                    .saveDocumentsInMemoryToDisk();
         }
 
         LOGGER.info("Using " + localDiskCacheDatabase.getName());

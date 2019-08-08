@@ -35,6 +35,7 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, Cach
      * If modifying these scopes, delete your previously saved tokens/ folder.
      */
     private static final List<String> SCOPES = Collections.singletonList(DriveScopes.DRIVE_READONLY);
+    private static final String TOKENS_DIRECTORY_PATH = "gooele-drive-tokens";
 
     private final String rootFolderID;
     private final List<GoogleDriveDocument> googleDriveDocuments;
@@ -63,7 +64,7 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, Cach
         try {
             // Build a new authorized API client service.
             final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-            return new Drive.Builder(HTTP_TRANSPORT, GoogleAPIUtils.JSON_FACTORY, GoogleAPIUtils.getCredentials(HTTP_TRANSPORT, SCOPES))
+            return new Drive.Builder(HTTP_TRANSPORT, GoogleAPIUtils.JSON_FACTORY, GoogleAPIUtils.getCredentials(HTTP_TRANSPORT, SCOPES, TOKENS_DIRECTORY_PATH))
                     .setApplicationName(APPLICATION_NAME)
                     .build();
         } catch (IOException | GeneralSecurityException e) {
