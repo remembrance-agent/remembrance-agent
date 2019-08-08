@@ -8,8 +8,9 @@ import java.util.Date;
 
 public class GmailDocument extends Document implements CachableDocument {
 
-    public GmailDocument(String body, String subject, String sender, Date date) {
+    public GmailDocument(String id, String body, String subject, String sender, Date date) {
         super(body, new Context(null, sender, subject, date));
+        this.url = "https://mail.google.com/mail/u/0/#inbox/" + id;
     }
 
 }

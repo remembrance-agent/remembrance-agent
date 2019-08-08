@@ -13,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
+import io.p13i.ra.databases.gmail.GmailDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
@@ -41,10 +42,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 
-import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
-import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
-import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
-import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
+import static io.p13i.ra.gui.User.Preferences.Pref.*;
 
 public class RemembranceAgentClient {
 
@@ -302,20 +300,24 @@ public class RemembranceAgentClient {
             sRemembranceAgentUpdateTimer = null;
         }
 
-        LocalDiskCacheDocumentDatabase database = new LocalDiskCacheDocumentDatabase("/Users/p13i/Documents/RA/~cache");
+        LocalDiskCacheDocumentDatabase localDiskCacheDatabase = new LocalDiskCacheDocumentDatabase("/Users/p13i/Documents/RA/~cache");
 
         if (!useCache) {
-            database.saveDocumentsToCache(new LocalDiskDocumentDatabase(User.Preferences.get(LocalDiskDocumentsFolderPath)) {{
-                loadDocuments();
-            }}.getDocumentsForSavingToCache());
-            database.saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(User.Preferences.get(GoogleDriveFolderID)) {{
-                loadDocuments();
-            }}.getDocumentsForSavingToCache());
+            localDiskCacheDatabase
+                    .saveDocumentsToCache(new LocalDiskDocumentDatabase(User.Preferences.get(LocalDiskDocumentsFolderPath)) {{
+                        loadDocuments();
+                    }}.getDocumentsForSavingToCache())
+                    .saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(User.Preferences.get(GoogleDriveFolderID)) {{
+                        loadDocuments();
+                    }}.getDocumentsForSavingToCache())
+                    .saveDocumentsToCache(new GmailDocumentDatabase(Integer.parseInt(User.Preferences.get(GmailMaxEmailsCount))) {{
+                        loadDocuments();
+                    }}.getDocumentsForSavingToCache());
         }
 
-        LOGGER.info("Using " + database.getName());
+        LOGGER.info("Using " + localDiskCacheDatabase.getName());
 
-        sRemembranceAgentEngine = new RemembranceAgentEngine(database);
+        sRemembranceAgentEngine = new RemembranceAgentEngine(localDiskCacheDatabase);
         LOGGER.info("Initialized Remembrance Agent.");
 
         LOGGER.info("Loading/indexing documents...");
@@ -326,7 +328,7 @@ public class RemembranceAgentClient {
         }
 
         sSuggestionsPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createTitledBorder("Suggestions (from " + database.getName() + ")"),
+                BorderFactory.createTitledBorder("Suggestions (from " + localDiskCacheDatabase.getName() + ")"),
                 BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
         sSuggestionsPanel.invalidate();
         sSuggestionsPanel.repaint();

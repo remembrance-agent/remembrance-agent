@@ -61,7 +61,7 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
         }
     }
 
-    public void saveDocumentsToCache(List<CachableDocument> cachableDocuments) {
+    public LocalDiskCacheDocumentDatabase saveDocumentsToCache(List<CachableDocument> cachableDocuments) {
         // Delete all documents already in cache
         List<String> documentsInCache = FileIO.listFiles(this.cacheLocalDirectory);
         for (String documentPath : documentsInCache) {
@@ -84,6 +84,8 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
             String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
             FileIO.write(cacheFileName, cachableDocument.getContent());
         }
+
+        return this;
     }
 
     @Override
