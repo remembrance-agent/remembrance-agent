@@ -28,8 +28,6 @@ class RemembranceAgentSuggestionCalculator {
     public static ScoredDocument compute(Query query, Document document, List<Document> allDocuments, ConfusionMatrix confusionMatrix) {
         List<String> wordVector = query.getWordVector();
 
-        LOGGER.info("Computed query word vector: '" + ListUtils.asString(wordVector) + "'");
-
         double wordScoreSum = 0.0;
         for (String word : wordVector) {
             double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);

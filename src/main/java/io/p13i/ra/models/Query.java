@@ -8,11 +8,13 @@ public class Query {
     private final String query;
     private final Context context;
     private final int numSuggestions;
+    private List<String> cachedWordVector;
 
     public Query(String query, Context context, int numSuggestions) {
         this.query = query;
         this.context = context;
         this.numSuggestions = numSuggestions;
+        this.computeWordVector();
     }
 
     public String getQuery() {
@@ -27,9 +29,12 @@ public class Query {
         return numSuggestions;
     }
 
+    public void computeWordVector() {
+        this.cachedWordVector = WordVector.getWordVector(getQuery());
+        this.cachedWordVector = WordVector.removeMostCommonWords(cachedWordVector);
+    }
+
     public List<String> getWordVector() {
-        List<String> wordVector = WordVector.getWordVector(getQuery());
-        wordVector = WordVector.removeMostCommonWords(wordVector);
-        return wordVector;
+        return cachedWordVector;
     }
 }
