@@ -3,7 +3,6 @@ package io.p13i.ra.gui;
 import io.p13i.ra.RemembranceAgentClient;
 
 import java.io.File;
-import java.util.Objects;
 
 import static java.util.prefs.Preferences.userNodeForPackage;
 
@@ -31,7 +30,7 @@ public class User {
             }
         }
 
-        public static String get(Pref getPref) {
+        public static String getString(Pref getPref) {
 
             for (Pref pref : Pref.values()) {
                 if (getPref.nodeName.equals(pref.nodeName)) {
@@ -40,6 +39,10 @@ public class User {
             }
 
             throw new IllegalArgumentException(getPref.toString());
+        }
+
+        public static int getInt(Pref getPref) {
+            return Integer.parseInt(getString(getPref));
         }
 
         public static void set(Pref pref, String value) {

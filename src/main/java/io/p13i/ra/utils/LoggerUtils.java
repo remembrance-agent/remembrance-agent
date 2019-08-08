@@ -22,7 +22,7 @@ public class LoggerUtils {
     private static <T> Logger getLoggerInternal(Class<T> forClass) throws IOException {
         Logger LOGGER = Logger.getLogger(forClass.getName());
         LOGGER.setLevel(Level.INFO);
-        LOGGER.addHandler(new FileHandler(User.Preferences.get(RAClientLogFile)) {{
+        LOGGER.addHandler(new FileHandler(User.Preferences.getString(RAClientLogFile)) {{
             setFormatter(new DefaultTimestampedFormatter());
         }});
         LOGGER.addHandler(new ConsoleHandler() {{

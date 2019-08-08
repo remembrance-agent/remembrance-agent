@@ -72,7 +72,7 @@ public class RemembranceAgentClient {
 
     public static void main(String[] args) {
 
-        sKeyLoggerBufferLogFileWriter = new BufferingLogFileWriter(User.Preferences.get(KeystrokesLogFile));
+        sKeyLoggerBufferLogFileWriter = new BufferingLogFileWriter(User.Preferences.getString(KeystrokesLogFile));
         sKeyLoggerBufferLogFileWriter.open();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -134,17 +134,17 @@ public class RemembranceAgentClient {
                                     fileChooser.setAcceptAllFileFilterUsed(false);
                                     if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
                                         User.Preferences.set(LocalDiskDocumentsFolderPath, fileChooser.getSelectedFile().toPath().toString());
-                                        LOGGER.info("Selected directory: " + User.Preferences.get(LocalDiskDocumentsFolderPath));
+                                        LOGGER.info("Selected directory: " + User.Preferences.getString(LocalDiskDocumentsFolderPath));
                                     }
                                 }
                             });
                         }});
                         add(new JMenuItem("Set Google Drive folder ID...") {{
                             addActionListener(e -> {
-                                String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder ID (leave blank to cancel):", User.Preferences.get(GoogleDriveFolderID));
+                                String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder ID (leave blank to cancel):", User.Preferences.getString(GoogleDriveFolderID));
                                 if (inputId != null && inputId.length() > 0) {
                                     User.Preferences.set(GoogleDriveFolderID, inputId);
-                                    LOGGER.info("Set Google Drive Folder ID: " + User.Preferences.get(GoogleDriveFolderID));
+                                    LOGGER.info("Set Google Drive Folder ID: " + User.Preferences.getString(GoogleDriveFolderID));
                                 }
                             });
                         }});
@@ -159,8 +159,8 @@ public class RemembranceAgentClient {
                                     fileChooser.setAcceptAllFileFilterUsed(false);
                                     if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
                                         User.Preferences.set(RAClientLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "ra-client.log");
-                                        LOGGER.info("Selected ra-client.log file: " + User.Preferences.get(RAClientLogFile));
-                                        JOptionPane.showMessageDialog(sJFrame, "Selected ra-client.log file: " + User.Preferences.get(RAClientLogFile));
+                                        LOGGER.info("Selected ra-client.log file: " + User.Preferences.getString(RAClientLogFile));
+                                        JOptionPane.showMessageDialog(sJFrame, "Selected ra-client.log file: " + User.Preferences.getString(RAClientLogFile));
                                     }
                                 }
                             });
@@ -168,7 +168,7 @@ public class RemembranceAgentClient {
                         add(new JMenuItem("Open ra-client.log log...") {{
                             addActionListener(e -> {
                                 try {
-                                    Desktop.getDesktop().open(new File(User.Preferences.get(RAClientLogFile)));
+                                    Desktop.getDesktop().open(new File(User.Preferences.getString(RAClientLogFile)));
                                 } catch (IOException ex) {
                                     ex.printStackTrace();
                                 }
@@ -200,9 +200,9 @@ public class RemembranceAgentClient {
                                     fileChooser.setAcceptAllFileFilterUsed(false);
                                     if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
                                         User.Preferences.set(User.Preferences.Pref.KeystrokesLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "keystrokes.log");
-                                        LOGGER.info("Selected keystrokes.log file directory: " + User.Preferences.get(KeystrokesLogFile));
+                                        LOGGER.info("Selected keystrokes.log file directory: " + User.Preferences.getString(KeystrokesLogFile));
                                         sKeystrokeBufferLabel.setBorder(BorderFactory.createCompoundBorder(
-                                                BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.get(KeystrokesLogFile) + ")"),
+                                                BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")"),
                                                 BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
                                     }
                                 }
@@ -211,7 +211,7 @@ public class RemembranceAgentClient {
                         add(new JMenuItem("Open keystrokes.log log...") {{
                             addActionListener(e -> {
                                 try {
-                                    Desktop.getDesktop().open(new File(User.Preferences.get(KeystrokesLogFile)));
+                                    Desktop.getDesktop().open(new File(User.Preferences.getString(KeystrokesLogFile)));
                                 } catch (IOException ex) {
                                     ex.printStackTrace();
                                 }
@@ -233,14 +233,14 @@ public class RemembranceAgentClient {
                 add(sSuggestionsPanel = new JPanel() {{
                     setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT);
                     setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createTitledBorder("Suggestions (from " + User.Preferences.get(LocalDiskDocumentsFolderPath) + ")"),
+                            BorderFactory.createTitledBorder("Suggestions (from " + User.Preferences.getString(LocalDiskDocumentsFolderPath) + ")"),
                             BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
                     setFont(GUI.FONT);
                 }});
                 add(sKeystrokeBufferLabel = new JLabel() {{
                     setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP + GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
                     setBorder(BorderFactory.createCompoundBorder(
-                            BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.get(KeystrokesLogFile) + ")"),
+                            BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")"),
                             BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
                     setFont(GUI.FONT);
                 }});
@@ -304,13 +304,13 @@ public class RemembranceAgentClient {
 
         if (!useCache) {
             localDiskCacheDatabase
-                    .saveDocumentsToCache(new LocalDiskDocumentDatabase(User.Preferences.get(LocalDiskDocumentsFolderPath)) {{
+                    .saveDocumentsToCache(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
                         loadDocuments();
                     }}.getDocumentsForSavingToCache())
-                    .saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(User.Preferences.get(GoogleDriveFolderID)) {{
+                    .saveDocumentsToCache(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{
                         loadDocuments();
                     }}.getDocumentsForSavingToCache())
-                    .saveDocumentsToCache(new GmailDocumentDatabase(Integer.parseInt(User.Preferences.get(GmailMaxEmailsCount))) {{
+                    .saveDocumentsToCache(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
                         loadDocuments();
                     }}.getDocumentsForSavingToCache());
         }
