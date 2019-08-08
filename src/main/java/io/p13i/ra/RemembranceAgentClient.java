@@ -303,9 +303,9 @@ public class RemembranceAgentClient {
 
         if (!useCache) {
             localDiskCacheDatabase
-                    .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{ loadDocuments(); }}.getDocumentsForSavingToCache())
-                    .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{ loadDocuments(); }}.getDocumentsForSavingToCache())
-                    .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{ loadDocuments(); }}.getDocumentsForSavingToCache())
+                    .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{ loadDocuments(); }})
+                    .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{ loadDocuments(); }})
+                    .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{ loadDocuments(); }})
                     .saveDocumentsInMemoryToDisk();
         }
 

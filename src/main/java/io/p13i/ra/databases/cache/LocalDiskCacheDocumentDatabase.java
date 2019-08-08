@@ -89,8 +89,8 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
     }
 
     @Override
-    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(List<CachableDocument> cachableDocuments) {
-        this.documentsFromMemory.addAll(cachableDocuments);
+    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(CachableDocumentDatabase cachableDocumentDatabase) {
+        this.documentsFromMemory.addAll(cachableDocumentDatabase.getDocumentsForSavingToCache());
         return this;
     }
 

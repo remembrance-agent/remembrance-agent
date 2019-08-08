@@ -4,8 +4,8 @@ import java.util.List;
 
 interface LocalDiskCache {
     void loadDocumentsFromDiskIntoMemory();
-    // Allow method chaining
     void saveDocumentsInMemoryToDisk();
-    LocalDiskCacheDocumentDatabase addDocumentsToMemory(List<CachableDocument> cachableDocuments);
+    // Allow method chaining
+    LocalDiskCacheDocumentDatabase addDocumentsToMemory(CachableDocumentDatabase cachableDocumentDatabase);
 }
 

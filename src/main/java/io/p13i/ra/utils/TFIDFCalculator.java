@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * @author Mohamed Guendouz
+ * @author Pramod Kotipalli (@p13i)
  */
 public class TFIDFCalculator {
     /**
