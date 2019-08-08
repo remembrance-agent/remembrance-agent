@@ -10,37 +10,24 @@ import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
 
 public class LoggerUtils {
 
-    private static ConsoleHandler sDefaultConsoleHandler;
-    private static FileHandler sDefaultFileHandler;
-
-    private static FileHandler getDefaultFileHandlerInstance() {
-        if (sDefaultFileHandler == null) {
-            try {
-                sDefaultFileHandler = new FileHandler(User.Preferences.get(RAClientLogFile)) {{
-                    setFormatter(new DefaultTimestampedFormatter());
-                }};
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return sDefaultFileHandler;
-    }
-
-    private static ConsoleHandler getDefaultConsoleHandlerInstance() {
-        if (sDefaultConsoleHandler == null) {
-            sDefaultConsoleHandler = new ConsoleHandler() {{
-                setFormatter(new LoggerUtils.DefaultTimestampedFormatter());
-            }};
-        }
-        return sDefaultConsoleHandler;
-    }
-
-
     public static <T> Logger getLogger(Class<T> forClass) {
+        try {
+            return getLoggerInternal(forClass);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private static <T> Logger getLoggerInternal(Class<T> forClass) throws IOException {
         Logger LOGGER = Logger.getLogger(forClass.getName());
         LOGGER.setLevel(Level.INFO);
-        LOGGER.addHandler(getDefaultConsoleHandlerInstance());
-        LOGGER.addHandler(getDefaultFileHandlerInstance());
+        LOGGER.addHandler(new FileHandler(User.Preferences.get(RAClientLogFile)) {{
+            setFormatter(new DefaultTimestampedFormatter());
+        }});
+        LOGGER.addHandler(new ConsoleHandler() {{
+            setFormatter(new LoggerUtils.DefaultTimestampedFormatter());
+        }});
         return LOGGER;
     }
 
