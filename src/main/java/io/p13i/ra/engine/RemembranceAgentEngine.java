@@ -47,7 +47,7 @@ public class RemembranceAgentEngine {
             scoredDocuments.add(scoredDoc);
         }
 
-        LOGGER.info("\n" + confusionMatrix.toString());
+//        LOGGER.info("\n" + confusionMatrix.toString());
 
         // Get the top numSuggestions documents
         List<ScoredDocument> suggestedDocuments = new ArrayList<>(query.getNumSuggestions());
