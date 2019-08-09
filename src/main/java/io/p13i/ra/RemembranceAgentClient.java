@@ -2,10 +2,7 @@ package io.p13i.ra;
 
 import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -55,14 +52,14 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener {
     // RA variables
     private static RemembranceAgentEngine sRemembranceAgentEngine;
     private static String sPriorQuery;
-    private static RemembranceAgentClient instance = new RemembranceAgentClient();
+    private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(RemembranceAgentClient.getInstance());
     }
 
     public static RemembranceAgentClient getInstance() {
-        return instance;
+        return sInstance;
     }
 
     @Override
@@ -158,7 +155,7 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener {
     }
 
     private void sendQueryToRemembranceAgent() {
-        GUI.sJFrame.setTitle("* REMEMBRANCE AGENT *");
+        GUI.sJFrame.setTitle("*** " + APPLICATION_NAME + " ***");
 
         String query = sBreakingBuffer.toString();
 
@@ -226,7 +223,7 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener {
             sPriorQuery = query;
         }
 
-        GUI.sJFrame.setTitle("REMEMBRANCE AGENT");
+        GUI.sJFrame.setTitle(APPLICATION_NAME);
     }
 
     @Override

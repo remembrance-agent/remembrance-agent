@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
+import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 import static io.p13i.ra.gui.User.Preferences.Pref.*;
 import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
 import static io.p13i.ra.utils.BufferingLogFileWriter.LOGGER;
@@ -33,7 +34,7 @@ public class GUI {
     public static JLabel sKeystrokeBufferLabel;
     public static JPanel sSuggestionsPanel;
 
-    public static final JFrame sJFrame = new JFrame("REMEMBRANCE AGENT") {{
+    public static final JFrame sJFrame = new JFrame(APPLICATION_NAME) {{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(GUI.WIDTH, GUI.HEIGHT);
         setResizable(false);
