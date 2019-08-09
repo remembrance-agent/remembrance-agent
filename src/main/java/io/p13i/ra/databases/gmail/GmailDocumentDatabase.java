@@ -90,18 +90,10 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
     }
 
     private Date getReceivedDate(Message message) {
-        try {
-            List<String> received = getHeaderValues(message, "Date");
-
-            if (received.size() == 0) {
-                return null;
-            }
-
-            return MESSAGE_DATE_FORMAT.parse(received.get(0));
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return getHeaderValues(message, "Date")
+                .take(1)
+                .select(GmailDocumentDatabase::tryParseMessageDate)
+                .firstOrDefault();
     }
 
     @Override
@@ -135,19 +127,27 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
         }
     }
 
-    private static List<String> getHeaderValues(Message message, String headerName) {
+    private static LINQList<String> getHeaderValues(Message message, String headerName) {
         return new LINQList<>(message.getPayload().getHeaders())
                 .where(header -> header.getName().equals(headerName))
-                .select(MessagePartHeader::getValue)
-                .toList();
+                .select(MessagePartHeader::getValue);
+    }
+
+    private static Date tryParseMessageDate(String dateString) {
+        try {
+            return MESSAGE_DATE_FORMAT.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private String getMessageSender(Message message) {
-        return new LINQList<>(getHeaderValues(message, "From")).firstOrDefault();
+        return getHeaderValues(message, "From").firstOrDefault();
     }
 
     private static String getMessageSubject(Message message) {
-        return new LINQList<>(getHeaderValues(message, "Subject")).firstOrDefault();
+        return getHeaderValues(message, "Subject").firstOrDefault();
     }
 
     /*

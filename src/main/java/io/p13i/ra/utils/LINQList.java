@@ -1,7 +1,6 @@
 package io.p13i.ra.utils;
 
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -21,6 +20,18 @@ public class LINQList<T> {
             if (condition.apply(item)) {
                 result.add(item);
             }
+        }
+        return new LINQList<>(result);
+    }
+
+    public LINQList<T> take(int count) {
+        List<T> result = new LinkedList<>();
+        int n = 0;
+        for (T t : this.source) {
+            if (++n > count) {
+                break;
+            }
+            result.add(t);
         }
         return new LINQList<>(result);
     }
