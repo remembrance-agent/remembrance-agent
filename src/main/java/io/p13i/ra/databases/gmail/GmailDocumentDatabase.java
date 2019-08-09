@@ -14,7 +14,7 @@ import io.p13i.ra.databases.cache.CachableDocumentDatabase;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.utils.GoogleAPIUtils;
 import io.p13i.ra.utils.ListUtils;
-import io.p13i.ra.utils.LINQ;
+import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.LoggerUtils;
 
 import java.io.*;
@@ -136,18 +136,18 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
     }
 
     private static List<String> getHeaderValues(Message message, String headerName) {
-        return new LINQ<>(message.getPayload().getHeaders())
+        return new LINQList<>(message.getPayload().getHeaders())
                 .where(header -> header.getName().equals(headerName))
                 .select(MessagePartHeader::getValue)
                 .toList();
     }
 
     private String getMessageSender(Message message) {
-        return new LINQ<>(getHeaderValues(message, "From")).firstOrDefault();
+        return new LINQList<>(getHeaderValues(message, "From")).firstOrDefault();
     }
 
     private static String getMessageSubject(Message message) {
-        return new LINQ<>(getHeaderValues(message, "Subject")).firstOrDefault();
+        return new LINQList<>(getHeaderValues(message, "Subject")).firstOrDefault();
     }
 
     /*

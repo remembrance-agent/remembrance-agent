@@ -1,48 +1,49 @@
 package io.p13i.ra.utils;
 
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-public class LINQ<T> {
-    private final Iterable<T> iterable;
+public class LINQList<T> {
+    private final Iterable<T> source;
     private T default_ = null;
 
-    public LINQ(Iterable<T> iterable) {
-        this.iterable = iterable;
+    public LINQList(Iterable<T> source) {
+        this.source = source;
     }
 
-    public LINQ<T> where(Function<T, Boolean> condition) {
+    public LINQList<T> where(Function<T, Boolean> condition) {
         List<T> result = new LinkedList<>();
-        for (T item : iterable) {
+        for (T item : source) {
             if (condition.apply(item)) {
                 result.add(item);
             }
         }
-        return new LINQ<>(result);
+        return new LINQList<>(result);
     }
 
-    public <TSelected> LINQ<TSelected> select(Function<T, TSelected> selector) {
+    public <TSelected> LINQList<TSelected> select(Function<T, TSelected> selector) {
         List<TSelected> result = new LinkedList<>();
-        for (T item : iterable) {
+        for (T item : source) {
             result.add(selector.apply(item));
         }
-        return new LINQ<>(result);
+        return new LINQList<>(result);
     }
 
     public T default_() {
         return this.default_;
     }
 
-    public LINQ<T> setDefault(T newDefault) {
+    public LINQList<T> setDefault(T newDefault) {
         this.default_ = newDefault;
         return this;
     }
 
     public T first() throws NoSuchElementException {
-        return this.iterable.iterator().next();
+        return this.source.iterator().next();
     }
 
     public T firstOrDefault() {
@@ -55,7 +56,7 @@ public class LINQ<T> {
 
     public List<T> toList() {
         List<T> list = new LinkedList<>();
-        for (T item : iterable) {
+        for (T item : source) {
             list.add(item);
         }
         return list;
@@ -63,7 +64,7 @@ public class LINQ<T> {
 
     public int count() {
         int n = 0;
-        for (T ignored : this.iterable) {
+        for (T ignored : this.source) {
             n++;
         }
         return n;
@@ -75,7 +76,7 @@ public class LINQ<T> {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append('[');
         int i = 0;
-        for (T item : iterable) {
+        for (T item : source) {
             stringBuilder.append("'");
             stringBuilder.append(item.toString());
             stringBuilder.append("'");

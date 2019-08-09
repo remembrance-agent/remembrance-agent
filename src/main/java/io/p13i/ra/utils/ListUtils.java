@@ -10,7 +10,7 @@ public class ListUtils {
      * @return into a string
      */
     public static <T> String asString(List<T> list) {
-        return new LINQ<>(list).toString();
+        return new LINQList<>(list).toString();
     }
 
     public static <T> List<T> intersection(List<T> first, List<T> second) {
