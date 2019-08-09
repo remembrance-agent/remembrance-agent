@@ -29,3 +29,5 @@ StoredCredential
 .idea/
 .gradle/
 out/
+.DS_Store
+build/
