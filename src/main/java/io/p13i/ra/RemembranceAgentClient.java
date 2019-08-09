@@ -71,10 +71,6 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener {
             public void run() {
                 try {
                     System.out.println("Shutting down ...");
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 } finally {
                     sKeyLoggerBufferLogFileWriter.flush();
                     sKeyLoggerBufferLogFileWriter.close();
