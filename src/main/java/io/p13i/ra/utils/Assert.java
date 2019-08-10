@@ -1,17 +1,17 @@
 package io.p13i.ra.utils;
 
 public class Assert {
-    private static void that(boolean condition) {
+    public static void that(boolean condition) {
         that(condition, "Assertion rejected");
     }
 
-    private static void that(boolean condition, String message) {
+    public static void that(boolean condition, String message) {
         if (!condition) {
             fail(message);
         }
     }
 
-    private static void fail(String message) {
+    public static void fail(String message) {
         throw new AssertionError(message);
     }
 

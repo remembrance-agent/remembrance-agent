@@ -32,7 +32,7 @@ public class GUI {
     public static final int SUGGESTION_BUTTON_WIDTH = 440;
 
     // Swing elements
-    public static JLabel sKeystrokeBufferLabel;
+    public static BorderedJLabel sKeystrokeBufferLabel;
     public static JPanel sSuggestionsPanel;
     public static JDialog sSpeechDialog;
 
@@ -180,13 +180,22 @@ public class GUI {
                             public void actionPerformed(ActionEvent e) {
 
                                 SwingUtilities.invokeLater(() -> {
-                                    SpeechRecognizer speechRecognizer = new SpeechRecognizer(RemembranceAgentClient.getInstance());
+                                    sKeystrokeBufferLabel.setBorderTitle("Speech input...", GUI.BORDER_PADDING);
+                                    sKeystrokeBufferLabel.invalidate();
+                                    sKeystrokeBufferLabel.repaint();
+
+                                    SpeechRecognizer speechRecognizer = new SpeechRecognizer();
+                                    speechRecognizer.setOnInputCallback(RemembranceAgentClient.getInstance());
                                     setTitle("Start speaking...");
                                     for (int i = 0; i < 1; i++) {
                                         LOGGER.info("" + i);
-                                        speechRecognizer.recognizeFromMicrophone(10);
+                                        speechRecognizer.startInput();
                                     }
                                     setTitle("Stop speaking...");
+
+                                    sKeystrokeBufferLabel.setBorderTitle("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")", GUI.BORDER_PADDING);
+                                    sKeystrokeBufferLabel.invalidate();
+                                    sKeystrokeBufferLabel.repaint();
                                 });
 
                             }
@@ -212,11 +221,9 @@ public class GUI {
                         BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
                 setFont(GUI.FONT);
             }});
-            add(sKeystrokeBufferLabel = new JLabel() {{
+            add(sKeystrokeBufferLabel = new BorderedJLabel() {{
                 setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP + GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
-                setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")"),
-                        BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
+                setBorderTitle("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
         }});

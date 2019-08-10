@@ -4,7 +4,6 @@ package io.p13i.ra.utils;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 public class LINQList<T> {
     private final Iterable<T> source;
@@ -20,6 +19,22 @@ public class LINQList<T> {
             charactersList.add(string.charAt(i));
         }
         return new LINQList<>(charactersList);
+    }
+
+    public static LINQList<Integer> range(int start, int end) {
+        Assert.that(start >= 0);
+        Assert.that(end > 0);
+        Assert.that(start < end);
+        List<Integer> integerList = new ArrayList<>(end);
+        for (int i = start; i < end; i++) {
+            integerList.add(i);
+        }
+        return new LINQList<>(integerList);
+    }
+
+
+    public static LINQList<Integer> range(int end) {
+        return range(0, end);
     }
 
     public LINQList<T> where(Function<T, Boolean> condition) {

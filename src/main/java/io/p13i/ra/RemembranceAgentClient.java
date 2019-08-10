@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.io.File;
 import java.util.*;
 import java.util.Timer;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -17,26 +16,34 @@ import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
 import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
+import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.input.speech.SpeechRecognizer;
-import io.p13i.ra.utils.*;
+import io.p13i.ra.utils.BufferingLogFileWriter;
+import io.p13i.ra.utils.DateUtils;
+import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
+import io.p13i.ra.utils.LoggerUtils;
+import io.p13i.ra.utils.URIUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.dispatcher.SwingDispatchService;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
-import io.p13i.ra.utils.CharacterUtils;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 
-import javax.swing.*;
+import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;
+import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
+import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
+import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
 
-import static io.p13i.ra.gui.GUI.sSpeechDialog;
-import static io.p13i.ra.gui.User.Preferences.Pref.*;
-
-public class RemembranceAgentClient implements Runnable, NativeKeyListener, SpeechRecognizer.OnRecognize {
+public class RemembranceAgentClient implements Runnable, NativeKeyListener, AbstractInputMechanism.OnInput {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
@@ -252,10 +259,8 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Spee
     }
 
     @Override
-    public void onRecognize(String cumilativeTranscript, String newText) {
-        LINQList.from(cumilativeTranscript)
-            .select(CharacterUtils::toUpperCase)
-            .forEach(sBreakingBuffer::addCharacter);
+    public void onInput(Character c) {
+        sBreakingBuffer.addCharacter(c);
         GUI.sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
     }
 }

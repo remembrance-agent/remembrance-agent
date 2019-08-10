@@ -12,6 +12,9 @@ import com.google.cloud.speech.v1.StreamingRecognitionResult;
 import com.google.cloud.speech.v1.StreamingRecognizeRequest;
 import com.google.cloud.speech.v1.StreamingRecognizeResponse;
 import com.google.protobuf.ByteString;
+import io.p13i.ra.input.AbstractInputMechanism;
+import io.p13i.ra.utils.CharacterUtils;
+import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.LoggerUtils;
 
 import javax.sound.sampled.AudioFormat;
@@ -22,65 +25,69 @@ import javax.sound.sampled.TargetDataLine;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-public class SpeechRecognizer {
+public class SpeechRecognizer extends AbstractInputMechanism implements ResponseObserver<StreamingRecognizeResponse> {
 
     private static Logger LOGGER = LoggerUtils.getLogger(SpeechRecognizer.class);
-    private OnRecognize mOnRecognizeCallback;
 
-    /**
-     * Demonstrates using the Speech API to transcribe an audio file.
-     */
-    public static void main(String... args) {
+    ArrayList<StreamingRecognizeResponse> responses = new ArrayList<>();
+
+    @Override
+    public void startInput() {
+        recognizeFromMicrophone(10);
     }
 
-    public SpeechRecognizer(SpeechRecognizer.OnRecognize onRecognizeCallback) {
-        mOnRecognizeCallback = onRecognizeCallback;
+    @Override
+    public void endInput() {
+
+    }
+
+
+    @Override
+    public void onStart(StreamController controller) {
+    }
+
+    @Override
+    public void onResponse(StreamingRecognizeResponse response) {
+        LOGGER.info("Got response: " + getTranscript(response));
+        responses.add(response);
+    }
+
+    @Override
+    public void onComplete() {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (StreamingRecognizeResponse response : responses) {
+            String transcript = getTranscript(response);
+            LOGGER.info("Transcript : " + getTranscript(response));
+            stringBuilder.append(transcript);
+
+            LINQList.from(transcript)
+                    .select(CharacterUtils::toUpperCase)
+                    .forEach(onInputCallback::onInput);
+        }
+    }
+
+    private String getTranscript(StreamingRecognizeResponse response) {
+        StreamingRecognitionResult result = response.getResultsList().get(0);
+        SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
+        return alternative.getTranscript();
+    }
+
+    @Override
+    public void onError(Throwable t) {
+        LOGGER.throwing(SpeechRecognizer.class.getSimpleName(), "onError", t);
+        throw new RuntimeException(t);
     }
 
     /**
      * Performs microphone streaming speech recognition with a duration of 1 minute.
      */
-    public void recognizeFromMicrophone(int durationSecs) {
-
-        ResponseObserver<StreamingRecognizeResponse> responseObserver =
-                new ResponseObserver<StreamingRecognizeResponse>() {
-                    ArrayList<StreamingRecognizeResponse> responses = new ArrayList<>();
-
-                    public void onStart(StreamController controller) {
-                    }
-
-                    public void onResponse(StreamingRecognizeResponse response) {
-                        LOGGER.info("Got response: " + getTranscript(response));
-                        responses.add(response);
-                    }
-
-                    public void onComplete() {
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (StreamingRecognizeResponse response : responses) {
-                            String transcript = getTranscript(response);
-                            LOGGER.info("Transcript : " + getTranscript(response));
-                            stringBuilder.append(transcript);
-                            mOnRecognizeCallback.onRecognize(stringBuilder.toString(), transcript);
-                        }
-                    }
-
-                    public String getTranscript(StreamingRecognizeResponse response) {
-                        StreamingRecognitionResult result = response.getResultsList().get(0);
-                        SpeechRecognitionAlternative alternative = result.getAlternativesList().get(0);
-                        return alternative.getTranscript();
-                    }
-
-                    public void onError(Throwable t) {
-                        LOGGER.throwing(SpeechRecognizer.class.getSimpleName(), "onError", t);
-                        throw new RuntimeException(t);
-                    }
-                };
+    private void recognizeFromMicrophone(int durationSecs) {
 
         try (SpeechClient client = SpeechClient.create()) {
 
             ClientStream<StreamingRecognizeRequest> clientStream = client
                     .streamingRecognizeCallable()
-                    .splitCall(responseObserver);
+                    .splitCall(this);
 
             RecognitionConfig recognitionConfig =  RecognitionConfig.newBuilder()
                     .setEncoding(RecognitionConfig.AudioEncoding.LINEAR16)
@@ -143,10 +150,7 @@ public class SpeechRecognizer {
             throw new RuntimeException(e);
         }
 
-        responseObserver.onComplete();
+        this.onComplete();
     }
 
-    public interface OnRecognize {
-        void onRecognize(String cumilativeTranscript, String newText);
-    }
 }

@@ -9,4 +9,8 @@ public class IntegerUtils {
             return false;
         }
     }
+
+    public static Character asCharacter(Integer i) {
+        return i.toString().charAt(0);
+    }
 }
