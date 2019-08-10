@@ -24,6 +24,7 @@ sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
 }
 
 test {
@@ -51,4 +52,9 @@ dependencies {
     
     // Gmail API
     compile 'com.google.apis:google-api-services-gmail:v1-rev83-1.23.0'
+
+    // Speech Recognition
+    compile group: 'com.google.cloud', name: 'google-cloud-speech', version:'1.13.0'
+
+    compile 'com.google.guava:guava:24.1.1-jre'
 }

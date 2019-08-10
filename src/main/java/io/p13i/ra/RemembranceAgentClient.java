@@ -3,9 +3,9 @@ package io.p13i.ra;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.io.File;
-import java.util.List;
+import java.util.*;
 import java.util.Timer;
-import java.util.TimerTask;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -21,6 +21,7 @@ import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
+import io.p13i.ra.input.speech.SpeechRecognizer;
 import io.p13i.ra.utils.*;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
@@ -28,11 +29,14 @@ import org.jnativehook.dispatcher.SwingDispatchService;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import io.p13i.ra.utils.CharacterUtils;
+
 import javax.swing.*;
 
+import static io.p13i.ra.gui.GUI.sSpeechDialog;
 import static io.p13i.ra.gui.User.Preferences.Pref.*;
 
-public class RemembranceAgentClient implements Runnable, NativeKeyListener {
+public class RemembranceAgentClient implements Runnable, NativeKeyListener, SpeechRecognizer.OnRecognize {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
@@ -231,7 +235,7 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener {
     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
         String keyText = NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode());
 
-        RemembranceAgentClient.sKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + keyText + "\n");
+        sKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + keyText + "\n");
 
         LOGGER.info("Keystroke: " + keyText);
 
@@ -245,5 +249,13 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener {
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
 
+    }
+
+    @Override
+    public void onRecognize(String cumilativeTranscript, String newText) {
+        LINQList.from(cumilativeTranscript)
+            .select(CharacterUtils::toUpperCase)
+            .forEach(sBreakingBuffer::addCharacter);
+        GUI.sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
     }
 }

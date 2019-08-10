@@ -2,7 +2,6 @@ package io.p13i.ra.databases.gmail;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.repackaged.org.apache.commons.codec.binary.Base64;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
@@ -156,7 +155,7 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
     private static String getMessageContent(Message message) {
         StringBuilder stringBuilder = new StringBuilder();
         getPlainTextFromMessagePartsRecursive(message.getPayload().getParts(), stringBuilder);
-        return new String(Base64.decodeBase64(stringBuilder.toString()), StandardCharsets.UTF_8);
+        return new String(Base64.getDecoder().decode(stringBuilder.toString()), StandardCharsets.UTF_8);
     }
 
     /*

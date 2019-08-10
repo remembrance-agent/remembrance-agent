@@ -1,6 +1,7 @@
 package io.p13i.ra.gui;
 
 import io.p13i.ra.RemembranceAgentClient;
+import io.p13i.ra.input.speech.SpeechRecognizer;
 import io.p13i.ra.utils.IntegerUtils;
 
 import javax.swing.*;
@@ -33,6 +34,7 @@ public class GUI {
     // Swing elements
     public static JLabel sKeystrokeBufferLabel;
     public static JPanel sSuggestionsPanel;
+    public static JDialog sSpeechDialog;
 
     public static final JFrame sJFrame = new JFrame(APPLICATION_NAME) {{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -167,6 +169,26 @@ public class GUI {
                                 Desktop.getDesktop().open(new File(User.Preferences.getString(KeystrokesLogFile)));
                             } catch (IOException ex) {
                                 ex.printStackTrace();
+                            }
+                        });
+                    }});
+                }});
+                add(new JMenu("Speech") {{
+                    add(new JMenuItem("Recognize") {{
+                        addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+
+                                SwingUtilities.invokeLater(() -> {
+                                    SpeechRecognizer speechRecognizer = new SpeechRecognizer(RemembranceAgentClient.getInstance());
+                                    setTitle("Start speaking...");
+                                    for (int i = 0; i < 1; i++) {
+                                        LOGGER.info("" + i);
+                                        speechRecognizer.recognizeFromMicrophone(10);
+                                    }
+                                    setTitle("Stop speaking...");
+                                });
+
                             }
                         });
                     }});

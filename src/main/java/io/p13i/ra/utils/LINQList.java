@@ -1,10 +1,10 @@
 package io.p13i.ra.utils;
 
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class LINQList<T> {
     private final Iterable<T> source;
@@ -12,6 +12,14 @@ public class LINQList<T> {
 
     public LINQList(Iterable<T> source) {
         this.source = source;
+    }
+
+    public static LINQList<Character> from(String string) {
+        List<Character> charactersList = new ArrayList<>(string.length());
+        for (int i = 0; i < string.length(); i++) {
+            charactersList.add(string.charAt(i));
+        }
+        return new LINQList<>(charactersList);
     }
 
     public LINQList<T> where(Function<T, Boolean> condition) {
@@ -71,6 +79,13 @@ public class LINQList<T> {
             list.add(item);
         }
         return list;
+    }
+
+    public LINQList<T> forEach(Consumer<T> consumer) {
+        for (T item : source) {
+            consumer.accept(item);
+        }
+        return this;
     }
 
     public int count() {
