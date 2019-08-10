@@ -1,7 +1,8 @@
 package io.p13i.ra.gui;
 
 import io.p13i.ra.RemembranceAgentClient;
-import io.p13i.ra.input.speech.SpeechRecognizer;
+import io.p13i.ra.input.InputMechanismManager;
+import io.p13i.ra.input.speech.SpeechInputMechanism;
 import io.p13i.ra.utils.IntegerUtils;
 
 import javax.swing.*;
@@ -34,7 +35,6 @@ public class GUI {
     // Swing elements
     public static BorderedJLabel sKeystrokeBufferLabel;
     public static JPanel sSuggestionsPanel;
-    public static JDialog sSpeechDialog;
 
     public static final JFrame sJFrame = new JFrame(APPLICATION_NAME) {{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -135,10 +135,10 @@ public class GUI {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                if (RemembranceAgentClient.sBreakingBuffer.isEmpty()) {
+                                if (RemembranceAgentClient.getInstance().mBreakingBuffer.isEmpty()) {
                                     JOptionPane.showMessageDialog(sJFrame, "Buffer is empty. No clearing required.");
                                 } else {
-                                    RemembranceAgentClient.sBreakingBuffer.clear();
+                                    RemembranceAgentClient.getInstance().mBreakingBuffer.clear();
                                     sKeystrokeBufferLabel.setText("");
                                 }
                             }
@@ -184,8 +184,9 @@ public class GUI {
                                     sKeystrokeBufferLabel.invalidate();
                                     sKeystrokeBufferLabel.repaint();
 
-                                    SpeechRecognizer speechRecognizer = new SpeechRecognizer();
-                                    speechRecognizer.setOnInputCallback(RemembranceAgentClient.getInstance());
+                                    SpeechInputMechanism speechRecognizer = InputMechanismManager.getInstance()
+                                            .getInputMechanismInstance(SpeechInputMechanism.class);
+
                                     setTitle("Start speaking...");
                                     for (int i = 0; i < 1; i++) {
                                         LOGGER.info("" + i);
@@ -193,7 +194,7 @@ public class GUI {
                                     }
                                     setTitle("Stop speaking...");
 
-                                    sKeystrokeBufferLabel.setBorderTitle("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")", GUI.BORDER_PADDING);
+                                    sKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
                                     sKeystrokeBufferLabel.invalidate();
                                     sKeystrokeBufferLabel.repaint();
                                 });
@@ -223,7 +224,7 @@ public class GUI {
             }});
             add(sKeystrokeBufferLabel = new BorderedJLabel() {{
                 setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP + GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
-                setBorderTitle("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")", GUI.BORDER_PADDING);
+                setBorderTitle("", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
         }});

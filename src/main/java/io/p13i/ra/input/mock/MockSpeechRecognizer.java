@@ -9,6 +9,11 @@ import java.util.function.Consumer;
 public class MockSpeechRecognizer extends AbstractInputMechanism {
 
     @Override
+    public void initalizeInputMechanism() {
+
+    }
+
+    @Override
     public void startInput() {
         LINQList.range(5)
             .select(IntegerUtils::asCharacter)
@@ -16,7 +21,7 @@ public class MockSpeechRecognizer extends AbstractInputMechanism {
     }
 
     @Override
-    public void endInput() {
+    public void closeInputMechanism() {
 
     }
 }

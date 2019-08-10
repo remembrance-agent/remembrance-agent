@@ -17,6 +17,10 @@ import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
 import io.p13i.ra.input.AbstractInputMechanism;
+import io.p13i.ra.input.InputMechanismManager;
+import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
+import io.p13i.ra.input.mock.MockSpeechRecognizer;
+import io.p13i.ra.input.speech.SpeechInputMechanism;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
@@ -27,10 +31,6 @@ import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
 import io.p13i.ra.utils.LoggerUtils;
 import io.p13i.ra.utils.URIUtils;
 import org.jnativehook.GlobalScreen;
-import org.jnativehook.NativeHookException;
-import org.jnativehook.dispatcher.SwingDispatchService;
-import org.jnativehook.keyboard.NativeKeyEvent;
-import org.jnativehook.keyboard.NativeKeyListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -43,11 +43,16 @@ import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
 import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
 import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
 
-public class RemembranceAgentClient implements Runnable, NativeKeyListener, AbstractInputMechanism.OnInput {
+public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.OnInput {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
     public static final String APPLICATION_NAME = "Remembrance Agent (v" + System.getenv("VERSION") + ")";
+
+    private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
+    public static RemembranceAgentClient getInstance() {
+        return sInstance;
+    }
 
     // Settings
     private static final int KEYBOARD_BUFFER_SIZE = 75;
@@ -56,36 +61,42 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Abst
     /**
      * "local" variables
      */
-    public static final KeyboardLoggerBreakingBuffer sBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
-    private static BufferingLogFileWriter sKeyLoggerBufferLogFileWriter;
-    private static Timer sRemembranceAgentUpdateTimer = new Timer();
+    public final KeyboardLoggerBreakingBuffer mBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
+    private BufferingLogFileWriter mKeyLoggerBufferLogFileWriter;
+    private Timer mRemembranceAgentUpdateTimer = new Timer();
 
     // RA variables
-    private static RemembranceAgentEngine sRemembranceAgentEngine;
-    private static String sPriorQuery;
-    private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
+    private RemembranceAgentEngine mRemembranceAgentEngine;
+    private String mPriorQuery;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(RemembranceAgentClient.getInstance());
     }
 
-    public static RemembranceAgentClient getInstance() {
-        return sInstance;
+    private RemembranceAgentClient() {
+        mKeyLoggerBufferLogFileWriter = new BufferingLogFileWriter(User.Preferences.getString(KeystrokesLogFile));
+        mKeyLoggerBufferLogFileWriter.open();
+
+        // Add the key logger
+        InputMechanismManager.getInstance()
+                .addInputMechanism(new KeyboardInputMechanism())
+                .addInputMechanism(new SpeechInputMechanism(/* trials */ 1, /* duration */ 5))
+                .addInputMechanism(new MockSpeechRecognizer())
+                .initializeAllInputMechanisms()
+                .setOnInputCallbacks(this)
+                .setActiveInputMechanism(KeyboardInputMechanism.class);
     }
 
     @Override
     public void run() {
-        sKeyLoggerBufferLogFileWriter = new BufferingLogFileWriter(User.Preferences.getString(KeystrokesLogFile));
-        sKeyLoggerBufferLogFileWriter.open();
-
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 try {
                     System.out.println("Shutting down ...");
                 } finally {
-                    sKeyLoggerBufferLogFileWriter.flush();
-                    sKeyLoggerBufferLogFileWriter.close();
-                    sKeyLoggerBufferLogFileWriter = null;
+                    mKeyLoggerBufferLogFileWriter.flush();
+                    mKeyLoggerBufferLogFileWriter.close();
+                    mKeyLoggerBufferLogFileWriter = null;
                 }
             }
         });
@@ -100,14 +111,6 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Abst
         // init!
         initializeRemembranceAgent(true);
 
-        // Add the key logger
-        try {
-            GlobalScreen.setEventDispatcher(new SwingDispatchService());
-            GlobalScreen.registerNativeHook();
-            GlobalScreen.addNativeKeyListener(RemembranceAgentClient.getInstance());
-        } catch (NativeHookException e) {
-            throw new RuntimeException(e);
-        }
         LOGGER.info("Added native key logger.");
 
         GUI.sJFrame.setVisible(true);
@@ -116,10 +119,10 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Abst
     public void initializeRemembranceAgent(boolean useCache) {
 
         // Clear the timer
-        if (sRemembranceAgentUpdateTimer != null) {
-            sRemembranceAgentUpdateTimer.cancel();
-            sRemembranceAgentUpdateTimer.purge();
-            sRemembranceAgentUpdateTimer = null;
+        if (mRemembranceAgentUpdateTimer != null) {
+            mRemembranceAgentUpdateTimer.cancel();
+            mRemembranceAgentUpdateTimer.purge();
+            mRemembranceAgentUpdateTimer = null;
         }
 
         LocalDiskCacheDocumentDatabase localDiskCacheDatabase = new LocalDiskCacheDocumentDatabase("/Users/p13i/Documents/RA/~cache");
@@ -134,15 +137,17 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Abst
 
         LOGGER.info("Using " + localDiskCacheDatabase.getName());
 
-        sRemembranceAgentEngine = new RemembranceAgentEngine(localDiskCacheDatabase);
+        mRemembranceAgentEngine = new RemembranceAgentEngine(localDiskCacheDatabase);
         LOGGER.info("Initialized Remembrance Agent.");
 
         LOGGER.info("Loading/indexing documents...");
-        List<Document> documentsIndexed = sRemembranceAgentEngine.indexDocuments();
+        List<Document> documentsIndexed = mRemembranceAgentEngine.indexDocuments();
         LOGGER.info(String.format("Indexing complete. Added %d documents:", documentsIndexed.size()));
         for (Document document : documentsIndexed) {
             LOGGER.info(document.toString());
         }
+
+        GUI.sKeystrokeBufferLabel.setBorderTitle(InputMechanismManager.getInstance().getActiveInputMechanism().getInputMechanismName(), GUI.BORDER_PADDING);
 
         GUI.sSuggestionsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Suggestions (from " + localDiskCacheDatabase.getName() + ")"),
@@ -151,8 +156,8 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Abst
         GUI.sSuggestionsPanel.repaint();
 
         // Start the RA task
-        sRemembranceAgentUpdateTimer = new Timer();
-        sRemembranceAgentUpdateTimer.schedule(new TimerTask() {
+        mRemembranceAgentUpdateTimer = new Timer();
+        mRemembranceAgentUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 sendQueryToRemembranceAgent();
@@ -164,16 +169,16 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Abst
     private void sendQueryToRemembranceAgent() {
         GUI.sJFrame.setTitle("*** " + APPLICATION_NAME + " ***");
 
-        String query = sBreakingBuffer.toString();
+        String query = mBreakingBuffer.toString();
 
-        if (query.equals(sPriorQuery)) {
-            LOGGER.info("Skipping prior query: '" + sPriorQuery + "'");
+        if (query.equals(mPriorQuery)) {
+            LOGGER.info("Skipping prior query: '" + mPriorQuery + "'");
         } else {
 
             Context context = new Context(null, "p13i", query, DateUtils.now());
 
             LOGGER.info("Sending query to RA: '" + query + "'");
-            List<ScoredDocument> suggestions = sRemembranceAgentEngine.determineSuggestions(new Query(query, context, GUI.RA_NUMBER_SUGGESTIONS));
+            List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(new Query(query, context, GUI.RA_NUMBER_SUGGESTIONS));
 
             GUI.sSuggestionsPanel.removeAll();
 
@@ -227,40 +232,19 @@ public class RemembranceAgentClient implements Runnable, NativeKeyListener, Abst
             GUI.sSuggestionsPanel.validate();
             GUI.sSuggestionsPanel.repaint();
 
-            sPriorQuery = query;
+            mPriorQuery = query;
         }
 
         GUI.sJFrame.setTitle(APPLICATION_NAME);
     }
 
     @Override
-    public void nativeKeyTyped(NativeKeyEvent nativeKeyEvent) {
-
-    }
-
-    @Override
-    public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
-        String keyText = NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode());
-
-        sKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + keyText + "\n");
-
-        LOGGER.info("Keystroke: " + keyText);
-
-        char characterToAdd = keyText.charAt(0);
-
-        sBreakingBuffer.addCharacter(characterToAdd);
-        LOGGER.info(String.format("[Buffer count=%04d:] %s", sBreakingBuffer.getTotalTypedCharactersCount(), sBreakingBuffer.toString()));
-        GUI.sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
-    }
-
-    @Override
-    public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
-
-    }
-
-    @Override
     public void onInput(Character c) {
-        sBreakingBuffer.addCharacter(c);
-        GUI.sKeystrokeBufferLabel.setText(sBreakingBuffer.toString());
+        LOGGER.info("Keystroke: " + c);
+        mKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + c + "\n");
+
+        mBreakingBuffer.addCharacter(c);
+        LOGGER.info(String.format("[Buffer count=%04d:] %s", mBreakingBuffer.getTotalTypedCharactersCount(), mBreakingBuffer.toString()));
+        GUI.sKeystrokeBufferLabel.setText(mBreakingBuffer.toString());
     }
 }

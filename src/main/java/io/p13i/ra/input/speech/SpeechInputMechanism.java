@@ -25,19 +25,33 @@ import javax.sound.sampled.TargetDataLine;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-public class SpeechRecognizer extends AbstractInputMechanism implements ResponseObserver<StreamingRecognizeResponse> {
+public class SpeechInputMechanism extends AbstractInputMechanism implements ResponseObserver<StreamingRecognizeResponse> {
 
-    private static Logger LOGGER = LoggerUtils.getLogger(SpeechRecognizer.class);
+    private static Logger LOGGER = LoggerUtils.getLogger(SpeechInputMechanism.class);
 
     ArrayList<StreamingRecognizeResponse> responses = new ArrayList<>();
+    private int numberOfRunsPerInvokation;
+    private int durationPerInvokation;
 
-    @Override
-    public void startInput() {
-        recognizeFromMicrophone(10);
+    public SpeechInputMechanism(int numberOfRunsPerInvokation, int durationPerInvokation) {
+        this.numberOfRunsPerInvokation = numberOfRunsPerInvokation;
+        this.durationPerInvokation = durationPerInvokation;
     }
 
     @Override
-    public void endInput() {
+    public void initalizeInputMechanism() {
+
+    }
+
+    @Override
+    public void startInput() {
+        for (int i = 0; i < numberOfRunsPerInvokation; i++) {
+            recognizeFromMicrophone();
+        }
+    }
+
+    @Override
+    public void closeInputMechanism() {
 
     }
 
@@ -74,14 +88,14 @@ public class SpeechRecognizer extends AbstractInputMechanism implements Response
 
     @Override
     public void onError(Throwable t) {
-        LOGGER.throwing(SpeechRecognizer.class.getSimpleName(), "onError", t);
+        LOGGER.throwing(SpeechInputMechanism.class.getSimpleName(), "onError", t);
         throw new RuntimeException(t);
     }
 
     /**
      * Performs microphone streaming speech recognition with a duration of 1 minute.
      */
-    private void recognizeFromMicrophone(int durationSecs) {
+    private void recognizeFromMicrophone() {
 
         try (SpeechClient client = SpeechClient.create()) {
 
@@ -132,7 +146,7 @@ public class SpeechRecognizer extends AbstractInputMechanism implements Response
                 byte[] data = new byte[6400];
                 int bytesRead = audio.read(data);
 
-                if (estimatedTime > durationSecs * 1000) {
+                if (estimatedTime > durationPerInvokation * 1000) {
                     LOGGER.info("Stop speaking.");
                     targetDataLine.stop();
                     targetDataLine.close();
@@ -146,7 +160,7 @@ public class SpeechRecognizer extends AbstractInputMechanism implements Response
 
             }
         } catch (Exception e) {
-            LOGGER.throwing(SpeechRecognizer.class.getSimpleName(), "recognizeFromMicrophone", e);
+            LOGGER.throwing(SpeechInputMechanism.class.getSimpleName(), "recognizeFromMicrophone", e);
             throw new RuntimeException(e);
         }
 
