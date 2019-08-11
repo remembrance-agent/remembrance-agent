@@ -72,7 +72,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     private static final double DATE_BIAS = 0.00;
 
     static {
-        Assert.equal(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);
+        Assert.almostEqual(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);
     }
 
     private ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments, ConfusionMatrix confusionMatrix) {

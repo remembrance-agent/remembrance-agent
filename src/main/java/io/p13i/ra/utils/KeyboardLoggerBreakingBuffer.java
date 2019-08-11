@@ -59,16 +59,26 @@ public class KeyboardLoggerBreakingBuffer {
         limitedCapacityBuffer.add(newTimestamp);
     }
 
+    /**
+     * Determines if a character is allowed in to the buffer
+     * @param c
+     * @return
+     */
     private static boolean isCharacterAllowedIntoBuffer(char c) {
-        return CharacterUtils.isAlphanumeric(c) || c == '␣' || c == '.' || c == '\'' || c == '-' || c == ' ';
+        return CharacterUtils.isAlphanumeric(c) || CharacterUtils.isSpace(c) || c == '.' || c == '\'' || c == '-' ;
     }
 
-    public boolean isEmpty() { return limitedCapacityBuffer.isEmpty(); }
-
+    /**
+     * Empties the buffer
+     */
     public void clear() {
         limitedCapacityBuffer.clear();
     }
 
+    /**
+     * Gets the total number of characters accepted into the buffer
+     * @return
+     */
     public int getTotalTypedCharactersCount() {
         return this.limitedCapacityBuffer.getTotalAddedElementsCount();
     }
@@ -78,6 +88,9 @@ public class KeyboardLoggerBreakingBuffer {
         return this.limitedCapacityBuffer.toString();
     }
 
+    /**
+     * Represents a character and tht time it was initialized
+     */
     private class TimestampedCharacter {
         Character character;
         final Date timestamp;

@@ -23,7 +23,6 @@ import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
 import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
 import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
 import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
-import static io.p13i.ra.utils.BufferingLogFileWriter.LOGGER;
 
 public class GUI {
     public static final int WIDTH = 600;
@@ -88,7 +87,6 @@ public class GUI {
                                 fileChooser.setAcceptAllFileFilterUsed(false);
                                 if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
                                     User.Preferences.set(LocalDiskDocumentsFolderPath, fileChooser.getSelectedFile().toPath().toString());
-                                    LOGGER.info("Selected directory: " + User.Preferences.getString(LocalDiskDocumentsFolderPath));
                                 }
                             }
                         });
@@ -98,7 +96,6 @@ public class GUI {
                             String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder ID (leave blank to cancel):", User.Preferences.getString(GoogleDriveFolderID));
                             if (inputId != null && inputId.length() > 0) {
                                 User.Preferences.set(GoogleDriveFolderID, inputId);
-                                LOGGER.info("Set Google Drive Folder ID: " + User.Preferences.getString(GoogleDriveFolderID));
                             }
                         });
                     }});
@@ -108,7 +105,6 @@ public class GUI {
                             String inputId = JOptionPane.showInputDialog("Enter a count for recent emails to index (leave blank to cancel):", User.Preferences.getInt(GmailMaxEmailsCount));
                             if (inputId != null && inputId.length() > 0 && IntegerUtils.isInt(inputId)) {
                                 User.Preferences.set(GmailMaxEmailsCount, inputId);
-                                LOGGER.info("Set GmailMaxEmailsCount: " + User.Preferences.getInt(GmailMaxEmailsCount));
                             }
                         });
                     }});
@@ -123,7 +119,6 @@ public class GUI {
                                 fileChooser.setAcceptAllFileFilterUsed(false);
                                 if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
                                     User.Preferences.set(RAClientLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "ra-client.log");
-                                    LOGGER.info("Selected ra-client.log file: " + User.Preferences.getString(RAClientLogFile));
                                     JOptionPane.showMessageDialog(sJFrame, "Selected ra-client.log file: " + User.Preferences.getString(RAClientLogFile));
                                 }
                             }
@@ -144,12 +139,8 @@ public class GUI {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                if (RemembranceAgentClient.getInstance().mInputBuffer.isEmpty()) {
-                                    JOptionPane.showMessageDialog(sJFrame, "Buffer is empty. No clearing required.");
-                                } else {
-                                    RemembranceAgentClient.getInstance().mInputBuffer.clear();
-                                    sKeystrokeBufferLabel.setText("");
-                                }
+                                RemembranceAgentClient.getInstance().mInputBuffer.clear();
+                                sKeystrokeBufferLabel.setText("");
                             }
                         });
                     }});
@@ -164,7 +155,6 @@ public class GUI {
                                 fileChooser.setAcceptAllFileFilterUsed(false);
                                 if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
                                     User.Preferences.set(KeystrokesLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "keystrokes.log");
-                                    LOGGER.info("Selected keystrokes.log file directory: " + User.Preferences.getString(KeystrokesLogFile));
                                     sKeystrokeBufferLabel.setBorder(BorderFactory.createCompoundBorder(
                                             BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")"),
                                             BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
@@ -203,7 +193,6 @@ public class GUI {
 
                                     setTitle("Start speaking...");
                                     for (int i = 0; i < 1; i++) {
-                                        LOGGER.info("" + i);
                                         speechRecognizer.startInput();
                                     }
                                     setTitle("Stop speaking...");

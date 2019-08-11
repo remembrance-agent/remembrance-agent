@@ -1,7 +1,8 @@
 package io.p13i.ra;
 
-import java.util.*;
+import java.util.List;
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
@@ -16,13 +17,15 @@ import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.InputMechanismManager;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
 import io.p13i.ra.input.speech.SpeechInputMechanism;
-import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.*;
+import io.p13i.ra.utils.BufferingLogFileWriter;
+import io.p13i.ra.utils.DateUtils;
+import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
+import io.p13i.ra.utils.LINQList;
+import io.p13i.ra.utils.LoggerUtils;
 
-import javax.swing.BorderFactory;
 import javax.swing.SwingUtilities;
 
 import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;
@@ -197,6 +200,9 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         return remembranceAgentEngine;
     }
 
+    /**
+     * Sends the contextual {@code Query} to the RA
+     */
     private void sendQueryToRemembranceAgent() {
         GUI.sJFrame.setTitle("* SEARCHING * " + APPLICATION_NAME + " * SEARCHING *");
 
@@ -218,6 +224,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             // And tell the logger
             LOGGER.info(" -> (" + scoredDocument.getScore() + ") " + scoredDocument.toShortString());
 
+            // Add each of the components for the document to the GUI
             LINQList.from(GUI.getComponentsForScoredDocument(scoredDocument, i))
                 .forEach(GUI.sSuggestionsPanel::add);
         }
@@ -233,11 +240,16 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     @Override
     public void onInput(Character c) {
         LOGGER.info("Keystroke: " + c);
+
+        // Write the timestamp and character to the keylogger log file
         mKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + c + "\n");
+
+        // Add to the buffer
         mInputBuffer.addCharacter(c);
 
         LOGGER.info(String.format("[Buffer count=%04d:] %s", mInputBuffer.getTotalTypedCharactersCount(), mInputBuffer.toString()));
 
+        // Display on the GUI
         GUI.sKeystrokeBufferLabel.setText(mInputBuffer.toString());
     }
 }

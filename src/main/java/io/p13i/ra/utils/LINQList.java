@@ -5,6 +5,10 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+/**
+ * An inefficient implementation of some of the IEnumerable extensions from C#
+ * @param <T> the type of the elements
+ */
 public class LINQList<T> {
     private final Iterable<T> source;
     private T default_ = null;
@@ -13,6 +17,11 @@ public class LINQList<T> {
         this.source = source;
     }
 
+    /**
+     * Generates a {@code LINQList} from a string
+     * @param string the string
+     * @return a {@code LINQList}
+     */
     public static LINQList<Character> from(String string) {
         List<Character> charactersList = new ArrayList<>(string.length());
         for (int i = 0; i < string.length(); i++) {
@@ -21,26 +30,31 @@ public class LINQList<T> {
         return new LINQList<>(charactersList);
     }
 
+    /**
+     * Generates a {@code LINQList} from an iterable
+     * @param source the iterable
+     * @param <T> the type of the elements
+     * @return a {@code LINQList}
+     */
     public static <T> LINQList<T> from(Iterable<T> source) {
         return new LINQList<>(source);
     }
 
-    public static LINQList<Integer> range(int start, int end) {
-        Assert.that(start >= 0);
-        Assert.that(end > 0);
-        Assert.that(start < end);
-        List<Integer> integerList = new ArrayList<>(end);
-        for (int i = start; i < end; i++) {
-            integerList.add(i);
-        }
-        return new LINQList<>(integerList);
+    /**
+     * Generates a {@code LINQList} from an array
+     * @param source the iterable
+     * @param <T> the type of the elements
+     * @return a {@code LINQList}
+     */
+    public static <T> LINQList<T> from(T[] source) {
+        return new LINQList<>(Arrays.asList(source));
     }
 
-
-    public static LINQList<Integer> range(int end) {
-        return range(0, end);
-    }
-
+    /**
+     * Generates a {@code LINQList} for elements matching a condition
+     * @param condition the condition
+     * @return a new {@code LINQList}
+     */
     public LINQList<T> where(Function<T, Boolean> condition) {
         List<T> result = new LinkedList<>();
         for (T item : source) {
@@ -51,6 +65,11 @@ public class LINQList<T> {
         return new LINQList<>(result);
     }
 
+    /**
+     * Gets the first {@code count} elements from a {@code LINQList}
+     * @param count the first elements to take
+     * @return a new {@code LINQList}
+     */
     public LINQList<T> take(int count) {
         List<T> result = new LinkedList<>();
         int n = 0;
@@ -63,6 +82,12 @@ public class LINQList<T> {
         return new LINQList<>(result);
     }
 
+    /**
+     * Maps a {@code LINQList} to new elements
+     * @param selector the mapper
+     * @param <TSelected> the selected type
+     * @return a new {@code LINQList} of the selected type
+     */
     public <TSelected> LINQList<TSelected> select(Function<T, TSelected> selector) {
         List<TSelected> result = new LinkedList<>();
         for (T item : source) {
@@ -71,19 +96,19 @@ public class LINQList<T> {
         return new LINQList<>(result);
     }
 
-    public T default_() {
-        return this.default_;
-    }
-
-    public LINQList<T> setDefault(T newDefault) {
-        this.default_ = newDefault;
-        return this;
-    }
-
+    /**
+     * Gets the first element of the iterable
+     * @return the first element
+     * @throws NoSuchElementException or throws an exception if there is no first element
+     */
     public T first() throws NoSuchElementException {
         return this.source.iterator().next();
     }
 
+    /**
+     * Gets the first element or null
+     * @return first element or null
+     */
     public T firstOrDefault() {
         try {
             return first();
@@ -92,6 +117,10 @@ public class LINQList<T> {
         }
     }
 
+    /**
+     * Converts the iterable to a list
+     * @return a new list
+     */
     public List<T> toList() {
         List<T> list = new LinkedList<>();
         for (T item : source) {
@@ -100,6 +129,11 @@ public class LINQList<T> {
         return list;
     }
 
+    /**
+     * Runs code for each element in the list
+     * @param consumer the code to run
+     * @return the same {@code LINQList}
+     */
     public LINQList<T> forEach(Consumer<T> consumer) {
         for (T item : source) {
             consumer.accept(item);
@@ -107,6 +141,10 @@ public class LINQList<T> {
         return this;
     }
 
+    /**
+     * Counts the elements in the {@code LINQList}
+     * @return a count
+     */
     public int count() {
         int n = 0;
         for (T ignored : this.source) {

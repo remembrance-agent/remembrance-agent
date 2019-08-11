@@ -8,9 +8,19 @@ import java.util.logging.*;
 
 import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
 
+/**
+ * utilities for working with the logger
+ */
 public class LoggerUtils {
 
-    public static <T> Logger getLogger(Class<T> forClass) {
+    /**
+     * Gets a logger for the given class or throws an exception
+     * @param forClass the class in questino
+     * @param <T> the type of class
+     * @return a Logger instance or an exception
+     * @throws RuntimeException if a logger couldn't be created
+     */
+    public static <T> Logger getLogger(Class<T> forClass) throws RuntimeException {
         try {
             return getLoggerInternal(forClass);
         } catch (IOException e) {

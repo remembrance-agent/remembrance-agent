@@ -17,9 +17,20 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+
+/**
+ * Wrapper for common functionality between Google Java APIs
+ */
 public class GoogleAPIUtils {
 
+    /**
+     * The client used to parse JSON
+     */
     public static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+
+    /**
+     * Where the credentials file is relative to the resources directory
+     */
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
     /**

@@ -4,6 +4,9 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+/**
+ * Utilities for formatting dates
+ */
 public class DateUtils {
 
     public static final String YEAR_FORMAT = "yyyy";
@@ -16,37 +19,49 @@ public class DateUtils {
 
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
-
+    /**
+     * Formats a date
+     * @param date the date to format
+     * @param pattern the pattern to use
+     * @return the formatted date
+     */
     public static String formatDate(Date date, String pattern) {
         return new SimpleDateFormat(pattern).format(date);
     }
 
+    /**
+     * Gets the current time
+     * @return the current time as a date
+     */
     public static Date now() {
         return Calendar.getInstance().getTime();
     }
 
-    private static String nowAs(String pattern) {
-        return formatDate(now(), pattern);
-    }
-
-    public static String timestamp() {
-        return nowAs(TIMESTAMP_FORMAT);
-    }
-
+    /**
+     * Gets now() as a timestamp
+     * @return a long timestamp
+     */
     public static long longTimestamp() {
         return now().getTime();
     }
 
+    /**
+     * Gets the timestamp of the given date
+     * @param date the date
+     * @return a formatted string timestamp
+     */
     public static String timestampOf(Date date) {
         return formatDate(date, TIMESTAMP_FORMAT);
     }
 
+    /**
+     * Computes the difference (d2 - d1) in seconds between two dates
+     * @param d1 the first date
+     * @param d2 the second date
+     * @return the difference in seconds
+     */
     public static long deltaSeconds(Date d1, Date d2) {
         long difference = d2.getTime() - d1.getTime();
-        return difference / 1000 % 60;
-    }
-
-    public static String formatTimestamp(Date date) {
-        return formatDate(date, TIMESTAMP_FORMAT);
+        return difference / 1000;
     }
 }

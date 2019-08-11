@@ -4,23 +4,38 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Useful string utilities
+ */
 public class StringUtils {
     private static final String NULL = "<null>";
 
-    public static String truncateEndWithEllipse(String str, int maxLength) {
-        if (str == null) {
+    /**
+     * Ends a string after a given length with ...
+     * @param string the string
+     * @param maxLength the max length
+     * @return the truncated string
+     */
+    public static String truncateEndWithEllipse(String string, int maxLength) {
+        if (string == null) {
             return NULL;
         }
-        boolean includeEllipses = str.length() > maxLength;
-        return str.substring(0, Math.min(str.length(), maxLength)) + (includeEllipses ? "..." : "");
+        boolean includeEllipses = string.length() > maxLength;
+        return string.substring(0, Math.min(string.length(), maxLength)) + (includeEllipses ? "..." : "");
     }
 
-    public static String truncateBeginningWithEllipse(String str, int maxLength) {
-        if (str == null) {
+    /**
+     * Adds ... to the front followed by the last {@code maxLength} characters
+     * @param string the string
+     * @param maxLength the max length
+     * @return the truncated string
+     */
+    public static String truncateBeginningWithEllipse(String string, int maxLength) {
+        if (string == null) {
             return NULL;
         }
-        boolean includeEllipses = str.length() > maxLength;
-        return (includeEllipses ? "..." : "") + str.substring(Math.max(0, str.length() - maxLength));
+        boolean includeEllipses = string.length() > maxLength;
+        return (includeEllipses ? "..." : "") + string.substring(Math.max(0, string.length() - maxLength));
     }
 
     /**
@@ -51,7 +66,7 @@ public class StringUtils {
 
     /**
      * https://stackoverflow.com/a/2560017/5071723
-     * @param s
+     * @param s the string
      * @return
      */
     public static String splitCamelCase(String s) {

@@ -1,5 +1,6 @@
 package io.p13i.ra.models;
 
+import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.TFIDFCalculator;
@@ -40,7 +41,7 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
     }
 
     public String toShortString() {
-        return String.format("%s [%s] -- %s", this.document.getDocumentTypeName(), StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.asString(getMatchingTermsInDocument(5)));
+        return String.format("%s [%s] -- %s", this.document.getDocumentTypeName(), StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), 20), LINQList.from(getMatchingTermsInDocument(5)).toString());
     }
 
     private List<String> getMatchingTermsInDocument(int maxCount) {

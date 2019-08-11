@@ -7,9 +7,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
 
+/**
+ * Writes log files to a after a specified number of items are writen to the buffer
+ */
 public class BufferingLogFileWriter implements Flushable, Closeable {
 
-    public static final Logger LOGGER = LoggerUtils.getLogger(BufferingLogFileWriter.class);
+    private static final Logger LOGGER = LoggerUtils.getLogger(BufferingLogFileWriter.class);
 
     public static final int MAX_QUEUE_SIZE = 50;
     public final Queue<String> mQueue = new LinkedList<>();
@@ -20,10 +23,17 @@ public class BufferingLogFileWriter implements Flushable, Closeable {
         this.logFilePath = logFilePath;
     }
 
+    /**
+     * Opens the print writer
+     */
     public synchronized void open() {
         this.printWriter = FileIO.openPrintWriter(this.logFilePath);
     }
 
+    /**
+     * Queues a file. If the capacity is exceed, flushes the buffer
+     * @param line the line to add to the queue
+     */
     public synchronized void queue(String line) {
         if (mQueue.size() > MAX_QUEUE_SIZE) {
             this.flush();
@@ -32,8 +42,10 @@ public class BufferingLogFileWriter implements Flushable, Closeable {
         mQueue.add(line);
     }
 
+    /**
+     * Empties the queue into the print writer
+     */
     public synchronized void flush() {
-        LOGGER.info("Flushing queue...");
         while (!mQueue.isEmpty()) {
             String line = mQueue.poll();
             this.printWriter.print(line);
@@ -41,9 +53,9 @@ public class BufferingLogFileWriter implements Flushable, Closeable {
                 this.printWriter.println();
             }
         }
-        LOGGER.info("Flushed.");
     }
 
+    @Override
     public synchronized void close() {
         this.printWriter.close();
     }

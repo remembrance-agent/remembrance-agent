@@ -20,6 +20,10 @@ class LimitedCapacityBuffer<T> {
         queue = new LinkedList<>();
     }
 
+    /**
+     * Adds a new element removing the oldest-added element if there is not more space
+     * @param element the element to add
+     */
     public void add(T element) {
         if (queue.size() >= maximumSize) {
             queue.poll();
@@ -29,6 +33,9 @@ class LimitedCapacityBuffer<T> {
         lastAddedElement = element;
     }
 
+    /**
+     * Empties the buffer
+     */
     public void clear() {
         while (!queue.isEmpty()) {
             queue.poll();
@@ -37,26 +44,29 @@ class LimitedCapacityBuffer<T> {
 
     @Override
     public String toString() {
-        return toString("");
+        return LINQList.from(this.queue).toString();
     }
 
-    private String toString(String withSeperator) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (T c : queue) {
-            stringBuilder.append(c);
-            stringBuilder.append(withSeperator);
-        }
-        return stringBuilder.toString();
-    }
-
-    int size() {
+    /**
+     * The number of elements currently in the buffer
+     * @return a count
+     */
+    public int size() {
         return queue.size();
     }
 
+    /**
+     * The element last interested into the buffer
+     * @return the last element added
+     */
     T getLastAddedElement() {
         return lastAddedElement;
     }
 
+    /**
+     * Removes the last added element
+     * @return the element removed
+     */
     public T removeLast() {
         if (queue.isEmpty()) {
             return null;
@@ -65,10 +75,18 @@ class LimitedCapacityBuffer<T> {
         return queue.removeLast();
     }
 
+    /**
+     * Gets the total number of characters added to the buffer
+     * @return a count
+     */
     int getTotalAddedElementsCount() {
         return totalAddedElementsCount;
     }
 
+    /**
+     * Indicates if the buffer is empty
+     * @return whether the buffer is empty
+     */
     public boolean isEmpty() {
         return queue.isEmpty();
     }
