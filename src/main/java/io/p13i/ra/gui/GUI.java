@@ -18,8 +18,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
-import static io.p13i.ra.gui.User.Preferences.Pref.*;
+import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;
+import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
 import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
+import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
+import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
 import static io.p13i.ra.utils.BufferingLogFileWriter.LOGGER;
 
 public class GUI {
@@ -36,6 +39,7 @@ public class GUI {
     public static final int SUGGESTION_PADDING_LEFT = 25;
     public static final int SCORE_WIDTH = 100;
     public static final int SUGGESTION_BUTTON_WIDTH = 440;
+    public static final int SUGGESTION_PADDING = 10;
 
     // Swing elements
     public static BorderedJLabel sKeystrokeBufferLabel;
@@ -189,9 +193,9 @@ public class GUI {
                                     sKeystrokeBufferLabel.invalidate();
                                     sKeystrokeBufferLabel.repaint();
 
-                                    MockSpeechRecognizer speechRecognizer = InputMechanismManager.getInstance()
-                                            .setActiveInputMechanism(MockSpeechRecognizer.class)
-                                            .getInputMechanismInstance(MockSpeechRecognizer.class);
+                                    SpeechInputMechanism speechRecognizer = InputMechanismManager.getInstance()
+                                            .setActiveInputMechanism(SpeechInputMechanism.class)
+                                            .getInputMechanismInstance(SpeechInputMechanism.class);
 
                                     sKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
 
@@ -245,12 +249,12 @@ public class GUI {
         return new ArrayList<Component>() {{
             add(new JLabel() {{
                 setText(Double.toString(doc.getScore()));
-                setBounds(GUI.SUGGESTION_PADDING_LEFT, GUI.PADDING_TOP + i * GUI.SUGGESTION_HEIGHT, GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
+                setBounds(GUI.SUGGESTION_PADDING_LEFT, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
                 setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
             }});
             add(new JButton() {{
                 setText(doc.toShortString());
-                setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, GUI.PADDING_TOP + i * GUI.SUGGESTION_HEIGHT, GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
+                setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
                 setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
                 setHorizontalAlignment(SwingConstants.LEFT);
                 addActionListener(e -> {
