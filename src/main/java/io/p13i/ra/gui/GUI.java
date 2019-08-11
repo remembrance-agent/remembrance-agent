@@ -2,6 +2,8 @@ package io.p13i.ra.gui;
 
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.input.InputMechanismManager;
+import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
+import io.p13i.ra.input.mock.MockSpeechRecognizer;
 import io.p13i.ra.input.speech.SpeechInputMechanism;
 import io.p13i.ra.utils.IntegerUtils;
 
@@ -184,8 +186,11 @@ public class GUI {
                                     sKeystrokeBufferLabel.invalidate();
                                     sKeystrokeBufferLabel.repaint();
 
-                                    SpeechInputMechanism speechRecognizer = InputMechanismManager.getInstance()
-                                            .getInputMechanismInstance(SpeechInputMechanism.class);
+                                    MockSpeechRecognizer speechRecognizer = InputMechanismManager.getInstance()
+                                            .setActiveInputMechanism(MockSpeechRecognizer.class)
+                                            .getInputMechanismInstance(MockSpeechRecognizer.class);
+
+                                    sKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
 
                                     setTitle("Start speaking...");
                                     for (int i = 0; i < 1; i++) {
@@ -194,7 +199,12 @@ public class GUI {
                                     }
                                     setTitle("Stop speaking...");
 
-                                    sKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
+                                    String keyboardInputName = InputMechanismManager.getInstance()
+                                            .setActiveInputMechanism(KeyboardInputMechanism.class)
+                                            .getInputMechanismInstance(KeyboardInputMechanism.class)
+                                            .getInputMechanismName();
+
+                                    sKeystrokeBufferLabel.setBorderTitle(keyboardInputName, GUI.BORDER_PADDING);
                                     sKeystrokeBufferLabel.invalidate();
                                     sKeystrokeBufferLabel.repaint();
                                 });

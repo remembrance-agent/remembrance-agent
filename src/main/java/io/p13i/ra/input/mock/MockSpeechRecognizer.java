@@ -1,6 +1,7 @@
 package io.p13i.ra.input.mock;
 
 import io.p13i.ra.input.AbstractInputMechanism;
+import io.p13i.ra.utils.CharacterUtils;
 import io.p13i.ra.utils.IntegerUtils;
 import io.p13i.ra.utils.LINQList;
 
@@ -15,8 +16,8 @@ public class MockSpeechRecognizer extends AbstractInputMechanism {
 
     @Override
     public void startInput() {
-        LINQList.range(5)
-            .select(IntegerUtils::asCharacter)
+        LINQList.from("Hello from a mock speech recognition engine")
+            .select(CharacterUtils::toUpperCase)
             .forEach(onInputCallback::onInput);
     }
 

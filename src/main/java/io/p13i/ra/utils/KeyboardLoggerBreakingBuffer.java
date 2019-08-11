@@ -51,7 +51,7 @@ public class KeyboardLoggerBreakingBuffer {
             }
         }
 
-        if (c == '␣') {
+        if (CharacterUtils.isSpace(c)) {
             newTimestamp.character = DEFAULT_BREAKER_CHARACTER;
         }
 
@@ -60,7 +60,7 @@ public class KeyboardLoggerBreakingBuffer {
     }
 
     private static boolean isCharacterAllowedIntoBuffer(char c) {
-        return CharacterUtils.isAlphanumeric(c) || c == '␣' || c == '.' || c == '\'' || c == '-';
+        return CharacterUtils.isAlphanumeric(c) || c == '␣' || c == '.' || c == '\'' || c == '-' || c == ' ';
     }
 
     public boolean isEmpty() { return limitedCapacityBuffer.isEmpty(); }

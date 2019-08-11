@@ -2,11 +2,11 @@ package io.p13i.ra.utils;
 
 public class CharacterUtils {
     public static boolean isAlphanumeric(char c) {
-        return ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || ('0' <= c && c <= '9');
+        return isUpperCase(c) || isLowerCase(c) || isNumeric(c);
     }
 
     public static boolean isSpace(char c) {
-        return c == ' ';
+        return c == ' ' || c == '␣';
     }
 
     public static Character toUpperCase(Character c) {
@@ -24,5 +24,9 @@ public class CharacterUtils {
 
     public static boolean isLowerCase(char c) {
         return ('a' <= c && c <= 'z');
+    }
+
+    public static boolean isNumeric(char c) {
+        return ('0' <= c && c <= '9');
     }
 }

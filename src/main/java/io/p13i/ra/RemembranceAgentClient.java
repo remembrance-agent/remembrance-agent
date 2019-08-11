@@ -49,6 +49,9 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
     public static final String APPLICATION_NAME = "Remembrance Agent (v" + System.getenv("VERSION") + ")";
 
+    /**
+     * Maintain an instance for the RA for the GUI's updates
+     */
     private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
     public static RemembranceAgentClient getInstance() {
         return sInstance;
@@ -62,7 +65,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
      * "local" variables
      */
     public final KeyboardLoggerBreakingBuffer mBreakingBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
-    private BufferingLogFileWriter mKeyLoggerBufferLogFileWriter;
+    private final BufferingLogFileWriter mKeyLoggerBufferLogFileWriter;
     private Timer mRemembranceAgentUpdateTimer = new Timer();
 
     // RA variables
@@ -96,7 +99,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
                 } finally {
                     mKeyLoggerBufferLogFileWriter.flush();
                     mKeyLoggerBufferLogFileWriter.close();
-                    mKeyLoggerBufferLogFileWriter = null;
                 }
             }
         });
@@ -167,7 +169,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     }
 
     private void sendQueryToRemembranceAgent() {
-        GUI.sJFrame.setTitle("*** " + APPLICATION_NAME + " ***");
+        GUI.sJFrame.setTitle("SEARCHING * " + APPLICATION_NAME + " * SEARCHING");
 
         String query = mBreakingBuffer.toString();
 
