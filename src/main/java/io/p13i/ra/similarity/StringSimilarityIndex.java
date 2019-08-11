@@ -1,6 +1,5 @@
 package io.p13i.ra.similarity;
 
-import io.p13i.ra.utils.Assert;
 
 public class StringSimilarityIndex implements ISimilarityIndex<String> {
     public double calculate(String s1, String s2) {

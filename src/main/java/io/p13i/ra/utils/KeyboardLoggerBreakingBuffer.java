@@ -1,6 +1,7 @@
 package io.p13i.ra.utils;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -61,8 +62,8 @@ public class KeyboardLoggerBreakingBuffer {
 
     /**
      * Determines if a character is allowed in to the buffer
-     * @param c
-     * @return
+     * @param c the character to check
+     * @return whether or not the character is allowed in the buffer
      */
     private static boolean isCharacterAllowedIntoBuffer(char c) {
         return CharacterUtils.isAlphanumeric(c) || CharacterUtils.isSpace(c) || c == '.' || c == '\'' || c == '-' ;
@@ -76,8 +77,7 @@ public class KeyboardLoggerBreakingBuffer {
     }
 
     /**
-     * Gets the total number of characters accepted into the buffer
-     * @return
+     * @return the total number of characters accepted into the buffer
      */
     public int getTotalTypedCharactersCount() {
         return this.limitedCapacityBuffer.getTotalAddedElementsCount();
@@ -85,7 +85,10 @@ public class KeyboardLoggerBreakingBuffer {
 
     @Override
     public String toString() {
-        return this.limitedCapacityBuffer.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        LINQList.from(this.limitedCapacityBuffer)
+                .forEach(stringBuilder::append);
+        return stringBuilder.toString();
     }
 
     /**

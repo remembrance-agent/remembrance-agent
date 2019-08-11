@@ -40,10 +40,18 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
         return "<ScoredDocument score=" + new DecimalFormat("#0.0000").format(getScore()) + ", document=" + getDocument().toString() + ">";
     }
 
+    /**
+     * @return a string displayable in the GUI
+     */
     public String toShortString() {
         return String.format("%s [%s] -- %s", this.document.getDocumentTypeName(), StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), 20), LINQList.from(getMatchingTermsInDocument(5)).toString());
     }
 
+    /**
+     * Gets the terms in the document matching the terms in the query, ranked by their TFs in TFiDF
+     * @param maxCount limited to this count
+     * @return the list of matching terms ranked
+     */
     private List<String> getMatchingTermsInDocument(int maxCount) {
         List<String> queryWordVector = query.getWordVector();
         List<String> documentWordVector = document.getWordVector();

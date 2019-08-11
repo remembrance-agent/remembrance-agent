@@ -1,6 +1,5 @@
 package io.p13i.ra.similarity;
 
-import io.p13i.ra.utils.Assert;
 import io.p13i.ra.utils.DateUtils;
 
 import java.util.Date;

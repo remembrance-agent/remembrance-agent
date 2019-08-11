@@ -1,5 +1,6 @@
 package io.p13i.ra.utils;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -8,7 +9,7 @@ import java.util.Queue;
  * Simple wrapper around a queue that limits the size of a queue and tracks the last element added to the queue.
  * @param <T> The type of elements in the buffer
  */
-class LimitedCapacityBuffer<T> {
+public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     private final LinkedList<T> queue;
     private int totalAddedElementsCount = 0;
@@ -89,5 +90,10 @@ class LimitedCapacityBuffer<T> {
      */
     public boolean isEmpty() {
         return queue.isEmpty();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return queue.iterator();
     }
 }
