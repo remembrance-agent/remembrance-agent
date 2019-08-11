@@ -6,7 +6,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
-import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.databases.cache.ICachableDocument;
 import io.p13i.ra.databases.cache.ICachableDocumentDatabase;
 import io.p13i.ra.utils.GoogleAPIUtils;
@@ -23,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase<GoogleDriveDocument>, ICachableDocumentDatabase {
+public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<GoogleDriveDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(GoogleDriveFolderDocumentDatabase.class);
 

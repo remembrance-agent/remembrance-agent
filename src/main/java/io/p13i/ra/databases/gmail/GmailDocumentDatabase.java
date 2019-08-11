@@ -7,7 +7,7 @@ import com.google.api.services.gmail.GmailScopes;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartHeader;
-import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.databases.cache.ICachableDocument;
 import io.p13i.ra.databases.cache.ICachableDocumentDatabase;
 import io.p13i.ra.utils.GoogleAPIUtils;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 
-public class GmailDocumentDatabase implements DocumentDatabase<GmailDocument>, ICachableDocumentDatabase {
+public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(GmailDocumentDatabase.class);
 

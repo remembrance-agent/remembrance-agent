@@ -1,6 +1,6 @@
 package io.p13i.ra.databases.cache;
 
-import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheDocumentMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadataParser;
@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, ILocalDiskCache {
+public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase, ILocalDiskCache {
 
     private final String cacheLocalDirectory;
     private List<AbstractDocument> documentsFromDisk = new ArrayList<>();

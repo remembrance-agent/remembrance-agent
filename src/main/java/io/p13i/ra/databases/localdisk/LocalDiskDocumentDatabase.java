@@ -1,6 +1,6 @@
 package io.p13i.ra.databases.localdisk;
 
-import io.p13i.ra.databases.DocumentDatabase;
+import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.databases.cache.ICachableDocument;
 import io.p13i.ra.databases.cache.ICachableDocumentDatabase;
 import io.p13i.ra.utils.FileIO;
@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * Represents the data store of files on local disk
  */
-public class LocalDiskDocumentDatabase implements DocumentDatabase<LocalDiskDocument>, ICachableDocumentDatabase {
+public class LocalDiskDocumentDatabase implements IDocumentDatabase<LocalDiskDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(LocalDiskDocumentDatabase.class);
     private final String directory;
