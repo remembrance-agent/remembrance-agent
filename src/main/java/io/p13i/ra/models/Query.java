@@ -4,7 +4,7 @@ import io.p13i.ra.utils.WordVector;
 
 import java.util.List;
 
-public class Query {
+public final class Query {
     private final String query;
     private final Context context;
     private final int numSuggestions;

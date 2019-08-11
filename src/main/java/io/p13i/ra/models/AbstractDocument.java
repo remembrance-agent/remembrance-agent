@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Houses all information about a file and it's context in the world
  */
-public class Document {
+public abstract class AbstractDocument {
     /**
      * How many characters to place in the toString() call
      */
@@ -21,11 +21,7 @@ public class Document {
 
     private List<String> cachedDocumentVector = null;
 
-    public Document(String content) {
-        this(content, new Context(null, null, null, null));
-    }
-
-    public Document(String content, Context context) {
+    public AbstractDocument(String content, Context context) {
         this.content = content;
         this.context = context;
     }
@@ -58,7 +54,7 @@ public class Document {
 
     @Override
     public String toString() {
-        return "<" + Document.class.getSimpleName() + " content='" + getContentTruncated() + "'>";
+        return "<" + AbstractDocument.class.getSimpleName() + " content='" + getContentTruncated() + "'>";
     }
 
     public String getURL() {
@@ -70,6 +66,6 @@ public class Document {
     }
 
     public String getDocumentTypeName() {
-        return Document.class.getSimpleName();
+        return AbstractDocument.class.getSimpleName();
     }
 }

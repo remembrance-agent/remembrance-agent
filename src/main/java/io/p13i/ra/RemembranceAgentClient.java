@@ -21,8 +21,8 @@ import io.p13i.ra.input.InputMechanismManager;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
 import io.p13i.ra.input.mock.MockSpeechRecognizer;
 import io.p13i.ra.input.speech.SpeechInputMechanism;
+import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.models.Context;
-import io.p13i.ra.models.Document;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.BufferingLogFileWriter;
@@ -141,9 +141,9 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         LOGGER.info("Initialized Remembrance Agent.");
 
         LOGGER.info("Loading/indexing documents...");
-        List<Document> documentsIndexed = mRemembranceAgentEngine.indexDocuments();
+        List<AbstractDocument> documentsIndexed = mRemembranceAgentEngine.indexDocuments();
         LOGGER.info(String.format("Indexing complete. Added %d documents:", documentsIndexed.size()));
-        for (Document document : documentsIndexed) {
+        for (AbstractDocument document : documentsIndexed) {
             LOGGER.info(document.toString());
         }
 

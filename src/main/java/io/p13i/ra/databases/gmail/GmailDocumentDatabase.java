@@ -8,9 +8,8 @@ import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartHeader;
 import io.p13i.ra.databases.DocumentDatabase;
-import io.p13i.ra.databases.cache.CachableDocument;
-import io.p13i.ra.databases.cache.CachableDocumentDatabase;
-import io.p13i.ra.models.Document;
+import io.p13i.ra.databases.cache.ICachableDocument;
+import io.p13i.ra.databases.cache.ICachableDocumentDatabase;
 import io.p13i.ra.utils.GoogleAPIUtils;
 import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.LINQList;
@@ -27,7 +26,7 @@ import java.util.logging.Logger;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 
-public class GmailDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
+public class GmailDocumentDatabase implements DocumentDatabase<GmailDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(GmailDocumentDatabase.class);
 
@@ -80,7 +79,7 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
                 GmailDocument gmailDocument = new GmailDocument(fullMessage.getId(), getMessageContent(fullMessage), getMessageSubject(fullMessage), getMessageSender(fullMessage), getReceivedDate(fullMessage));
                 this.gmailDocuments.add(gmailDocument);
 
-                LOGGER.info("Added Gmail Document: " + gmailDocument.toString());
+                LOGGER.info("Added Gmail AbstractDocument: " + gmailDocument.toString());
             }
         } catch (IOException e) {
             LOGGER.throwing(GmailDocumentDatabase.class.getSimpleName(), "loadDocuments", e);
@@ -96,15 +95,14 @@ public class GmailDocumentDatabase implements DocumentDatabase, CachableDocument
     }
 
     @Override
-    public List<Document> getAllDocuments() {
-        return ListUtils.castUp(this.gmailDocuments);
+    public List<GmailDocument> getAllDocuments() {
+        return this.gmailDocuments;
     }
 
     @Override
-    public List<CachableDocument> getDocumentsForSavingToCache() {
+    public List<ICachableDocument> getDocumentsForSavingToCache() {
         return ListUtils.castUp(this.gmailDocuments);
     }
-
 
     /**
      * Global instance of the scopes required by this quickstart.

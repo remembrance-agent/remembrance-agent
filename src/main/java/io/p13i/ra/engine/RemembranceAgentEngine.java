@@ -1,22 +1,22 @@
 package io.p13i.ra.engine;
 
-import io.p13i.ra.models.Context;
-import io.p13i.ra.models.Document;
 import io.p13i.ra.databases.DocumentDatabase;
-import io.p13i.ra.databases.localdisk.LocalDiskDocumentDatabase;
-import io.p13i.ra.models.Query;
-import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.utils.LoggerUtils;
-import io.p13i.ra.utils.ResourceUtil;
+import io.p13i.ra.models.*;
+import io.p13i.ra.similarity.DateSimilarityIndex;
+import io.p13i.ra.similarity.StringSimilarityIndex;
+import io.p13i.ra.utils.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.PriorityQueue;
 import java.util.logging.Logger;
 
 
 /**
  * Core RA implementation and wrapper functions
  */
-public class RemembranceAgentEngine {
+public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentEngine.class);
 
     private final DocumentDatabase documentDatabase;
@@ -25,12 +25,14 @@ public class RemembranceAgentEngine {
         this.documentDatabase = documentDatabase;
     }
 
-    public List<Document> indexDocuments() {
+    @Override
+    public List<AbstractDocument> indexDocuments() {
         this.documentDatabase.loadDocuments();
         this.documentDatabase.indexDocuments();
         return this.documentDatabase.getAllDocuments();
     }
 
+    @Override
     public List<ScoredDocument> determineSuggestions(Query query) {
         if (query.getWordVector().size() == 0) {
             return new ArrayList<>();
@@ -40,10 +42,10 @@ public class RemembranceAgentEngine {
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
         ConfusionMatrix confusionMatrix = new ConfusionMatrix();
-        List<Document> allDocuments = this.documentDatabase.getAllDocuments();
-        LOGGER.info("Searching " + allDocuments.size() + " documents.");
-        for (Document document : allDocuments) {
-            ScoredDocument scoredDoc = RemembranceAgentSuggestionCalculator.compute(query, document, allDocuments, confusionMatrix);
+        List<AbstractDocument> allDocuments = this.documentDatabase.getAllDocuments();
+        LOGGER.info("Searching " + allDocuments.size() + " documents for '" + query.getQuery() + "'");
+        for (AbstractDocument document : allDocuments) {
+            ScoredDocument scoredDoc = scoreQueryAgainstDocuments(query, document, allDocuments, confusionMatrix);
             scoredDocuments.add(scoredDoc);
         }
 
@@ -60,18 +62,54 @@ public class RemembranceAgentEngine {
         return suggestedDocuments;
     }
 
-    public static void main(String[] args) {
-        String directoryPath = ResourceUtil.getResourcePath(RemembranceAgentEngine.class, "sample-documents");
-        RemembranceAgentEngine ra = new RemembranceAgentEngine(new LocalDiskDocumentDatabase(directoryPath));
-        ra.indexDocuments();
+    private static final double CONTENT_BIAS = 1.00;
+    private static final double LOCATION_BIAS = 0.00;
+    private static final double PERSON_BIAS = 0.00;
+    private static final double SUBJECT_BIAS = 0.00;
+    private static final double DATE_BIAS = 0.00;
 
-        Context queryContext = new Context(null, null, null, null);
-        final int numSuggestions = 2;
-        Query query = new Query("jesus", queryContext, numSuggestions);
-        List<ScoredDocument> suggestedDocuments = ra.determineSuggestions(query);
+    static {
+        Assert.equal(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);
+    }
 
-        for (ScoredDocument doc : suggestedDocuments) {
-            System.out.println(doc.toString());
+    private ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments, ConfusionMatrix confusionMatrix) {
+        List<String> wordVector = query.getWordVector();
+
+        double wordScoreSum = 0.0;
+        for (String word : wordVector) {
+
+            double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
+
+            confusionMatrix.add(word, document.getContext().getSubject(), wordScore);
+
+            if (Double.isNaN(wordScore)) {
+                // adding NaN to a double will cause the double to become NaN
+                continue;
+            }
+
+            wordScoreSum += wordScore;
         }
+
+
+        // Normalize
+        double contentScore = wordScoreSum / (double) wordVector.size();
+
+        StringSimilarityIndex stringSimilarityIndex = new StringSimilarityIndex();
+        DateSimilarityIndex dateSimilarityIndex = new DateSimilarityIndex();
+
+        double locationScore = stringSimilarityIndex.calculate(query.getContext().getLocation(), document.getContext().getLocation());
+        double personScore = stringSimilarityIndex.calculate(query.getContext().getPerson(), document.getContext().getPerson());
+        double subjectScore = stringSimilarityIndex.calculate(query.getContext().getSubject(), document.getContext().getSubject());
+        double dateScore = dateSimilarityIndex.calculate(query.getContext().getDate(), document.getContext().getDate());
+
+        double contentBiased = contentScore * CONTENT_BIAS;
+        double locationBiased = locationScore * LOCATION_BIAS;
+        double personBiased = personScore * PERSON_BIAS;
+        double subjectBiased = subjectScore * SUBJECT_BIAS;
+        double dateBiased = dateScore * DATE_BIAS;
+
+        double score = contentBiased + locationBiased + personBiased + subjectBiased + dateBiased;
+
+        return new ScoredDocument(query, score, document);
     }
 }

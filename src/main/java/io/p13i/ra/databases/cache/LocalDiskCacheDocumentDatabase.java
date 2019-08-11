@@ -5,7 +5,7 @@ import io.p13i.ra.databases.cache.metadata.LocalDiskCacheDocumentMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadataParser;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
-import io.p13i.ra.models.Document;
+import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
@@ -15,11 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDiskCache {
+public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, ILocalDiskCache {
 
     private final String cacheLocalDirectory;
-    private List<Document> documentsFromDisk = new ArrayList<>();
-    private List<CachableDocument> documentsFromMemory = new ArrayList<>();
+    private List<AbstractDocument> documentsFromDisk = new ArrayList<>();
+    private List<ICachableDocument> documentsFromMemory = new ArrayList<>();
 
     private String getMetadataJSONFilePath() {
         return this.cacheLocalDirectory + File.separator + "~metadata.json";
@@ -57,7 +57,7 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
             String subject = metadata.fileNamesToMetadata.get(fileName).subject;
             String url = metadata.fileNamesToMetadata.get(fileName).url;
             String content = FileIO.read(cachedFilePath);
-            Document document = new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url);
+            AbstractDocument document = new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url);
             this.documentsFromDisk.add(document);
         }
     }
@@ -72,7 +72,7 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
 
         // Save metadata file
         Map<String, LocalDiskCacheDocumentMetadata> fileNamesToMetadata = new HashMap<>();
-        for (CachableDocument cachableDocument : this.documentsFromMemory) {
+        for (ICachableDocument cachableDocument : this.documentsFromMemory) {
             fileNamesToMetadata.put(cachableDocument.getCacheFileName(), new LocalDiskCacheDocumentMetadata() {{
                 fileName = cachableDocument.getCacheFileName();
                 subject = cachableDocument.getContext().getSubject();
@@ -82,20 +82,20 @@ public class LocalDiskCacheDocumentDatabase implements DocumentDatabase, LocalDi
         FileIO.write(getMetadataJSONFilePath(), LocalDiskCacheMetadataParser.asString(new LocalDiskCacheMetadata(fileNamesToMetadata)));
 
         // Write each cache file
-        for (CachableDocument cachableDocument : this.documentsFromMemory) {
+        for (ICachableDocument cachableDocument : this.documentsFromMemory) {
             String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
             FileIO.write(cacheFileName, cachableDocument.getContent());
         }
     }
 
     @Override
-    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(CachableDocumentDatabase cachableDocumentDatabase) {
+    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(ICachableDocumentDatabase cachableDocumentDatabase) {
         this.documentsFromMemory.addAll(cachableDocumentDatabase.getDocumentsForSavingToCache());
         return this;
     }
 
     @Override
-    public List<Document> getAllDocuments() {
+    public List<AbstractDocument> getAllDocuments() {
         return this.documentsFromDisk;
     }
 

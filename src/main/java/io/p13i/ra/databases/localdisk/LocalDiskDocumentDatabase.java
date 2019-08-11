@@ -1,9 +1,8 @@
 package io.p13i.ra.databases.localdisk;
 
 import io.p13i.ra.databases.DocumentDatabase;
-import io.p13i.ra.databases.cache.CachableDocument;
-import io.p13i.ra.databases.cache.CachableDocumentDatabase;
-import io.p13i.ra.models.Document;
+import io.p13i.ra.databases.cache.ICachableDocument;
+import io.p13i.ra.databases.cache.ICachableDocumentDatabase;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.LoggerUtils;
@@ -16,7 +15,7 @@ import java.util.logging.Logger;
 /**
  * Represents the data store of files on local disk
  */
-public class LocalDiskDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
+public class LocalDiskDocumentDatabase implements DocumentDatabase<LocalDiskDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(LocalDiskDocumentDatabase.class);
     private final String directory;
@@ -57,22 +56,12 @@ public class LocalDiskDocumentDatabase implements DocumentDatabase, CachableDocu
     }
 
     @Override
-    public List<Document> getAllDocuments() {
-        return ListUtils.castUp(this.documents);
-    }
-
-    public static void main(String[] args) {
-        LocalDiskDocumentDatabase documentDatabase = new LocalDiskDocumentDatabase("/Users/p13i/Projects/glass-notes/sample-documents");
-        documentDatabase.loadDocuments();
-        documentDatabase.indexDocuments();
-        List<Document> documents = documentDatabase.getAllDocuments();
-        for (Document document : documents) {
-            System.out.println(document.toString());
-        }
+    public List<LocalDiskDocument> getAllDocuments() {
+        return this.documents;
     }
 
     @Override
-    public List<CachableDocument> getDocumentsForSavingToCache() {
+    public List<ICachableDocument> getDocumentsForSavingToCache() {
         return ListUtils.castUp(this.documents);
     }
 }

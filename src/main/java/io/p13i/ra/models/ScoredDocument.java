@@ -13,9 +13,9 @@ import java.util.List;
 public final class ScoredDocument implements Comparable<ScoredDocument> {
     private final Query query;
     private final double score;
-    private final Document document;
+    private final AbstractDocument document;
 
-    public ScoredDocument(Query query, double score, Document document) {
+    public ScoredDocument(Query query, double score, AbstractDocument document) {
         this.query = query;
         this.score = score;
         this.document = document;
@@ -25,7 +25,7 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
         return score;
     }
 
-    public Document getDocument() {
+    public AbstractDocument getDocument() {
         return document;
     }
 

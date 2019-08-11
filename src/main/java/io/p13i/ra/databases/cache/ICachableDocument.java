@@ -8,7 +8,7 @@ import io.p13i.ra.utils.StringUtils;
 /**
  * Represents one object that can be cached
  */
-public interface CachableDocument {
+public interface ICachableDocument {
 
     String CACHE_FILE_EXTENSION = "cache.txt";
 

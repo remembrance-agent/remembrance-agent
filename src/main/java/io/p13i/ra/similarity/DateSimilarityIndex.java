@@ -8,7 +8,7 @@ import java.util.Date;
 /**
  * Computes an index [0, 1] between two Date objects
  */
-public class DateSimilarityIndex implements SimilarityIndex<Date> {
+public class DateSimilarityIndex implements ISimilarityIndex<Date> {
     public double calculate(Date d1, Date d2) {
         if (d1 == null || d2 == null) {
             return this.NO_SIMILARITY;

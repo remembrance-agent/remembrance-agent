@@ -7,9 +7,8 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 import io.p13i.ra.databases.DocumentDatabase;
-import io.p13i.ra.databases.cache.CachableDocument;
-import io.p13i.ra.databases.cache.CachableDocumentDatabase;
-import io.p13i.ra.models.Document;
+import io.p13i.ra.databases.cache.ICachableDocument;
+import io.p13i.ra.databases.cache.ICachableDocumentDatabase;
 import io.p13i.ra.utils.GoogleAPIUtils;
 import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.LoggerUtils;
@@ -24,7 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, CachableDocumentDatabase {
+public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase<GoogleDriveDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(GoogleDriveFolderDocumentDatabase.class);
 
@@ -110,12 +109,12 @@ public class GoogleDriveFolderDocumentDatabase implements DocumentDatabase, Cach
     }
 
     @Override
-    public List<Document> getAllDocuments() {
-        return ListUtils.castUp(this.googleDriveDocuments);
+    public List<GoogleDriveDocument> getAllDocuments() {
+        return this.googleDriveDocuments;
     }
 
     @Override
-    public List<CachableDocument> getDocumentsForSavingToCache() {
+    public List<ICachableDocument> getDocumentsForSavingToCache() {
         return ListUtils.castUp(this.googleDriveDocuments);
     }
 }

@@ -1,10 +1,10 @@
 package io.p13i.ra.databases;
 
-import io.p13i.ra.models.Document;
+import io.p13i.ra.models.AbstractDocument;
 
 import java.util.List;
 
-public interface DocumentDatabase {
+public interface DocumentDatabase<TDocument extends AbstractDocument> {
     /**
      * Gets the name of the data store
      * @return human readable name
@@ -20,8 +20,8 @@ public interface DocumentDatabase {
      * Indexes all the documents
      */
     default void indexDocuments() {
-        List<Document> documents = getAllDocuments();
-        for (Document document : documents) {
+        List<TDocument> documents = getAllDocuments();
+        for (TDocument document : documents) {
             document.computeWordVector();
         }
     }
@@ -30,5 +30,5 @@ public interface DocumentDatabase {
      * Fetches the documents from memory
      * @return All the documents
      */
-    List<Document> getAllDocuments();
+    List<TDocument> getAllDocuments();
 }
