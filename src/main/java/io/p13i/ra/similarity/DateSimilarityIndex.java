@@ -21,8 +21,6 @@ public class DateSimilarityIndex implements ISimilarityIndex<Date> {
 
         double index = (yearSimilarity + monthSimilarity + dayOfWeekSimilarity) / 3.0;
 
-        Assert.inRange(index, INDEX_LOWER_BOUND, INDEX_HIGHER_BOUND);
-
-        return index;
+        return checkInBounds(index);
     }
 }

@@ -11,9 +11,7 @@ public class StringSimilarityIndex implements ISimilarityIndex<String> {
         int longerStringLength = Math.max(s1.length(), s2.length());
         double index = (longerStringLength - distance) / (double) longerStringLength;
 
-        Assert.inRange(index, INDEX_LOWER_BOUND, INDEX_HIGHER_BOUND);
-
-        return index;
+        return checkInBounds(index);
     }
 
     /**
