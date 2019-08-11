@@ -26,10 +26,13 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     }
 
     @Override
-    public List<AbstractDocument> indexDocuments() {
+    public void loadDocuments() {
         this.documentDatabase.loadDocuments();
+    }
+
+    @Override
+    public void indexDocuments() {
         this.documentDatabase.indexDocuments();
-        return this.documentDatabase.getAllDocuments();
     }
 
     @Override

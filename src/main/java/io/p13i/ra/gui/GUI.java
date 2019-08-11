@@ -5,7 +5,9 @@ import io.p13i.ra.input.InputMechanismManager;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
 import io.p13i.ra.input.mock.MockSpeechRecognizer;
 import io.p13i.ra.input.speech.SpeechInputMechanism;
+import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.IntegerUtils;
+import io.p13i.ra.utils.URIUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 import static io.p13i.ra.gui.User.Preferences.Pref.*;
@@ -36,7 +39,7 @@ public class GUI {
 
     // Swing elements
     public static BorderedJLabel sKeystrokeBufferLabel;
-    public static JPanel sSuggestionsPanel;
+    public static BorderedJPanel sSuggestionsPanel;
 
     public static final JFrame sJFrame = new JFrame(APPLICATION_NAME) {{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -52,7 +55,7 @@ public class GUI {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                RemembranceAgentClient.getInstance().initializeRemembranceAgent(true);
+                                RemembranceAgentClient.getInstance().initializeRAEngine(true);
                                 JOptionPane.showMessageDialog(sJFrame, "Reinitialized!");
                             }
                         });
@@ -64,7 +67,7 @@ public class GUI {
                             public void actionPerformed(ActionEvent e) {
                                 JOptionPane.showMessageDialog(sJFrame, "Reloading with new cache! GUI will freeze");
                                 sJFrame.setEnabled(false);
-                                RemembranceAgentClient.getInstance().initializeRemembranceAgent(false);
+                                RemembranceAgentClient.getInstance().initializeRAEngine(false);
                                 JOptionPane.showMessageDialog(sJFrame, "Reinitialized with new cache!");
                                 sJFrame.setEnabled(true);
                             }
@@ -137,10 +140,10 @@ public class GUI {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                if (RemembranceAgentClient.getInstance().mBreakingBuffer.isEmpty()) {
+                                if (RemembranceAgentClient.getInstance().mInputBuffer.isEmpty()) {
                                     JOptionPane.showMessageDialog(sJFrame, "Buffer is empty. No clearing required.");
                                 } else {
-                                    RemembranceAgentClient.getInstance().mBreakingBuffer.clear();
+                                    RemembranceAgentClient.getInstance().mInputBuffer.clear();
                                     sKeystrokeBufferLabel.setText("");
                                 }
                             }
@@ -225,11 +228,9 @@ public class GUI {
                     }});
                 }});
             }});
-            add(sSuggestionsPanel = new JPanel() {{
+            add(sSuggestionsPanel = new BorderedJPanel() {{
                 setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT);
-                setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createTitledBorder("Suggestions (from " + User.Preferences.getString(LocalDiskDocumentsFolderPath) + ")"),
-                        BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
+                setBorderTitle("Suggestions (from " + User.Preferences.getString(LocalDiskDocumentsFolderPath) + ")", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
             add(sKeystrokeBufferLabel = new BorderedJLabel() {{
@@ -239,4 +240,38 @@ public class GUI {
             }});
         }});
     }};
+
+    public static java.util.List<Component> getComponentsForScoredDocument(ScoredDocument doc, int i) {
+        return new ArrayList<Component>() {{
+            add(new JLabel() {{
+                setText(Double.toString(doc.getScore()));
+                setBounds(GUI.SUGGESTION_PADDING_LEFT, GUI.PADDING_TOP + i * GUI.SUGGESTION_HEIGHT, GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
+                setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
+            }});
+            add(new JButton() {{
+                setText(doc.toShortString());
+                setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, GUI.PADDING_TOP + i * GUI.SUGGESTION_HEIGHT, GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
+                setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
+                setHorizontalAlignment(SwingConstants.LEFT);
+                addActionListener(e -> {
+
+                    boolean error = false;
+                    try {
+                        Desktop.getDesktop().open(new File(doc.getDocument().getURL()));
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        error = true;
+                    }
+                    if (error) {
+                        try {
+                            Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getURL()));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
+                setEnabled(true);
+            }});
+        }};
+    }
 }

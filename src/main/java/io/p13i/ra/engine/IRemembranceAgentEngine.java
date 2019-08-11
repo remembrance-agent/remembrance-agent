@@ -7,7 +7,9 @@ import io.p13i.ra.models.ScoredDocument;
 import java.util.List;
 
 public interface IRemembranceAgentEngine {
-    List<AbstractDocument> indexDocuments();
+    void loadDocuments();
+
+    void indexDocuments();
 
     List<ScoredDocument> determineSuggestions(Query query);
 }

@@ -21,6 +21,10 @@ public class LINQList<T> {
         return new LINQList<>(charactersList);
     }
 
+    public static <T> LINQList<T> from(Iterable<T> source) {
+        return new LINQList<>(source);
+    }
+
     public static LINQList<Integer> range(int start, int end) {
         Assert.that(start >= 0);
         Assert.that(end > 0);

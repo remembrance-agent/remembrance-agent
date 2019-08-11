@@ -10,9 +10,17 @@ import org.jnativehook.dispatcher.SwingDispatchService;
 import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class KeyboardInputMechanism extends AbstractInputMechanism implements NativeKeyListener {
     @Override
     public void initalizeInputMechanism() {
+
+        // Get the logger for "org.jnativehook" and set the level to off.
+        Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
+        logger.setLevel(Level.OFF);
+
         try {
             GlobalScreen.setEventDispatcher(new SwingDispatchService());
             GlobalScreen.registerNativeHook();
