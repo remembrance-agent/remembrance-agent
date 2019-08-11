@@ -198,6 +198,8 @@ public class GUI {
                                             .getInputMechanismInstance(SpeechInputMechanism.class);
 
                                     sKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
+                                    sKeystrokeBufferLabel.invalidate();
+                                    sKeystrokeBufferLabel.repaint();
 
                                     setTitle("Start speaking...");
                                     for (int i = 0; i < 1; i++) {
