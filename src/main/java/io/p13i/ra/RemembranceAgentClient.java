@@ -54,6 +54,8 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         return sInstance;
     }
 
+    private final GUI mGUI = new GUI();
+
     /**
      * The number of characters to store in the buffer AND display in the GUI
      */
@@ -131,7 +133,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     @Override
     public void run() {
         // Show the GUI
-        GUI.setVisible(true);
+        mGUI.setVisible(true);
 
         // init!
         mRemembranceAgentEngine = initializeRAEngine(true);
@@ -171,7 +173,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         }
 
         // Update the GUI with where the suggestions are coming from
-        GUI.setSuggestionsPanelTitle("Suggestions (from " + localDiskCacheDatabase.getName() + ")");
+        mGUI.setSuggestionsPanelTitle("Suggestions (from " + localDiskCacheDatabase.getName() + ")");
 
         // Initialize!
         RemembranceAgentEngine remembranceAgentEngine = new RemembranceAgentEngine(localDiskCacheDatabase);
@@ -186,7 +188,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         String inputMechanism = InputMechanismManager.getInstance()
                 .getActiveInputMechanism()
                 .getInputMechanismName();
-        GUI.setKeyStrokeBufferTitle(inputMechanism);
+        mGUI.setKeyStrokeBufferTitle(inputMechanism);
 
         // Start the RA task
         mRAUpdateTimer = new Timer();
@@ -204,7 +206,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
      * Sends the contextual {@code Query} to the RA
      */
     private void sendQueryToRemembranceAgent() {
-        GUI.setTitle("* SEARCHING * " + APPLICATION_NAME + " * SEARCHING *");
+        mGUI.setTitle("* SEARCHING * " + APPLICATION_NAME + " * SEARCHING *");
 
         // Build a query
         String queryString = mInputBuffer.toString();
@@ -214,7 +216,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         LOGGER.info("Sending query to RA: '" + queryString + "'");
 
         // Update the GUI
-        GUI.removeScoredDocuments();
+        mGUI.removeScoredDocuments();
 
         // Add the suggestion's elements to the GUI
         LOGGER.info(String.format("Got %d suggestion(s).", suggestions.size()));
@@ -225,11 +227,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             LOGGER.info(" -> (" + scoredDocument.getScore() + ") " + scoredDocument.toShortString());
 
             // Add each of the components for the document to the GUI
-            GUI.addScoredDocument(scoredDocument, i);
+            mGUI.addScoredDocument(scoredDocument, i);
         }
 
         // Reset the title
-        GUI.setTitle(APPLICATION_NAME);
+        mGUI.setTitle(APPLICATION_NAME);
     }
 
     @Override
@@ -243,6 +245,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         LOGGER.info(String.format("[Buffer count=%04d:] %s", mInputBuffer.getTotalTypedCharactersCount(), mInputBuffer.toString()));
 
         // Display on the GUI
-        GUI.setKeystrokesBufferText(mInputBuffer.toString());
+        mGUI.setKeystrokesBufferText(mInputBuffer.toString());
     }
 }

@@ -3,7 +3,6 @@ package io.p13i.ra.gui;
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.input.InputMechanismManager;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
-import io.p13i.ra.input.mock.MockSpeechRecognizer;
 import io.p13i.ra.input.speech.SpeechInputMechanism;
 import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.IntegerUtils;
@@ -15,7 +14,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;
@@ -41,10 +39,10 @@ public class GUI {
     public static final int SUGGESTION_PADDING = 10;
 
     // Swing elements
-    private static BorderedJLabel sKeystrokeBufferLabel;
-    private static BorderedJPanel sSuggestionsPanel;
+    private BorderedJLabel mKeystrokeBufferLabel;
+    private BorderedJPanel mSuggestionsPanel;
 
-    private static final JFrame sJFrame = new JFrame(APPLICATION_NAME) {{
+    private final JFrame mJFrame = new JFrame(APPLICATION_NAME) {{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(GUI.WIDTH, GUI.HEIGHT);
         setResizable(false);
@@ -59,7 +57,7 @@ public class GUI {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 RemembranceAgentClient.getInstance().initializeRAEngine(true);
-                                JOptionPane.showMessageDialog(sJFrame, "Reinitialized!");
+                                JOptionPane.showMessageDialog(mJFrame, "Reinitialized!");
                             }
                         });
                     }});
@@ -68,11 +66,11 @@ public class GUI {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                JOptionPane.showMessageDialog(sJFrame, "Reloading with new cache! GUI will freeze");
-                                sJFrame.setEnabled(false);
+                                JOptionPane.showMessageDialog(mJFrame, "Reloading with new cache! GUI will freeze");
+                                mJFrame.setEnabled(false);
                                 RemembranceAgentClient.getInstance().initializeRAEngine(false);
-                                JOptionPane.showMessageDialog(sJFrame, "Reinitialized with new cache!");
-                                sJFrame.setEnabled(true);
+                                JOptionPane.showMessageDialog(mJFrame, "Reinitialized with new cache!");
+                                mJFrame.setEnabled(true);
                             }
                         });
                     }});
@@ -85,7 +83,7 @@ public class GUI {
                                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                                 // disable the "All files" option.
                                 fileChooser.setAcceptAllFileFilterUsed(false);
-                                if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
+                                if (fileChooser.showOpenDialog(mJFrame) == JFileChooser.APPROVE_OPTION) {
                                     User.Preferences.set(LocalDiskDocumentsFolderPath, fileChooser.getSelectedFile().toPath().toString());
                                 }
                             }
@@ -117,9 +115,9 @@ public class GUI {
                                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                                 // disable the "All files" option.
                                 fileChooser.setAcceptAllFileFilterUsed(false);
-                                if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
+                                if (fileChooser.showOpenDialog(mJFrame) == JFileChooser.APPROVE_OPTION) {
                                     User.Preferences.set(RAClientLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "ra-client.log");
-                                    JOptionPane.showMessageDialog(sJFrame, "Selected ra-client.log file: " + User.Preferences.getString(RAClientLogFile));
+                                    JOptionPane.showMessageDialog(mJFrame, "Selected ra-client.log file: " + User.Preferences.getString(RAClientLogFile));
                                 }
                             }
                         });
@@ -140,7 +138,7 @@ public class GUI {
                             @Override
                             public void actionPerformed(ActionEvent e) {
                                 RemembranceAgentClient.getInstance().mInputBuffer.clear();
-                                sKeystrokeBufferLabel.setText("");
+                                mKeystrokeBufferLabel.setText("");
                             }
                         });
                     }});
@@ -153,9 +151,9 @@ public class GUI {
                                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                                 // disable the "All files" option.
                                 fileChooser.setAcceptAllFileFilterUsed(false);
-                                if (fileChooser.showOpenDialog(sJFrame) == JFileChooser.APPROVE_OPTION) {
+                                if (fileChooser.showOpenDialog(mJFrame) == JFileChooser.APPROVE_OPTION) {
                                     User.Preferences.set(KeystrokesLogFile, fileChooser.getSelectedFile().toPath().toString() + File.separator + "keystrokes.log");
-                                    sKeystrokeBufferLabel.setBorder(BorderFactory.createCompoundBorder(
+                                    mKeystrokeBufferLabel.setBorder(BorderFactory.createCompoundBorder(
                                             BorderFactory.createTitledBorder("Keylogger Buffer (writing to " + User.Preferences.getString(KeystrokesLogFile) + ")"),
                                             BorderFactory.createEmptyBorder(GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING, GUI.BORDER_PADDING)));
                                 }
@@ -179,17 +177,17 @@ public class GUI {
                             public void actionPerformed(ActionEvent e) {
 
                                 SwingUtilities.invokeLater(() -> {
-                                    sKeystrokeBufferLabel.setBorderTitle("Speech input...", GUI.BORDER_PADDING);
-                                    sKeystrokeBufferLabel.invalidate();
-                                    sKeystrokeBufferLabel.repaint();
+                                    mKeystrokeBufferLabel.setBorderTitle("Speech input...", GUI.BORDER_PADDING);
+                                    mKeystrokeBufferLabel.invalidate();
+                                    mKeystrokeBufferLabel.repaint();
 
                                     SpeechInputMechanism speechRecognizer = InputMechanismManager.getInstance()
                                             .setActiveInputMechanism(SpeechInputMechanism.class)
                                             .getInputMechanismInstance(SpeechInputMechanism.class);
 
-                                    sKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
-                                    sKeystrokeBufferLabel.invalidate();
-                                    sKeystrokeBufferLabel.repaint();
+                                    mKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
+                                    mKeystrokeBufferLabel.invalidate();
+                                    mKeystrokeBufferLabel.repaint();
 
                                     setTitle("Start speaking...");
                                     for (int i = 0; i < 1; i++) {
@@ -202,9 +200,9 @@ public class GUI {
                                             .getInputMechanismInstance(KeyboardInputMechanism.class)
                                             .getInputMechanismName();
 
-                                    sKeystrokeBufferLabel.setBorderTitle(keyboardInputName, GUI.BORDER_PADDING);
-                                    sKeystrokeBufferLabel.invalidate();
-                                    sKeystrokeBufferLabel.repaint();
+                                    mKeystrokeBufferLabel.setBorderTitle(keyboardInputName, GUI.BORDER_PADDING);
+                                    mKeystrokeBufferLabel.invalidate();
+                                    mKeystrokeBufferLabel.repaint();
                                 });
 
                             }
@@ -216,19 +214,19 @@ public class GUI {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                JOptionPane.showMessageDialog(sJFrame, "© Pramod Kotipalli, http://remem.p13i.io/");
+                                JOptionPane.showMessageDialog(mJFrame, "© Pramod Kotipalli, http://remem.p13i.io/");
 
                             }
                         });
                     }});
                 }});
             }});
-            add(sSuggestionsPanel = new BorderedJPanel() {{
+            add(mSuggestionsPanel = new BorderedJPanel() {{
                 setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT);
                 setBorderTitle("Suggestions (from " + User.Preferences.getString(LocalDiskDocumentsFolderPath) + ")", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
-            add(sKeystrokeBufferLabel = new BorderedJLabel() {{
+            add(mKeystrokeBufferLabel = new BorderedJLabel() {{
                 setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP + GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
                 setBorderTitle("", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
@@ -236,17 +234,17 @@ public class GUI {
         }});
     }};
 
-    public static void removeScoredDocuments() {
-        sSuggestionsPanel.removeAll();
+    public void removeScoredDocuments() {
+        mSuggestionsPanel.removeAll();
     }
 
-    public static void addScoredDocument(ScoredDocument doc, int i) {
-        sSuggestionsPanel.add(new JLabel() {{
+    public void addScoredDocument(ScoredDocument doc, int i) {
+        mSuggestionsPanel.add(new JLabel() {{
             setText(Double.toString(doc.getScore()));
             setBounds(GUI.SUGGESTION_PADDING_LEFT, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
             setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
         }});
-        sSuggestionsPanel.add(new JButton() {{
+        mSuggestionsPanel.add(new JButton() {{
             setText(doc.toShortString());
             setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
             setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
@@ -270,33 +268,33 @@ public class GUI {
             });
             setEnabled(true);
         }});
-        sSuggestionsPanel.invalidate();
-        sSuggestionsPanel.repaint();
+        mSuggestionsPanel.invalidate();
+        mSuggestionsPanel.repaint();
     }
 
-    public static void setKeyStrokeBufferTitle(String title) {
-        sKeystrokeBufferLabel.setBorderTitle(title, GUI.BORDER_PADDING);
-        sKeystrokeBufferLabel.invalidate();
-        sKeystrokeBufferLabel.repaint();
+    public void setKeyStrokeBufferTitle(String title) {
+        mKeystrokeBufferLabel.setBorderTitle(title, GUI.BORDER_PADDING);
+        mKeystrokeBufferLabel.invalidate();
+        mKeystrokeBufferLabel.repaint();
     }
 
-    public static void setTitle(String text) {
-        sJFrame.setTitle(text);
+    public void setTitle(String text) {
+        mJFrame.setTitle(text);
     }
 
-    public static void setVisible(boolean visible) {
-        sJFrame.setVisible(visible);
+    public void setVisible(boolean visible) {
+        mJFrame.setVisible(visible);
     }
 
-    public static void setKeystrokesBufferText(String text) {
-        sKeystrokeBufferLabel.setText(text);
-        sKeystrokeBufferLabel.invalidate();
-        sKeystrokeBufferLabel.repaint();
+    public void setKeystrokesBufferText(String text) {
+        mKeystrokeBufferLabel.setText(text);
+        mKeystrokeBufferLabel.invalidate();
+        mKeystrokeBufferLabel.repaint();
     }
 
-    public static void setSuggestionsPanelTitle(String s) {
-        sSuggestionsPanel.setBorderTitle(s, GUI.BORDER_PADDING);
-        sSuggestionsPanel.invalidate();
-        sSuggestionsPanel.repaint();
+    public void setSuggestionsPanelTitle(String s) {
+        mSuggestionsPanel.setBorderTitle(s, GUI.BORDER_PADDING);
+        mSuggestionsPanel.invalidate();
+        mSuggestionsPanel.repaint();
     }
 }
