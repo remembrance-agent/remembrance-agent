@@ -10,11 +10,6 @@ import java.util.function.Consumer;
 public class MockSpeechRecognizer extends AbstractInputMechanism {
 
     @Override
-    public void initalizeInputMechanism() {
-
-    }
-
-    @Override
     public void startInput() {
         LINQList.from("Hello from a mock speech recognition engine")
             .select(CharacterUtils::toUpperCase)

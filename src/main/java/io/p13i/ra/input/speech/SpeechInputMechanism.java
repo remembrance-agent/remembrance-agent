@@ -39,11 +39,6 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
     }
 
     @Override
-    public void initalizeInputMechanism() {
-
-    }
-
-    @Override
     public void startInput() {
         for (int i = 0; i < numberOfRunsPerInvokation; i++) {
             recognizeFromMicrophone();

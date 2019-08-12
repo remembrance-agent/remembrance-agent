@@ -18,7 +18,6 @@ import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
 import io.p13i.ra.input.AbstractInputMechanism;
-import io.p13i.ra.input.InputMechanismManager;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
 import io.p13i.ra.input.speech.SpeechInputMechanism;
 import io.p13i.ra.models.Context;
@@ -49,6 +48,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     public static final String APPLICATION_NAME = "Remembrance Agent (v" + System.getenv("VERSION") + ")";
 
     private static RemembranceAgentClient sInstance;
+    private AbstractInputMechanism mCurrentInputMechanism;
 
     /**
      * @return the RA instance
@@ -114,16 +114,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         mKeyLoggerBufferLogFileWriter = new BufferingLogFileWriter(User.Preferences.getString(KeystrokesLogFile));
         mKeyLoggerBufferLogFileWriter.open();
 
-        // Add input mechanisms we can use
-        InputMechanismManager.getInstance()
-                .addInputMechanism(new KeyboardInputMechanism())
-                .addInputMechanism(new SpeechInputMechanism(
-                        /* trials: */ 1,
-                        /* duration per trial: */ 5))
-                .initializeAllInputMechanisms()
-                .setOnInputCallbacks(this)
-                .setActiveInputMechanism(KeyboardInputMechanism.class);
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
                 System.out.println("Shutting down ...");
@@ -144,6 +134,15 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // init!
         mRemembranceAgentEngine = initializeRAEngine(true);
+    }
+
+    public void startInputMechanism(AbstractInputMechanism inputMechanism) {
+        if (mCurrentInputMechanism != null) {
+            mCurrentInputMechanism.closeInputMechanism();
+        }
+        mCurrentInputMechanism = inputMechanism;
+        mGUI.setInputMechanism(mCurrentInputMechanism);
+        mCurrentInputMechanism.startInput();
     }
 
     /**
@@ -191,11 +190,8 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         // Index them all
         remembranceAgentEngine.indexDocuments();
 
-        // Tell the user what input is being used
-        String inputMechanism = InputMechanismManager.getInstance()
-                .getActiveInputMechanism()
-                .getInputMechanismName();
-        mGUI.setKeyStrokeBufferTitle(inputMechanism);
+        // Set the input mechanism being used
+        this.startInputMechanism(new KeyboardInputMechanism());
 
         // Start the RA task
         mRAUpdateTimer = new Timer();

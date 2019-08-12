@@ -15,8 +15,7 @@ import java.util.logging.Logger;
 
 public class KeyboardInputMechanism extends AbstractInputMechanism implements NativeKeyListener {
     @Override
-    public void initalizeInputMechanism() {
-
+    public void startInput() {
         // Get the logger for "org.jnativehook" and set the level to off.
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.OFF);
@@ -28,10 +27,6 @@ public class KeyboardInputMechanism extends AbstractInputMechanism implements Na
         } catch (NativeHookException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public void startInput() {
     }
 
     @Override

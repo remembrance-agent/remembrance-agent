@@ -2,7 +2,7 @@ package io.p13i.ra.gui;
 
 import com.google.inject.Singleton;
 import io.p13i.ra.RemembranceAgentClient;
-import io.p13i.ra.input.InputMechanismManager;
+import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
 import io.p13i.ra.input.speech.SpeechInputMechanism;
 import io.p13i.ra.models.ScoredDocument;
@@ -184,13 +184,9 @@ public class GUI {
                                     mKeystrokeBufferLabel.invalidate();
                                     mKeystrokeBufferLabel.repaint();
 
-                                    SpeechInputMechanism speechRecognizer = InputMechanismManager.getInstance()
-                                            .setActiveInputMechanism(SpeechInputMechanism.class)
-                                            .getInputMechanismInstance(SpeechInputMechanism.class);
+                                    SpeechInputMechanism speechRecognizer = new SpeechInputMechanism(1, 10);
 
-                                    mKeystrokeBufferLabel.setBorderTitle(speechRecognizer.getInputMechanismName(), GUI.BORDER_PADDING);
-                                    mKeystrokeBufferLabel.invalidate();
-                                    mKeystrokeBufferLabel.repaint();
+                                    RemembranceAgentClient.getInstance().startInputMechanism(speechRecognizer);
 
                                     setTitle("Start speaking...");
                                     for (int i = 0; i < 1; i++) {
@@ -198,14 +194,8 @@ public class GUI {
                                     }
                                     setTitle("Stop speaking...");
 
-                                    String keyboardInputName = InputMechanismManager.getInstance()
-                                            .setActiveInputMechanism(KeyboardInputMechanism.class)
-                                            .getInputMechanismInstance(KeyboardInputMechanism.class)
-                                            .getInputMechanismName();
 
-                                    mKeystrokeBufferLabel.setBorderTitle(keyboardInputName, GUI.BORDER_PADDING);
-                                    mKeystrokeBufferLabel.invalidate();
-                                    mKeystrokeBufferLabel.repaint();
+                                    RemembranceAgentClient.getInstance().startInputMechanism(new KeyboardInputMechanism());
                                 });
 
                             }
@@ -277,12 +267,6 @@ public class GUI {
         mSuggestionsPanel.repaint();
     }
 
-    public void setKeyStrokeBufferTitle(String title) {
-        mKeystrokeBufferLabel.setBorderTitle(title, GUI.BORDER_PADDING);
-        mKeystrokeBufferLabel.invalidate();
-        mKeystrokeBufferLabel.repaint();
-    }
-
     public void setTitle(String text) {
         mJFrame.setTitle(text);
     }
@@ -301,5 +285,9 @@ public class GUI {
         mSuggestionsPanel.setBorderTitle(s, GUI.BORDER_PADDING);
         mSuggestionsPanel.invalidate();
         mSuggestionsPanel.repaint();
+    }
+
+    public void setInputMechanism(AbstractInputMechanism currentInputMechanism) {
+        mKeystrokeBufferLabel.setBorderTitle(currentInputMechanism.getInputMechanismName(), GUI.BORDER_PADDING);
     }
 }
