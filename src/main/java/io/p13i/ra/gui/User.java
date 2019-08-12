@@ -6,6 +6,9 @@ import java.io.File;
 
 import static java.util.prefs.Preferences.userNodeForPackage;
 
+/**
+ * Encapsulates user-specific references
+ */
 public class User {
 
     public static String NAME = System.getenv("RA_USER_NAME");
@@ -26,43 +29,71 @@ public class User {
         }
     }
 
+    /**
+     * Manages user preference settings
+     */
     public static class Preferences {
 
         private static String NOT_SET = "";
 
-        public enum Pref {
+        /**
+         * Represents all preferences available to the user
+         */
+        public enum Preference {
             KeystrokesLogFile("KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME", Home.DIR + File.separator + "keystrokes.log"),
             RAClientLogFile("RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME", Home.DIR + File.separator + "ra.log"),
             LocalDiskDocumentsFolderPath("LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME", Home.DIR),
             GoogleDriveFolderID("GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME", NOT_SET),
             GmailMaxEmailsCount("GMAIL_MAX_EMAILS_COUNT_NODE_NAME", "10");
 
+            /**
+             * The name of the node used in the backing store
+             */
             private String nodeName;
+
+            /**
+             * The default value for the item if the node is not found in the backing store
+             */
             private String defaultValue;
 
-            Pref(String nodeName, String defaultValue) {
+            Preference(String nodeName, String defaultValue) {
                 this.nodeName = nodeName;
                 this.defaultValue = defaultValue;
             }
         }
 
-        public static String getString(Pref getPref) {
+        /**
+         * Gets a preference as a string
+         * @param preference the preference
+         * @return the string value
+         */
+        public static String getString(Preference preference) {
 
-            for (Pref pref : Pref.values()) {
-                if (getPref.nodeName.equals(pref.nodeName)) {
-                    return userNodeForPackage(RemembranceAgentClient.class).get(getPref.nodeName, getPref.defaultValue);
+            for (Preference pref : Preference.values()) {
+                if (preference.nodeName.equals(pref.nodeName)) {
+                    return userNodeForPackage(RemembranceAgentClient.class).get(preference.nodeName, preference.defaultValue);
                 }
             }
 
-            throw new IllegalArgumentException(getPref.toString());
+            throw new IllegalArgumentException(preference.toString());
         }
 
-        public static int getInt(Pref getPref) {
-            return Integer.parseInt(getString(getPref));
+        /**
+         * Gets a preference as an Integer
+         * @param preference the preference to get
+         * @return the int value
+         */
+        public static int getInt(Preference preference) {
+            return Integer.parseInt(getString(preference));
         }
 
-        public static void set(Pref pref, String value) {
-            userNodeForPackage(RemembranceAgentClient.class).put(pref.nodeName, value);
+        /**
+         * Sets the preference value in the backing store
+         * @param preference the preference
+         * @param value the value to set it to in the backing store
+         */
+        public static void set(Preference preference, String value) {
+            userNodeForPackage(RemembranceAgentClient.class).put(preference.nodeName, value);
         }
     }
 }

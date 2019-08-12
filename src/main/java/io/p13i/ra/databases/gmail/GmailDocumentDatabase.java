@@ -87,6 +87,11 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
         }
     }
 
+    /**
+     * Gets the receive date for an email
+     * @param message the email
+     * @return the parsed date
+     */
     private Date getReceivedDate(Message message) {
         return getHeaderValues(message, "Date")
                 .take(1)
@@ -111,6 +116,10 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
     private static final List<String> SCOPES = Collections.singletonList(GmailScopes.GMAIL_READONLY);
     private static final String TOKENS_DIRECTORY_PATH = "gmail-tokens";
 
+    /**
+     * Gets a Google Mail client
+     * @return a Gmail client
+     */
     private Gmail getGmailService() {
         try {
             // Build a new authorized API client service.
@@ -124,12 +133,23 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
         }
     }
 
+    /**
+     * Gets all the header values for a name in the message
+     * @param message the email
+     * @param headerName the name of the header
+     * @return list of matching values for this header
+     */
     private static LINQList<String> getHeaderValues(Message message, String headerName) {
         return new LINQList<>(message.getPayload().getHeaders())
                 .where(header -> header.getName().equals(headerName))
                 .select(MessagePartHeader::getValue);
     }
 
+    /**
+     * Trys to parse a date or returns null
+     * @param dateString the date string
+     * @return a Date or null if there's a parse error
+     */
     private static Date tryParseMessageDate(String dateString) {
         try {
             return MESSAGE_DATE_FORMAT.parse(dateString);
@@ -139,15 +159,23 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
         }
     }
 
+    /**
+     * @param message the email
+     * @return the sender value
+     */
     private String getMessageSender(Message message) {
         return getHeaderValues(message, "From").firstOrDefault();
     }
 
+    /**
+     * @param message the email
+     * @return the subject value
+     */
     private static String getMessageSubject(Message message) {
         return getHeaderValues(message, "Subject").firstOrDefault();
     }
 
-    /*
+    /**
     https://stackoverflow.com/a/38828761
      */
     private static String getMessageContent(Message message) {
@@ -156,7 +184,7 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
         return new String(Base64.getDecoder().decode(stringBuilder.toString()), StandardCharsets.UTF_8);
     }
 
-    /*
+    /**
     https://stackoverflow.com/a/38828761
      */
     private static void getPlainTextFromMessagePartsRecursive(List<MessagePart> messageParts, StringBuilder stringBuilder) {

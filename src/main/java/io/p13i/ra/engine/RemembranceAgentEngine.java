@@ -1,11 +1,12 @@
 package io.p13i.ra.engine;
 
-import com.google.inject.Inject;
 import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.models.*;
 import io.p13i.ra.similarity.DateSimilarityIndex;
 import io.p13i.ra.similarity.StringSimilarityIndex;
 import io.p13i.ra.utils.*;
+import io.p13i.ra.cache.ICache;
+import io.p13i.ra.cache.LimitedCapacityCache;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +54,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         List<AbstractDocument> allDocuments = this.documentDatabase.getAllDocuments();
         LOGGER.info("Searching " + allDocuments.size() + " documents for '" + query.getQuery() + "'");
         for (AbstractDocument document : allDocuments) {
-            ScoredDocument scoredDoc = scoreQueryAgainstDocuments(query, document, allDocuments);
+            ScoredDocument scoredDoc = Calculator.scoreQueryAgainstDocuments(query, document, allDocuments);
             scoredDocuments.add(scoredDoc);
         }
 
@@ -71,50 +72,68 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         return suggestedDocuments;
     }
 
-    private static final double CONTENT_BIAS = 1.00;
-    private static final double LOCATION_BIAS = 0.00;
-    private static final double PERSON_BIAS = 0.00;
-    private static final double SUBJECT_BIAS = 0.00;
-    private static final double DATE_BIAS = 0.00;
 
-    static {
-        Assert.almostEqual(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);
-    }
+    /**
+     * Scores queries against the document corpus
+     */
+    private static class Calculator {
 
-    private ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments) {
-        List<String> wordVector = query.getWordVector();
+        /**
+         * These values bias the components of the query. Must add to 1.00
+         */
+        private static final double CONTENT_BIAS = 1.00;
+        private static final double LOCATION_BIAS = 0.00;
+        private static final double PERSON_BIAS = 0.00;
+        private static final double SUBJECT_BIAS = 0.00;
+        private static final double DATE_BIAS = 0.00;
 
-        double wordScoreSum = 0.0;
-        for (String word : wordVector) {
+        /**
+         * Scores a query against all the documents in the data store
+         *
+         * @param query the query
+         * @param document the document to check the query against
+         * @param allDocuments the context of all documents
+         * @return a score between 0.0 and 1.0
+         */
+        private static ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments) {
+            List<String> wordVector = query.getWordVector();
 
-            double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
+            // Perform TFiDF on each word
+            double wordScoreSum = 0.0;
+            for (String word : wordVector) {
 
-            if (Double.isNaN(wordScore)) {
-                // adding NaN to a double will cause the double to become NaN
-                continue;
+                double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
+
+                if (Double.isNaN(wordScore)) {
+                    // adding NaN to a double will cause the double to become NaN
+                    continue;
+                }
+
+                wordScoreSum += wordScore;
             }
 
-            wordScoreSum += wordScore;
+
+            // Normalize
+            double contentScore = wordScoreSum / (double) wordVector.size();
+
+            // Compute the contextual properties
+            double locationScore = StringSimilarityIndex.calculate(query.getContext().getLocation(), document.getContext().getLocation());
+            double personScore = StringSimilarityIndex.calculate(query.getContext().getPerson(), document.getContext().getPerson());
+            double subjectScore = StringSimilarityIndex.calculate(query.getContext().getSubject(), document.getContext().getSubject());
+            double dateScore = DateSimilarityIndex.calculate(query.getContext().getDate(), document.getContext().getDate());
+
+            // Bias the terms
+            double contentBiased = contentScore * CONTENT_BIAS;
+            double locationBiased = locationScore * LOCATION_BIAS;
+            double personBiased = personScore * PERSON_BIAS;
+            double subjectBiased = subjectScore * SUBJECT_BIAS;
+            double dateBiased = dateScore * DATE_BIAS;
+
+            double score = contentBiased + locationBiased + personBiased + subjectBiased + dateBiased;
+
+            Assert.inRange(score, 0.0, 1.0);
+
+            return new ScoredDocument(query, score, document);
         }
-
-
-        // Normalize
-        double contentScore = wordScoreSum / (double) wordVector.size();
-
-
-        double locationScore = StringSimilarityIndex.calculate(query.getContext().getLocation(), document.getContext().getLocation());
-        double personScore = StringSimilarityIndex.calculate(query.getContext().getPerson(), document.getContext().getPerson());
-        double subjectScore = StringSimilarityIndex.calculate(query.getContext().getSubject(), document.getContext().getSubject());
-        double dateScore = DateSimilarityIndex.calculate(query.getContext().getDate(), document.getContext().getDate());
-
-        double contentBiased = contentScore * CONTENT_BIAS;
-        double locationBiased = locationScore * LOCATION_BIAS;
-        double personBiased = personScore * PERSON_BIAS;
-        double subjectBiased = subjectScore * SUBJECT_BIAS;
-        double dateBiased = dateScore * DATE_BIAS;
-
-        double score = contentBiased + locationBiased + personBiased + subjectBiased + dateBiased;
-
-        return new ScoredDocument(query, score, document);
     }
 }

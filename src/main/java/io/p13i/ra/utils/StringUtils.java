@@ -3,6 +3,9 @@ package io.p13i.ra.utils;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Useful string utilities
@@ -78,5 +81,14 @@ public class StringUtils {
                 ),
                 " "
         );
+    }
+
+    public static Iterable<Character> toCharList(String s) {
+        char[] characters = s.toCharArray();
+        List<Character> list = new ArrayList<>(characters.length);
+        for (char c : characters) {
+            list.add(c);
+        }
+        return list;
     }
 }

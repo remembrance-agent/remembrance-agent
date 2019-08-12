@@ -54,6 +54,8 @@ public class TFIDFCalculator {
      * @return the TF-IDF of term
      */
     public static double tfIdf(String queryTerm, AbstractDocument document, Iterable<AbstractDocument> documents) {
-        return tf(document, queryTerm) * idf(documents, queryTerm);
+        double score = tf(document, queryTerm) * idf(documents, queryTerm);
+        Assert.inRange(score, 0.0, 1.0);
+        return score;
     }
 }

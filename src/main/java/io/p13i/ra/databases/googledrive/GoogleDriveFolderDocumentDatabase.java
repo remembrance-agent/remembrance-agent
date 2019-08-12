@@ -45,11 +45,6 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
     }
 
     @Override
-    public String getName() {
-        return "Google Drive folder: " + this.rootFolderID;
-    }
-
-    @Override
     public void loadDocuments() {
         try {
             loadDocumentsRecursive(getClient(), this.googleDriveDocuments, this.rootFolderID /* recursive: */);
@@ -59,6 +54,10 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
         }
     }
 
+    /**
+     * Gets a Google Drive client
+     * @return Google Drive client
+     */
     private Drive getClient() {
         try {
             // Build a new authorized API client service.
@@ -72,6 +71,13 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
         }
     }
 
+    /**
+     * Loads all documents from a folder, recursively
+     * @param service the Drive client
+     * @param documents list of documents already garnered, added to in this method
+     * @param parentFolderID the enclosing folder ID
+     * @throws IOException if there is an issue reading from the API
+     */
     private static void loadDocumentsRecursive(Drive service, List<GoogleDriveDocument> documents, String parentFolderID) throws IOException {
         FileList filesList = service.files().list()
                 .setQ("'" + parentFolderID + "' in parents and mimeType != 'application/vnd.google-apps.folder'")

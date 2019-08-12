@@ -15,6 +15,7 @@ import com.google.protobuf.ByteString;
 import io.p13i.ra.utils.CharacterUtils;
 import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.LoggerUtils;
+import io.p13i.ra.utils.StringUtils;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -26,36 +27,60 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+
+/**
+ * Represents a speech input mechanism
+ */
 public class SpeechInputMechanism extends AbstractInputMechanism implements ResponseObserver<StreamingRecognizeResponse> {
 
     private static Logger LOGGER = LoggerUtils.getLogger(SpeechInputMechanism.class);
 
+    /**
+     * The responses returned from the API
+     */
     private ArrayList<StreamingRecognizeResponse> responses = new ArrayList<>();
+
+    /**
+     * The number of recognition sessions to run
+     */
     private int numberOfRunsPerInvokation;
+
+    /**
+     * The duration of each recognition seession
+     */
     private int durationPerInvokation;
 
+    /**
+     * The speech client
+     */
+    private SpeechClient mClient;
+
+    
     public SpeechInputMechanism(int numberOfRunsPerInvokation, int durationPerInvokation) {
         this.numberOfRunsPerInvokation = numberOfRunsPerInvokation;
         this.durationPerInvokation = durationPerInvokation;
     }
 
     @Override
-    public void startInput() {
+    public void startInputMechanism() {
         try {
             startInputInternal();
-        } catch (LineUnavailableException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        } catch (IOException | LineUnavailableException e) {
             LOGGER.throwing(SpeechInputMechanism.class.getSimpleName(), "recognizeFromMicrophone", e);
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * Internal method for performing speech recognition
+     * @throws IOException an error opening a file
+     * @throws LineUnavailableException microphone is unavailable
+     */
     private void startInputInternal() throws IOException, LineUnavailableException {
 
-        SpeechClient client = SpeechClient.create();
+        mClient = SpeechClient.create();
 
-        ClientStream<StreamingRecognizeRequest> clientStream = client
+        ClientStream<StreamingRecognizeRequest> clientStream = mClient
                 .streamingRecognizeCallable()
                 .splitCall(this);
 
@@ -81,8 +106,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
         DataLine.Info targetInfo = new DataLine.Info(TargetDataLine.class, audioFormat); // Set the system information to read from the microphone audio stream
 
         if (!AudioSystem.isLineSupported(targetInfo)) {
-            LOGGER.warning("Microphone not supported");
-            return;
+            throw new LineUnavailableException("Microphone not available");
         }
 
         // Target data line captures the audio stream the microphone produces.
@@ -122,7 +146,9 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
 
     @Override
     public void closeInputMechanism() {
-
+        if (mClient != null) {
+            mClient.close();
+        }
     }
 
 
@@ -132,27 +158,22 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
 
     @Override
     public void onResponse(StreamingRecognizeResponse response) {
-        LOGGER.info("Got response: " + getTranscript(response));
         responses.add(response);
     }
 
     @Override
     public void onComplete() {
-        for (StreamingRecognizeResponse response : responses) {
-            String transcript = getTranscript(response);
-            LOGGER.info("Transcript : " + getTranscript(response));
-
-            LINQList.from(transcript)
-                    .select(CharacterUtils::toUpperCase)
-                    .forEach(inputEventsListenerCallback::onInput);
-        }
-    }
-
-    private String getTranscript(StreamingRecognizeResponse response) {
-        return LINQList.from(response.getResultsList())
+        LINQList.from(responses)
+                // Get the transcripts
+                .aggregate(StreamingRecognizeResponse::getResultsList)
                 .aggregate(StreamingRecognitionResult::getAlternativesList)
                 .select(SpeechRecognitionAlternative::getTranscript)
-                .firstOrDefault();
+                // Log each transcript
+                .forEach(LOGGER::info)
+                .aggregate(StringUtils::toCharList)
+                .select(CharacterUtils::toUpperCase)
+                // Callback each inputted character
+                .forEach(c -> inputEventsListenerCallback.onInput(this, c));
     }
 
     @Override

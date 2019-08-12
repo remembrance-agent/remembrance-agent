@@ -5,7 +5,10 @@ import io.p13i.ra.utils.WordVector;
 import java.util.List;
 import java.util.Objects;
 
-public final class Query {
+/**
+ * Wraps a query to the RA
+ */
+public class Query implements IRequiresIndexing {
     private final String query;
     private final Context context;
     private final int numSuggestions;
@@ -15,7 +18,6 @@ public final class Query {
         this.query = query;
         this.context = context;
         this.numSuggestions = numSuggestions;
-        this.computeWordVector();
     }
 
     public String getQuery() {
@@ -28,11 +30,6 @@ public final class Query {
 
     public int getNumSuggestions() {
         return numSuggestions;
-    }
-
-    public void computeWordVector() {
-        this.cachedWordVector = WordVector.getWordVector(getQuery());
-        this.cachedWordVector = WordVector.removeMostCommonWords(cachedWordVector);
     }
 
     public List<String> getWordVector() {
@@ -55,5 +52,10 @@ public final class Query {
         return this.query.equals(other.query) &&
                 this.context.equals(other.context) &&
                 this.numSuggestions == other.numSuggestions;
+    }
+
+    @Override
+    public void index() {
+        this.cachedWordVector = WordVector.removeMostCommonWords(WordVector.getWordVector(getQuery()));
     }
 }

@@ -22,15 +22,10 @@ public class LocalDiskDocumentDatabase implements IDocumentDatabase<LocalDiskDoc
     private List<LocalDiskDocument> documents;
 
     /**
-     * @param directory The directory to index
+     * @param directory The local directory to index
      */
     public LocalDiskDocumentDatabase(String directory) {
         this.directory = directory;
-    }
-
-    @Override
-    public String getName() {
-        return LocalDiskDocumentDatabase.class.getName();
     }
 
     @Override

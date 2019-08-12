@@ -2,22 +2,33 @@ package io.p13i.ra.similarity;
 
 
 import io.p13i.ra.utils.Assert;
-import io.p13i.ra.utils.ICache;
-import io.p13i.ra.utils.LimitedCapacityCache;
+import io.p13i.ra.cache.ICache;
+import io.p13i.ra.cache.LimitedCapacityCache;
 import io.p13i.ra.utils.Tuple;
 
 /**
  * Compares strings and produces an index
  */
 public class StringSimilarityIndex {
+    /**
+     * Caches queries to the calculate method
+     */
+    private static ICache<Tuple<String, String>, Double> mSimilarityCache = new LimitedCapacityCache<>(/* maxSize: */ 512);
+
+    /**
+     * Calculates the similarity between two strings using edit distance
+     * @param x the first string
+     * @param y the second string
+     * @return a similarity index between 0.0 and 1.0
+     */
     public static double calculate(String x, String y) {
         if (x == null || y == null) {
             return 0.0;
         }
 
         Tuple<String, String> params = Tuple.of(x, y);
-        if (similarityCache.hasKey(params)) {
-            return similarityCache.get(params);
+        if (mSimilarityCache.hasKey(params)) {
+            return mSimilarityCache.get(params);
         }
 
         int distance = levenshteinDistance(x, y);
@@ -26,19 +37,16 @@ public class StringSimilarityIndex {
 
         Assert.inRange(index, 0.0, 1.0);
 
-        similarityCache.put(params, index);
+        mSimilarityCache.put(params, index);
 
         return index;
     }
-
-    public static ICache<Tuple<String, String>, Double> similarityCache = new LimitedCapacityCache<>(512);
 
     /**
      * https://www.baeldung.com/java-levenshtein-distance
      * O(m * n)
      */
     private static int levenshteinDistance(String x, String y) {
-
         int[][] dp = new int[x.length() + 1][y.length() + 1];
 
         for (int i = 0; i <= x.length(); i++) {

@@ -1,9 +1,11 @@
 package io.p13i.ra.gui;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 
-import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
-
+/**
+ * Wraps the bordering of a JLabel
+ */
 public class BorderedJLabel extends JLabel {
     public void setBorderTitle(String title, int borderAmount) {
         setBorder(BorderFactory.createCompoundBorder(

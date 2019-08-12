@@ -24,24 +24,8 @@ public class LocalDiskDocument extends AbstractDocument implements ICachableDocu
         this.url = url;
     }
 
-    private String getFilename() {
-        return filename;
-    }
-
     @Override
     public String toString() {
-        return "<" + LocalDiskDocument.class.getSimpleName() + " content='" + getContentTruncated() + "' filename='" + getFilename() + " last modified=" + DateUtils.timestampOf(this.lastModified) + "'>";
-    }
-
-    @Override
-    public String toTruncatedUrlString() {
-        String parentFolder = StringUtils.truncateEndWithEllipse(FileIO.getEnclosingFolderName(this.getURL()), 10);
-        String fileName = StringUtils.truncateEndWithEllipse(FileIO.getFileName(this.getURL()), 9);
-        return String.format("%s%s%s", parentFolder, File.separator, fileName);
-    }
-
-    @Override
-    public String getDocumentTypeName() {
-        return LocalDiskDocument.class.getSimpleName();
+        return "<" + getDocumentTypeName() + " content='" + getContentTruncated() + "' filename='" + filename + " last modified=" + DateUtils.timestampOf(this.lastModified) + "'>";
     }
 }

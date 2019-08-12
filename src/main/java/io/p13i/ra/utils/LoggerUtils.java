@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.logging.*;
 
-import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
+import static io.p13i.ra.gui.User.Preferences.Preference.RAClientLogFile;
 
 /**
  * utilities for working with the logger

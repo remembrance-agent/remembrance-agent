@@ -1,6 +1,5 @@
 package io.p13i.ra.gui;
 
-import com.google.inject.Singleton;
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.KeyboardInputMechanism;
@@ -9,22 +8,36 @@ import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.IntegerUtils;
 import io.p13i.ra.utils.URIUtils;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
+import java.awt.Desktop;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
-import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;
-import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
-import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
-import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
-import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
+import static io.p13i.ra.gui.User.Preferences.Preference.GmailMaxEmailsCount;
+import static io.p13i.ra.gui.User.Preferences.Preference.GoogleDriveFolderID;
+import static io.p13i.ra.gui.User.Preferences.Preference.KeystrokesLogFile;
+import static io.p13i.ra.gui.User.Preferences.Preference.LocalDiskDocumentsFolderPath;
+import static io.p13i.ra.gui.User.Preferences.Preference.RAClientLogFile;
 
 
-@Singleton
 public class GUI {
     public static final int WIDTH = 600;
     public static final int HEIGHT = 220;

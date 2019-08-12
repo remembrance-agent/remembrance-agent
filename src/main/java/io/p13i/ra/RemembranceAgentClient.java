@@ -5,10 +5,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
 import io.p13i.ra.databases.gmail.GmailDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
@@ -29,25 +25,23 @@ import io.p13i.ra.utils.LoggerUtils;
 
 import javax.swing.SwingUtilities;
 
-import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;
-import static io.p13i.ra.gui.User.Preferences.Pref.GoogleDriveFolderID;
-import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
-import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
+import static io.p13i.ra.gui.User.Preferences.Preference.GmailMaxEmailsCount;
+import static io.p13i.ra.gui.User.Preferences.Preference.GoogleDriveFolderID;
+import static io.p13i.ra.gui.User.Preferences.Preference.KeystrokesLogFile;
+import static io.p13i.ra.gui.User.Preferences.Preference.LocalDiskDocumentsFolderPath;
 
 /**
  * Implementation of RA GUI
  *
  * @author Pramod Kotipalli
  */
-@Singleton
 public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.InputEventsListener {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
     public static final String APPLICATION_NAME = "Remembrance Agent (v" + System.getenv("VERSION") + ")";
 
-    private static RemembranceAgentClient sInstance;
-    private AbstractInputMechanism mCurrentInputMechanism;
+    private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
 
     /**
      * @return the RA instance
@@ -59,8 +53,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     /**
      * The GUI reference
      */
-    @Inject
-    private GUI mGUI;
+    private GUI mGUI = new GUI();
 
     /**
      * The number of characters to store in the buffer AND display in the GUI
@@ -93,15 +86,16 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     private IRemembranceAgentEngine mRemembranceAgentEngine;
 
     /**
+     * Tracks the currently used input mechanism
+     */
+    private AbstractInputMechanism mCurrentInputMechanism;
+
+    /**
      * Entry-point for the RA client
      *
      * @param args ignored
      */
     public static void main(String[] args) {
-        Injector injector = Guice.createInjector(new RemembranceAgentModule());
-
-        sInstance = injector.getInstance(RemembranceAgentClient.class);
-
         SwingUtilities.invokeLater(RemembranceAgentClient.getInstance());
     }
 
@@ -140,7 +134,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             mCurrentInputMechanism.closeInputMechanism();
         }
         mCurrentInputMechanism = inputMechanism;
-        mCurrentInputMechanism.startInput();
+        mCurrentInputMechanism.startInputMechanism();
     }
 
     /**
@@ -212,7 +206,10 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         // Build a query
         String queryString = mInputBuffer.toString();
         Context context = new Context(null, User.NAME, queryString, null);
-        List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(new Query(queryString, context, GUI.RA_NUMBER_SUGGESTIONS));
+        Query query = new Query(queryString, context, GUI.RA_NUMBER_SUGGESTIONS) {{
+            index();
+        }};
+        List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
 
         LOGGER.info("Sending query to RA: '" + queryString + "'");
 
@@ -241,7 +238,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     }
 
     @Override
-    public void onInput(Character c) {
+    public void onInput(AbstractInputMechanism inputMechanism, Character c) {
         // Write the timestamp and character to the keylogger log file
         mKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + c + "\n");
 

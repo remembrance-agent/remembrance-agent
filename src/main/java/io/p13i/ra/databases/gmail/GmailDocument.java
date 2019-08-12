@@ -12,9 +12,4 @@ public class GmailDocument extends AbstractDocument implements ICachableDocument
         super(body, new Context(null, sender, subject, date));
         this.url = "https://mail.google.com/mail/u/0/#inbox/" + id;
     }
-
-    @Override
-    public String getDocumentTypeName() {
-        return GmailDocument.class.getSimpleName();
-    }
 }

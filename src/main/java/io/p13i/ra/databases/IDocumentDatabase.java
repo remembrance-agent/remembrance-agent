@@ -9,7 +9,9 @@ public interface IDocumentDatabase<TDocument extends AbstractDocument> {
      * Gets the name of the data store
      * @return human readable name
      */
-    String getName();
+    default String getName() {
+        return this.getClass().getSimpleName();
+    }
 
     /**
      * Loads all the documents from disk into memory
@@ -22,7 +24,7 @@ public interface IDocumentDatabase<TDocument extends AbstractDocument> {
     default void indexDocuments() {
         List<TDocument> documents = getAllDocuments();
         for (TDocument document : documents) {
-            document.computeWordVector();
+            document.index();
         }
     }
 

@@ -8,18 +8,32 @@ import java.util.List;
 /**
  * Houses all information about a file and it's context in the world
  */
-public abstract class AbstractDocument {
+public abstract class AbstractDocument implements IRequiresIndexing {
+
     /**
      * How many characters to place in the toString() call
      */
     private static final int CONTENT_TRUNCATED_MAX_LENGTH = 20;
 
+    /**
+     * The raw content of the document
+     */
     private final String content;
+
+    /**
+     * The context in which the document was created
+     */
     private final Context context;
 
-    protected String url = null;
+    /**
+     * The URL of the document either on disk or the internet
+     */
+    protected String url;
 
-    private List<String> cachedDocumentVector = null;
+    /**
+     * The post-index property
+     */
+    private List<String> cachedDocumentVector;
 
     public AbstractDocument(String content, Context context) {
         this.content = content;
@@ -34,16 +48,17 @@ public abstract class AbstractDocument {
         return content;
     }
 
+    /**
+     * Gets the content of the document truncated to CONTENT_TRUNCATED_MAX_LENGTH
+     * @return truncated contents
+     */
     protected String getContentTruncated() {
-        return getContentTruncated(CONTENT_TRUNCATED_MAX_LENGTH);
+        boolean includeEllipses = this.content.length() > CONTENT_TRUNCATED_MAX_LENGTH;
+        return content.substring(0, Math.min(this.content.length(), CONTENT_TRUNCATED_MAX_LENGTH)) + (includeEllipses ? "..." : "");
     }
 
-    private String getContentTruncated(int maxLength) {
-        boolean includeEllipses = this.content.length() > maxLength;
-        return content.substring(0, Math.min(this.content.length(), maxLength)) + (includeEllipses ? "..." : "");
-    }
-
-    public void computeWordVector() {
+    @Override
+    public void index() {
         cachedDocumentVector = WordVector.getWordVector(getContent());
         cachedDocumentVector = WordVector.removeMostCommonWords(cachedDocumentVector);
     }
@@ -61,11 +76,11 @@ public abstract class AbstractDocument {
         return url;
     }
 
-    public String toTruncatedUrlString() {
-        return StringUtils.truncateEndWithEllipse(this.getURL(), CONTENT_TRUNCATED_MAX_LENGTH);
-    }
-
+    /**
+     * Gets the name of the document type
+     * @return the document type's name
+     */
     public String getDocumentTypeName() {
-        return AbstractDocument.class.getSimpleName();
+        return this.getClass().getSimpleName();
     }
 }

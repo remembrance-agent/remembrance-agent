@@ -9,16 +9,23 @@ import java.util.Date;
  * Computes an index [0, 1] between two Date objects
  */
 public class DateSimilarityIndex {
+    /**
+     * Calculates the similarity between two dates
+     * @param d1 the first date
+     * @param d2 the second date
+     * @return a similarity index between 0.0 and 1.0
+     */
     public static double calculate(Date d1, Date d2) {
         if (d1 == null || d2 == null) {
             return 0.0;
         }
 
-        double yearSimilarity = StringSimilarityIndex.calculate(DateUtils.formatDate(d1, DateUtils.YEAR_FORMAT), DateUtils.formatDate(d2, DateUtils.YEAR_FORMAT));
-        double monthSimilarity = StringSimilarityIndex.calculate(DateUtils.formatDate(d1, DateUtils.MONTH_FORMAT), DateUtils.formatDate(d2, DateUtils.MONTH_FORMAT));
-        double dayOfWeekSimilarity = StringSimilarityIndex.calculate(DateUtils.formatDate(d1, DateUtils.DAY_OF_WEEK_FORMAT), DateUtils.formatDate(d2, DateUtils.DAY_OF_WEEK_FORMAT));
+        long nowTime = DateUtils.now().getTime();
 
-        double index = (yearSimilarity + monthSimilarity + dayOfWeekSimilarity) / 3.0;
+        long newTime = Math.max(d1.getTime(), d2.getTime());
+        long olderTime = Math.min(d1.getTime(), d2.getTime());
+
+        double index = 1 - ((newTime - olderTime) / (double) nowTime);
 
         Assert.inRange(index, 0.0, 1.0);
 

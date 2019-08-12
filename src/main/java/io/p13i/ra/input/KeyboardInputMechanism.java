@@ -1,6 +1,6 @@
 package io.p13i.ra.input;
 
-import io.p13i.ra.input.AbstractInputMechanism;
+import io.p13i.ra.utils.LINQList;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.dispatcher.SwingDispatchService;
@@ -10,9 +10,12 @@ import org.jnativehook.keyboard.NativeKeyListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Represents input to the keyboard
+ */
 public class KeyboardInputMechanism extends AbstractInputMechanism implements NativeKeyListener {
     @Override
-    public void startInput() {
+    public void startInputMechanism() {
         // Get the logger for "org.jnativehook" and set the level to off.
         Logger logger = Logger.getLogger(GlobalScreen.class.getPackage().getName());
         logger.setLevel(Level.OFF);
@@ -47,7 +50,7 @@ public class KeyboardInputMechanism extends AbstractInputMechanism implements Na
     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
         String keyText = NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode());
         char characterToAdd = keyText.charAt(0);
-        this.inputEventsListenerCallback.onInput(characterToAdd);
+        this.inputEventsListenerCallback.onInput(this, characterToAdd);
     }
 
     @Override

@@ -57,6 +57,4 @@ dependencies {
     compile group: 'com.google.cloud', name: 'google-cloud-speech', version:'1.13.0'
 
     compile 'com.google.guava:guava:24.1.1-jre'
-    // https://mvnrepository.com/artifact/com.google.inject/guice
-    compile group: 'com.google.inject', name: 'guice', version: '4.0'
 }
