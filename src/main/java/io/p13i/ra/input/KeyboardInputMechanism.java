@@ -1,4 +1,4 @@
-package io.p13i.ra.input.keyboard;
+package io.p13i.ra.input;
 
 import io.p13i.ra.input.AbstractInputMechanism;
 import org.jnativehook.GlobalScreen;

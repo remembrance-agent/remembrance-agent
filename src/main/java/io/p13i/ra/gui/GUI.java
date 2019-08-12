@@ -3,8 +3,8 @@ package io.p13i.ra.gui;
 import com.google.inject.Singleton;
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.input.AbstractInputMechanism;
-import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
-import io.p13i.ra.input.speech.SpeechInputMechanism;
+import io.p13i.ra.input.KeyboardInputMechanism;
+import io.p13i.ra.input.SpeechInputMechanism;
 import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.IntegerUtils;
 import io.p13i.ra.utils.URIUtils;
@@ -15,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;

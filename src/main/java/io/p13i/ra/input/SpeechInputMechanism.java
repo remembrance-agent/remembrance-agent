@@ -1,4 +1,4 @@
-package io.p13i.ra.input.speech;
+package io.p13i.ra.input;
 // Imports the Google Cloud client library
 
 import com.google.api.gax.rpc.ClientStream;
@@ -12,7 +12,6 @@ import com.google.cloud.speech.v1.StreamingRecognitionResult;
 import com.google.cloud.speech.v1.StreamingRecognizeRequest;
 import com.google.cloud.speech.v1.StreamingRecognizeResponse;
 import com.google.protobuf.ByteString;
-import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.utils.CharacterUtils;
 import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.LoggerUtils;

@@ -18,7 +18,7 @@ import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
 import io.p13i.ra.input.AbstractInputMechanism;
-import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
+import io.p13i.ra.input.KeyboardInputMechanism;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
