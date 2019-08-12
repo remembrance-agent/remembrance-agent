@@ -1,8 +1,14 @@
 package io.p13i.ra.similarity;
 
 
-import io.p13i.ra.utils.*;
+import io.p13i.ra.utils.Assert;
+import io.p13i.ra.utils.ICache;
+import io.p13i.ra.utils.LimitedCapacityCache;
+import io.p13i.ra.utils.Tuple;
 
+/**
+ * Compares strings and produces an index
+ */
 public class StringSimilarityIndex {
     public static double calculate(String x, String y) {
         if (x == null || y == null) {

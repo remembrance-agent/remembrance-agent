@@ -4,6 +4,10 @@ package io.p13i.ra.utils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+
+/**
+ * A caches limited in size
+ */
 public class LimitedCapacityCache<TKey, TValue> extends Cache<TKey, TValue> {
 
     private int maxSize;

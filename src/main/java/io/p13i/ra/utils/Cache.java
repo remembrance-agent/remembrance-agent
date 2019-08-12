@@ -3,6 +3,10 @@ package io.p13i.ra.utils;
 import java.util.HashMap;
 import java.util.Map;
 
+
+/**
+ * Implementation of a cache
+ */
 public class Cache<TKey, TValue> implements ICache<TKey, TValue> {
     protected Map<TKey, TValue> mCache = new HashMap<>();
 
