@@ -44,15 +44,12 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         // PriorityQueue sorts low -> high, we need to invert that
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
-        ConfusionMatrix confusionMatrix = new ConfusionMatrix();
         List<AbstractDocument> allDocuments = this.documentDatabase.getAllDocuments();
         LOGGER.info("Searching " + allDocuments.size() + " documents for '" + query.getQuery() + "'");
         for (AbstractDocument document : allDocuments) {
-            ScoredDocument scoredDoc = scoreQueryAgainstDocuments(query, document, allDocuments, confusionMatrix);
+            ScoredDocument scoredDoc = scoreQueryAgainstDocuments(query, document, allDocuments);
             scoredDocuments.add(scoredDoc);
         }
-
-//        LOGGER.info("\n" + confusionMatrix.toString());
 
         // Get the top numSuggestions documents
         List<ScoredDocument> suggestedDocuments = new ArrayList<>(query.getNumSuggestions());
@@ -75,15 +72,13 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         Assert.almostEqual(CONTENT_BIAS + LOCATION_BIAS + PERSON_BIAS + SUBJECT_BIAS + DATE_BIAS, 1.0);
     }
 
-    private ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments, ConfusionMatrix confusionMatrix) {
+    private ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments) {
         List<String> wordVector = query.getWordVector();
 
         double wordScoreSum = 0.0;
         for (String word : wordVector) {
 
-            double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
-
-            confusionMatrix.add(word, document.getContext().getSubject(), wordScore);
+            double wordScore = new TFIDFCalculator().tfIdf(word, document, allDocuments);
 
             if (Double.isNaN(wordScore)) {
                 // adding NaN to a double will cause the double to become NaN

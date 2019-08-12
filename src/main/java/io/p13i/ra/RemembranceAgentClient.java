@@ -5,6 +5,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
 import io.p13i.ra.databases.gmail.GmailDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
@@ -23,7 +25,6 @@ import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.utils.BufferingLogFileWriter;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
-import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.LoggerUtils;
 
 import javax.swing.SwingUtilities;
@@ -44,10 +45,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
     public static final String APPLICATION_NAME = "Remembrance Agent (v" + System.getenv("VERSION") + ")";
 
-    /**
-     * Maintain an instance for the RA for the GUI's updates
-     */
-    private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
+    private static RemembranceAgentClient sInstance;
 
     /**
      * @return the RA instance
@@ -92,13 +90,17 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
      * @param args ignored
      */
     public static void main(String[] args) {
+        Injector injector = Guice.createInjector(new RemembranceAgentModule());
+
+        sInstance = injector.getInstance(RemembranceAgentClient.class);
+
         SwingUtilities.invokeLater(RemembranceAgentClient.getInstance());
     }
 
     /**
      * Default (and only) constructor
      */
-    private RemembranceAgentClient() {
+    public RemembranceAgentClient() {
         // Open the keylogger file
         mKeyLoggerBufferLogFileWriter = new BufferingLogFileWriter(User.Preferences.getString(KeystrokesLogFile));
         mKeyLoggerBufferLogFileWriter.open();
@@ -129,7 +131,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     @Override
     public void run() {
         // Show the GUI
-        GUI.sJFrame.setVisible(true);
+        GUI.setVisible(true);
 
         // init!
         mRemembranceAgentEngine = initializeRAEngine(true);
@@ -169,9 +171,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         }
 
         // Update the GUI with where the suggestions are coming from
-        GUI.sSuggestionsPanel.setBorderTitle("Suggestions (from " + localDiskCacheDatabase.getName() + ")", GUI.BORDER_PADDING);
-        GUI.sSuggestionsPanel.invalidate();
-        GUI.sSuggestionsPanel.repaint();
+        GUI.setSuggestionsPanelTitle("Suggestions (from " + localDiskCacheDatabase.getName() + ")");
 
         // Initialize!
         RemembranceAgentEngine remembranceAgentEngine = new RemembranceAgentEngine(localDiskCacheDatabase);
@@ -186,7 +186,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         String inputMechanism = InputMechanismManager.getInstance()
                 .getActiveInputMechanism()
                 .getInputMechanismName();
-        GUI.sKeystrokeBufferLabel.setBorderTitle(inputMechanism, GUI.BORDER_PADDING);
+        GUI.setKeyStrokeBufferTitle(inputMechanism);
 
         // Start the RA task
         mRAUpdateTimer = new Timer();
@@ -204,7 +204,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
      * Sends the contextual {@code Query} to the RA
      */
     private void sendQueryToRemembranceAgent() {
-        GUI.sJFrame.setTitle("* SEARCHING * " + APPLICATION_NAME + " * SEARCHING *");
+        GUI.setTitle("* SEARCHING * " + APPLICATION_NAME + " * SEARCHING *");
 
         // Build a query
         String queryString = mInputBuffer.toString();
@@ -214,7 +214,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         LOGGER.info("Sending query to RA: '" + queryString + "'");
 
         // Update the GUI
-        GUI.sSuggestionsPanel.removeAll();
+        GUI.removeScoredDocuments();
 
         // Add the suggestion's elements to the GUI
         LOGGER.info(String.format("Got %d suggestion(s).", suggestions.size()));
@@ -225,16 +225,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             LOGGER.info(" -> (" + scoredDocument.getScore() + ") " + scoredDocument.toShortString());
 
             // Add each of the components for the document to the GUI
-            LINQList.from(GUI.getComponentsForScoredDocument(scoredDocument, i))
-                .forEach(GUI.sSuggestionsPanel::add);
+            GUI.addScoredDocument(scoredDocument, i);
         }
 
-        // Need to be called for the GUI to update
-        GUI.sSuggestionsPanel.validate();
-        GUI.sSuggestionsPanel.repaint();
-
         // Reset the title
-        GUI.sJFrame.setTitle(APPLICATION_NAME);
+        GUI.setTitle(APPLICATION_NAME);
     }
 
     @Override
@@ -248,6 +243,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         LOGGER.info(String.format("[Buffer count=%04d:] %s", mInputBuffer.getTotalTypedCharactersCount(), mInputBuffer.toString()));
 
         // Display on the GUI
-        GUI.sKeystrokeBufferLabel.setText(mInputBuffer.toString());
+        GUI.setKeystrokesBufferText(mInputBuffer.toString());
     }
 }

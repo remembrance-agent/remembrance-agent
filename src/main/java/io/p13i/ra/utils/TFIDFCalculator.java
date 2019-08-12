@@ -10,6 +10,9 @@ import java.util.List;
  * @author Pramod Kotipalli (@p13i)
  */
 public class TFIDFCalculator {
+    public TFIDFCalculator() {
+    }
+
     /**
      * @param doc  list of strings
      * @param term String represents a term
@@ -53,7 +56,7 @@ public class TFIDFCalculator {
      * @param documents all documents
      * @return the TF-IDF of term
      */
-    public static double tfIdf(String queryTerm, AbstractDocument document, Iterable<AbstractDocument> documents) {
+    public double tfIdf(String queryTerm, AbstractDocument document, Iterable<AbstractDocument> documents) {
         return tf(document, queryTerm) * idf(documents, queryTerm);
     }
 }

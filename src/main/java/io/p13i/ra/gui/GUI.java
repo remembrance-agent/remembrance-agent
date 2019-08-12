@@ -41,10 +41,10 @@ public class GUI {
     public static final int SUGGESTION_PADDING = 10;
 
     // Swing elements
-    public static BorderedJLabel sKeystrokeBufferLabel;
-    public static BorderedJPanel sSuggestionsPanel;
+    private static BorderedJLabel sKeystrokeBufferLabel;
+    private static BorderedJPanel sSuggestionsPanel;
 
-    public static final JFrame sJFrame = new JFrame(APPLICATION_NAME) {{
+    private static final JFrame sJFrame = new JFrame(APPLICATION_NAME) {{
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(GUI.WIDTH, GUI.HEIGHT);
         setResizable(false);
@@ -236,37 +236,67 @@ public class GUI {
         }});
     }};
 
-    public static java.util.List<Component> getComponentsForScoredDocument(ScoredDocument doc, int i) {
-        return new ArrayList<Component>() {{
-            add(new JLabel() {{
-                setText(Double.toString(doc.getScore()));
-                setBounds(GUI.SUGGESTION_PADDING_LEFT, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
-                setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
-            }});
-            add(new JButton() {{
-                setText(doc.toShortString());
-                setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
-                setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
-                setHorizontalAlignment(SwingConstants.LEFT);
-                addActionListener(e -> {
+    public static void removeScoredDocuments() {
+        sSuggestionsPanel.removeAll();
+    }
 
-                    boolean error = false;
+    public static void addScoredDocument(ScoredDocument doc, int i) {
+        sSuggestionsPanel.add(new JLabel() {{
+            setText(Double.toString(doc.getScore()));
+            setBounds(GUI.SUGGESTION_PADDING_LEFT, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
+            setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
+        }});
+        sSuggestionsPanel.add(new JButton() {{
+            setText(doc.toShortString());
+            setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
+            setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
+            setHorizontalAlignment(SwingConstants.LEFT);
+            addActionListener(e -> {
+
+                boolean error = false;
+                try {
+                    Desktop.getDesktop().open(new File(doc.getDocument().getURL()));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    error = true;
+                }
+                if (error) {
                     try {
-                        Desktop.getDesktop().open(new File(doc.getDocument().getURL()));
+                        Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getURL()));
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        error = true;
                     }
-                    if (error) {
-                        try {
-                            Desktop.getDesktop().browse(URIUtils.get(doc.getDocument().getURL()));
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
-                setEnabled(true);
-            }});
-        }};
+                }
+            });
+            setEnabled(true);
+        }});
+        sSuggestionsPanel.invalidate();
+        sSuggestionsPanel.repaint();
+    }
+
+    public static void setKeyStrokeBufferTitle(String title) {
+        sKeystrokeBufferLabel.setBorderTitle(title, GUI.BORDER_PADDING);
+        sKeystrokeBufferLabel.invalidate();
+        sKeystrokeBufferLabel.repaint();
+    }
+
+    public static void setTitle(String text) {
+        sJFrame.setTitle(text);
+    }
+
+    public static void setVisible(boolean visible) {
+        sJFrame.setVisible(visible);
+    }
+
+    public static void setKeystrokesBufferText(String text) {
+        sKeystrokeBufferLabel.setText(text);
+        sKeystrokeBufferLabel.invalidate();
+        sKeystrokeBufferLabel.repaint();
+    }
+
+    public static void setSuggestionsPanelTitle(String s) {
+        sSuggestionsPanel.setBorderTitle(s, GUI.BORDER_PADDING);
+        sSuggestionsPanel.invalidate();
+        sSuggestionsPanel.repaint();
     }
 }
