@@ -1,15 +1,12 @@
 package io.p13i.ra.similarity;
 
 
-import io.p13i.ra.utils.Cache;
-import io.p13i.ra.utils.ICache;
-import io.p13i.ra.utils.LimitedCapacityCache;
-import io.p13i.ra.utils.Tuple;
+import io.p13i.ra.utils.*;
 
-public class StringSimilarityIndex implements ISimilarityIndex<String> {
-    public double calculate(String x, String y) {
+public class StringSimilarityIndex {
+    public static double calculate(String x, String y) {
         if (x == null || y == null) {
-            return this.NO_SIMILARITY;
+            return 0.0;
         }
 
         Tuple<String, String> params = Tuple.of(x, y);
@@ -21,14 +18,14 @@ public class StringSimilarityIndex implements ISimilarityIndex<String> {
         int longerStringLength = Math.max(x.length(), y.length());
         double index = (longerStringLength - distance) / (double) longerStringLength;
 
-        checkInBounds(index);
+        Assert.inRange(index, 0.0, 1.0);
 
         similarityCache.put(params, index);
 
         return index;
     }
 
-    public static ICache<Tuple<String, String>, Double> similarityCache = new LimitedCapacityCache<>(64);
+    public static ICache<Tuple<String, String>, Double> similarityCache = new LimitedCapacityCache<>(512);
 
     /**
      * https://www.baeldung.com/java-levenshtein-distance

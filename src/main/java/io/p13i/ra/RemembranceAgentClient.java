@@ -6,7 +6,9 @@ import java.util.TimerTask;
 import java.util.logging.Logger;
 
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
 import io.p13i.ra.databases.gmail.GmailDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
@@ -39,6 +41,7 @@ import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
  *
  * @author Pramod Kotipalli
  */
+@Singleton
 public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.OnInput {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
@@ -54,7 +57,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         return sInstance;
     }
 
-    private final GUI mGUI = new GUI();
+    /**
+     * The GUI reference
+     */
+    @Inject
+    private GUI mGUI;
 
     /**
      * The number of characters to store in the buffer AND display in the GUI
@@ -210,7 +217,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Build a query
         String queryString = mInputBuffer.toString();
-        Context context = new Context(null, User.NAME, queryString, DateUtils.now());
+        Context context = new Context(null, User.NAME, queryString, null);
         List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(new Query(queryString, context, GUI.RA_NUMBER_SUGGESTIONS));
 
         LOGGER.info("Sending query to RA: '" + queryString + "'");

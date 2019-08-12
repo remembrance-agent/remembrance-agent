@@ -4,7 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Cache<TKey, TValue> implements ICache<TKey, TValue> {
-    private Map<TKey, TValue> mCache = new HashMap<>();
+    protected Map<TKey, TValue> mCache = new HashMap<>();
+
+    public Cache() {
+        this.invalidate();
+    }
 
     @Override
     public TValue get(TKey key) {

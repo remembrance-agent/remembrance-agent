@@ -3,6 +3,7 @@ package io.p13i.ra.models;
 import io.p13i.ra.utils.WordVector;
 
 import java.util.List;
+import java.util.Objects;
 
 public final class Query {
     private final String query;
@@ -36,5 +37,23 @@ public final class Query {
 
     public List<String> getWordVector() {
         return cachedWordVector;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.query, this.context, this.numSuggestions);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Query)) {
+            return false;
+        }
+
+        Query other = (Query) obj;
+
+        return this.query.equals(other.query) &&
+                this.context.equals(other.context) &&
+                this.numSuggestions == other.numSuggestions;
     }
 }

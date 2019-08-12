@@ -1,5 +1,6 @@
 package io.p13i.ra.gui;
 
+import com.google.inject.Singleton;
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.input.InputMechanismManager;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
@@ -22,6 +23,8 @@ import static io.p13i.ra.gui.User.Preferences.Pref.KeystrokesLogFile;
 import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
 import static io.p13i.ra.gui.User.Preferences.Pref.RAClientLogFile;
 
+
+@Singleton
 public class GUI {
     public static final int WIDTH = 600;
     public static final int HEIGHT = 220;
@@ -236,6 +239,8 @@ public class GUI {
 
     public void removeScoredDocuments() {
         mSuggestionsPanel.removeAll();
+        mSuggestionsPanel.invalidate();
+        mSuggestionsPanel.repaint();
     }
 
     public void addScoredDocument(ScoredDocument doc, int i) {

@@ -1,5 +1,6 @@
 package io.p13i.ra.engine;
 
+import com.google.inject.Inject;
 import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.models.*;
 import io.p13i.ra.similarity.DateSimilarityIndex;
@@ -20,6 +21,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentEngine.class);
 
     private final IDocumentDatabase documentDatabase;
+    private ICache<Query, List<ScoredDocument>> mSuggestionCache = new LimitedCapacityCache<>(128);
 
     public RemembranceAgentEngine(IDocumentDatabase documentDatabase) {
         this.documentDatabase = documentDatabase;
@@ -41,6 +43,10 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
             return new ArrayList<>();
         }
 
+        if (mSuggestionCache.hasKey(query)) {
+            return mSuggestionCache.get(query);
+        }
+
         // PriorityQueue sorts low -> high, we need to invert that
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
@@ -59,6 +65,9 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
                 suggestedDocuments.add(suggestedDocument);
             }
         }
+
+        mSuggestionCache.put(query, suggestedDocuments);
+
         return suggestedDocuments;
     }
 
@@ -78,7 +87,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         double wordScoreSum = 0.0;
         for (String word : wordVector) {
 
-            double wordScore = new TFIDFCalculator().tfIdf(word, document, allDocuments);
+            double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
 
             if (Double.isNaN(wordScore)) {
                 // adding NaN to a double will cause the double to become NaN
@@ -92,13 +101,11 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         // Normalize
         double contentScore = wordScoreSum / (double) wordVector.size();
 
-        StringSimilarityIndex stringSimilarityIndex = new StringSimilarityIndex();
-        DateSimilarityIndex dateSimilarityIndex = new DateSimilarityIndex();
 
-        double locationScore = stringSimilarityIndex.calculate(query.getContext().getLocation(), document.getContext().getLocation());
-        double personScore = stringSimilarityIndex.calculate(query.getContext().getPerson(), document.getContext().getPerson());
-        double subjectScore = stringSimilarityIndex.calculate(query.getContext().getSubject(), document.getContext().getSubject());
-        double dateScore = dateSimilarityIndex.calculate(query.getContext().getDate(), document.getContext().getDate());
+        double locationScore = StringSimilarityIndex.calculate(query.getContext().getLocation(), document.getContext().getLocation());
+        double personScore = StringSimilarityIndex.calculate(query.getContext().getPerson(), document.getContext().getPerson());
+        double subjectScore = StringSimilarityIndex.calculate(query.getContext().getSubject(), document.getContext().getSubject());
+        double dateScore = DateSimilarityIndex.calculate(query.getContext().getDate(), document.getContext().getDate());
 
         double contentBiased = contentScore * CONTENT_BIAS;
         double locationBiased = locationScore * LOCATION_BIAS;
