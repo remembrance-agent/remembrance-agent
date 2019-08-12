@@ -1,9 +1,6 @@
 package io.p13i.ra.input.keyboard;
 
-import io.p13i.ra.RemembranceAgentClient;
-import io.p13i.ra.gui.GUI;
 import io.p13i.ra.input.AbstractInputMechanism;
-import io.p13i.ra.utils.DateUtils;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.dispatcher.SwingDispatchService;
@@ -27,11 +24,14 @@ public class KeyboardInputMechanism extends AbstractInputMechanism implements Na
         } catch (NativeHookException e) {
             throw new RuntimeException(e);
         }
+
+        inputEventsListenerCallback.onInputReady(this);
     }
 
     @Override
     public void closeInputMechanism() {
         try {
+            GlobalScreen.removeNativeKeyListener(this);
             GlobalScreen.unregisterNativeHook();
         } catch (NativeHookException e) {
             e.printStackTrace();
@@ -47,7 +47,7 @@ public class KeyboardInputMechanism extends AbstractInputMechanism implements Na
     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
         String keyText = NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode());
         char characterToAdd = keyText.charAt(0);
-        this.onInputCallback.onInput(characterToAdd);
+        this.inputEventsListenerCallback.onInput(characterToAdd);
     }
 
     @Override

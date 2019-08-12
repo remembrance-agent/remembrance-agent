@@ -19,7 +19,6 @@ import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
 import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.keyboard.KeyboardInputMechanism;
-import io.p13i.ra.input.speech.SpeechInputMechanism;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredDocument;
@@ -41,7 +40,7 @@ import static io.p13i.ra.gui.User.Preferences.Pref.LocalDiskDocumentsFolderPath;
  * @author Pramod Kotipalli
  */
 @Singleton
-public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.OnInput {
+public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.InputEventsListener {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
@@ -141,7 +140,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             mCurrentInputMechanism.closeInputMechanism();
         }
         mCurrentInputMechanism = inputMechanism;
-        mGUI.setInputMechanism(mCurrentInputMechanism);
         mCurrentInputMechanism.startInput();
     }
 
@@ -235,6 +233,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Reset the title
         mGUI.setTitle(APPLICATION_NAME);
+    }
+
+    @Override
+    public void onInputReady(AbstractInputMechanism inputMechanism) {
+        mGUI.setInputMechanism(inputMechanism);
     }
 
     @Override

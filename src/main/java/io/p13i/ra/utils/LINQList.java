@@ -96,6 +96,17 @@ public class LINQList<T> {
         return new LINQList<>(result);
     }
 
+    public <TSelected> LINQList<TSelected> aggregate(Function<T, Iterable<TSelected>> selector) {
+        List<TSelected> result = new LinkedList<>();
+        for (T item : source) {
+            Iterable<TSelected> subIterable = selector.apply(item);
+            for (TSelected subItem : subIterable) {
+                result.add(subItem);
+            }
+        }
+        return new LINQList<>(result);
+    }
+
     /**
      * Gets the first element of the iterable
      * @return the first element

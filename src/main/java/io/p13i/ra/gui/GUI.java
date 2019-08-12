@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 import static io.p13i.ra.gui.User.Preferences.Pref.GmailMaxEmailsCount;
@@ -179,25 +180,27 @@ public class GUI {
                             @Override
                             public void actionPerformed(ActionEvent e) {
 
-                                SwingUtilities.invokeLater(() -> {
-                                    mKeystrokeBufferLabel.setBorderTitle("Speech input...", GUI.BORDER_PADDING);
-                                    mKeystrokeBufferLabel.invalidate();
-                                    mKeystrokeBufferLabel.repaint();
+                                // All code inside SwingWorker runs on a seperate thread
+                                SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+                                    @Override
+                                    public Boolean doInBackground() {
 
-                                    SpeechInputMechanism speechRecognizer = new SpeechInputMechanism(1, 10);
+                                        SpeechInputMechanism speechRecognizer = new SpeechInputMechanism(1, 10);
 
-                                    RemembranceAgentClient.getInstance().startInputMechanism(speechRecognizer);
+                                        RemembranceAgentClient.getInstance().startInputMechanism(speechRecognizer);
 
-                                    setTitle("Start speaking...");
-                                    for (int i = 0; i < 1; i++) {
-                                        speechRecognizer.startInput();
+                                        RemembranceAgentClient.getInstance().startInputMechanism(new KeyboardInputMechanism());
+
+                                        return true;
                                     }
-                                    setTitle("Stop speaking...");
+                                    @Override
+                                    public void done() {
 
+                                    }
+                                };
 
-                                    RemembranceAgentClient.getInstance().startInputMechanism(new KeyboardInputMechanism());
-                                });
-
+                                // Call the SwingWorker from within the Swing thread
+                                worker.execute();
                             }
                         });
                     }});
