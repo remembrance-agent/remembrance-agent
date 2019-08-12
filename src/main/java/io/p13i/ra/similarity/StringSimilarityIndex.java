@@ -1,23 +1,41 @@
 package io.p13i.ra.similarity;
 
 
+import io.p13i.ra.utils.Cache;
+import io.p13i.ra.utils.ICache;
+import io.p13i.ra.utils.LimitedCapacityCache;
+import io.p13i.ra.utils.Tuple;
+
 public class StringSimilarityIndex implements ISimilarityIndex<String> {
-    public double calculate(String s1, String s2) {
-        if (s1 == null || s2 == null) {
+    public double calculate(String x, String y) {
+        if (x == null || y == null) {
             return this.NO_SIMILARITY;
         }
-        int distance = levenshteinDistance(s1, s2);
-        int longerStringLength = Math.max(s1.length(), s2.length());
+
+        Tuple<String, String> params = Tuple.of(x, y);
+        if (similarityCache.hasKey(params)) {
+            return similarityCache.get(params);
+        }
+
+        int distance = levenshteinDistance(x, y);
+        int longerStringLength = Math.max(x.length(), y.length());
         double index = (longerStringLength - distance) / (double) longerStringLength;
 
-        return checkInBounds(index);
+        checkInBounds(index);
+
+        similarityCache.put(params, index);
+
+        return index;
     }
+
+    public static ICache<Tuple<String, String>, Double> similarityCache = new LimitedCapacityCache<>(64);
 
     /**
      * https://www.baeldung.com/java-levenshtein-distance
      * O(m * n)
      */
     private static int levenshteinDistance(String x, String y) {
+
         int[][] dp = new int[x.length() + 1][y.length() + 1];
 
         for (int i = 0; i <= x.length(); i++) {

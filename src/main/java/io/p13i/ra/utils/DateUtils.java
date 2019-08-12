@@ -1,5 +1,6 @@
 package io.p13i.ra.utils;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,13 +21,22 @@ public class DateUtils {
     private static final String TIMESTAMP_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZ";
 
     /**
+     * Use a normal cache because the number of elements is limited to under 10 (upon code inspection).
+     */
+    private static ICache<String, DateFormat> dateFormatCache = new Cache<>();
+
+    /**
      * Formats a date
      * @param date the date to format
      * @param pattern the pattern to use
      * @return the formatted date
      */
     public static String formatDate(Date date, String pattern) {
-        return new SimpleDateFormat(pattern).format(date);
+        if (!dateFormatCache.hasKey(pattern)) {
+            dateFormatCache.put(pattern, new SimpleDateFormat(pattern));
+        }
+
+        return dateFormatCache.get(pattern).format(date);
     }
 
     /**

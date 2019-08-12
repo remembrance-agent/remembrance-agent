@@ -239,8 +239,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
     @Override
     public void onInput(Character c) {
-        LOGGER.info("Keystroke: " + c);
-
         // Write the timestamp and character to the keylogger log file
         mKeyLoggerBufferLogFileWriter.queue(DateUtils.longTimestamp() + " " + c + "\n");
 
