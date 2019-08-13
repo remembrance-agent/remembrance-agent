@@ -104,7 +104,13 @@ public class FileIO {
      * @return
      */
     private static List<String> ls(String folderPath) {
-        return Arrays.stream(Objects.requireNonNull(new File(folderPath).listFiles()))
+        File[] files = new File(folderPath).listFiles();
+
+        if (files == null) {
+            return Collections.emptyList();
+        }
+
+        return Arrays.stream(files)
                 .map(File::getAbsolutePath)
                 .collect(Collectors.toList());
     }

@@ -36,6 +36,7 @@ import static io.p13i.ra.gui.User.Preferences.Preference.GoogleDriveFolderID;
 import static io.p13i.ra.gui.User.Preferences.Preference.KeystrokesLogFile;
 import static io.p13i.ra.gui.User.Preferences.Preference.LocalDiskDocumentsFolderPath;
 import static io.p13i.ra.gui.User.Preferences.Preference.RAClientLogFile;
+import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 
 
 public class GUI {
@@ -83,11 +84,38 @@ public class GUI {
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                JOptionPane.showMessageDialog(mJFrame, "Reloading with new cache! GUI will freeze");
-                                mJFrame.setEnabled(false);
-                                RemembranceAgentClient.getInstance().initializeRAEngine(false);
-                                JOptionPane.showMessageDialog(mJFrame, "Reinitialized with new cache!");
-                                mJFrame.setEnabled(true);
+
+
+                                // All code inside SwingWorker runs on a separate thread
+                                SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+                                    @Override
+                                    public Boolean doInBackground() {
+
+                                        JOptionPane.showMessageDialog(mJFrame, "Reloading with new cache! GUI will be disabled");
+                                        mJFrame.setEnabled(false);
+                                        setSuggestionsPanelTitle("Loading caches...");
+
+                                        try {
+                                            RemembranceAgentClient.getInstance().initializeRAEngine(false);
+                                        } catch (Exception e) {
+                                            JOptionPane.showMessageDialog(mJFrame, e.toString(), "Errored :(", OK_CANCEL_OPTION);
+                                            mJFrame.setEnabled(true);
+                                            return false;
+                                        }
+
+                                        JOptionPane.showMessageDialog(mJFrame, "Reinitialized with new cache!");
+                                        mJFrame.setEnabled(true);
+
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void done() {
+
+                                    }
+                                };
+
+                                worker.execute();
                             }
                         });
                     }});

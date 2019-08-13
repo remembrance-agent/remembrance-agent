@@ -13,6 +13,7 @@ import io.p13i.ra.utils.GoogleAPIUtils;
 import io.p13i.ra.utils.LoggerUtils;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.text.DateFormat;
@@ -73,6 +74,9 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
 
 
             for (Message message : response) {
+
+                LOGGER.info("Loading message: " + message.getId());
+
                 Message fullMessage = service
                         .users()
                         .messages()
@@ -188,7 +192,11 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
     private static String getMessageContent(Message message) {
         StringBuilder stringBuilder = new StringBuilder();
         getPlainTextFromMessagePartsRecursive(message.getPayload().getParts(), stringBuilder);
-        return new String(Base64.getDecoder().decode(stringBuilder.toString()), StandardCharsets.UTF_8);
+        try {
+            return new String(Base64.getDecoder().decode(stringBuilder.toString()), Charset.defaultCharset());
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
     }
 
     /**

@@ -54,6 +54,9 @@ public abstract class AbstractDocument implements IRequiresIndexing {
      * @return truncated contents
      */
     protected String getContentTruncated() {
+        if (content == null) {
+            return null;
+        }
         boolean includeEllipses = this.content.length() > CONTENT_TRUNCATED_MAX_LENGTH;
         return content.substring(0, Math.min(this.content.length(), CONTENT_TRUNCATED_MAX_LENGTH)) + (includeEllipses ? "..." : "");
     }

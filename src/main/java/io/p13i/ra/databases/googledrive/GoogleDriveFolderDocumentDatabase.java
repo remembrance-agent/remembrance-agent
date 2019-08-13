@@ -1,6 +1,7 @@
 package io.p13i.ra.databases.googledrive;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
@@ -16,6 +17,7 @@ import io.p13i.ra.utils.LoggerUtils;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,7 +83,7 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
      * @param service        the Drive client
      * @param documents      list of documents already garnered, added to in this method
      * @param parentFolderID the enclosing folder ID
-     * @throws IOException if there is an issue reading from the API
+     * @throws IOException if there is an issue reading from the API or writing to the byte buffer
      */
     private static void loadDocumentsRecursive(Drive service, List<GoogleDriveDocument> documents, String parentFolderID) throws IOException {
         FileList filesList = service.files().list()
@@ -96,11 +98,20 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
                 continue;
             }
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            service.files().export(file.getId(), "text/plain")
-                    .executeMediaAndDownloadTo(outputStream);
+            LOGGER.info("Loading document: " + file.getName());
 
-            String fileContents = new String(outputStream.toByteArray(), Charset.defaultCharset());
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            String fileContents = null;
+
+            try {
+                service.files().export(file.getId(), "text/plain")
+                        .executeMediaAndDownloadTo(outputStream);
+                fileContents = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+            } catch (Exception e) {
+                e.printStackTrace();
+                LOGGER.throwing(GoogleDriveFolderDocumentDatabase.class.getSimpleName(), "loadDocumentsRecursive", e);
+                throw e;
+            }
 
             documents.add(new GoogleDriveDocument(file.getId(), fileContents, file.getName(), new Date(file.getModifiedTime().getValue())));
         }
