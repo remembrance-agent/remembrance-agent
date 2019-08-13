@@ -6,6 +6,7 @@ import java.util.List;
 
 /**
  * Computes TFiDF
+ *
  * @author Mohamed Guendouz
  * @author Pramod Kotipalli (@p13i)
  */
@@ -48,6 +49,7 @@ public class TFIDFCalculator {
 
     /**
      * Computes the TFiDF of a query for a given document
+     *
      * @param queryTerm term
      * @param document  a text document
      * @param documents all documents

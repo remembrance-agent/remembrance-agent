@@ -30,7 +30,8 @@ public class DateUtils {
 
     /**
      * Formats a date
-     * @param date the date to format
+     *
+     * @param date    the date to format
      * @param pattern the pattern to use
      * @return the formatted date
      */
@@ -44,6 +45,7 @@ public class DateUtils {
 
     /**
      * Gets the current time
+     *
      * @return the current time as a date
      */
     public static Date now() {
@@ -52,6 +54,7 @@ public class DateUtils {
 
     /**
      * Gets now() as a timestamp
+     *
      * @return a long timestamp
      */
     public static long longTimestamp() {
@@ -60,6 +63,7 @@ public class DateUtils {
 
     /**
      * Gets the timestamp of the given date
+     *
      * @param date the date
      * @return a formatted string timestamp
      */
@@ -69,6 +73,7 @@ public class DateUtils {
 
     /**
      * Computes the difference (d2 - d1) in seconds between two dates
+     *
      * @param d1 the first date
      * @param d2 the second date
      * @return the difference in seconds

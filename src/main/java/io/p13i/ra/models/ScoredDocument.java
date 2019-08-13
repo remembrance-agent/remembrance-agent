@@ -48,6 +48,7 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
 
     /**
      * Gets the terms in the document matching the terms in the query, ranked by their TFs in TFiDF
+     *
      * @param maxCount limited to this count
      * @return the list of matching terms ranked
      */

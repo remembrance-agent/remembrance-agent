@@ -18,6 +18,7 @@ public class KeyboardLoggerBreakingBuffer {
 
     /**
      * Adds the given character and a space if required
+     *
      * @param c the character to add
      */
     public void addCharacter(char c) {
@@ -39,9 +40,9 @@ public class KeyboardLoggerBreakingBuffer {
             // This must not be the first element added
             if (lastTimestampedCharacter != null) {
                 long keystrokeDelta = DateUtils.deltaSeconds(lastTimestampedCharacter.timestamp, newTimestamp.timestamp);
-                                // And, finally, the delta should be long enough
+                // And, finally, the delta should be long enough
                 if (keystrokeDelta > BREAKING_BUFFER_DURATION_SEC) {
-                                        limitedCapacityBuffer.add(new TimestampedCharacter(DEFAULT_BREAKER_CHARACTER));
+                    limitedCapacityBuffer.add(new TimestampedCharacter(DEFAULT_BREAKER_CHARACTER));
                 }
             }
         }
@@ -56,11 +57,12 @@ public class KeyboardLoggerBreakingBuffer {
 
     /**
      * Determines if a character is allowed in to the buffer
+     *
      * @param c the character to check
      * @return whether or not the character is allowed in the buffer
      */
     private static boolean isCharacterAllowedIntoBuffer(char c) {
-        return CharacterUtils.isAlphanumeric(c) || CharacterUtils.isSpace(c) || c == '.' || c == '\'' || c == '-' ;
+        return CharacterUtils.isAlphanumeric(c) || CharacterUtils.isSpace(c) || c == '.' || c == '\'' || c == '-';
     }
 
     /**

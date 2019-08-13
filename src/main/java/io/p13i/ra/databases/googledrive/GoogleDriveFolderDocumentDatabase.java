@@ -59,6 +59,7 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
 
     /**
      * Gets a Google Drive client
+     *
      * @return Google Drive client
      */
     private Drive getClient() {
@@ -76,8 +77,9 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
 
     /**
      * Loads all documents from a folder, recursively
-     * @param service the Drive client
-     * @param documents list of documents already garnered, added to in this method
+     *
+     * @param service        the Drive client
+     * @param documents      list of documents already garnered, added to in this method
      * @param parentFolderID the enclosing folder ID
      * @throws IOException if there is an issue reading from the API
      */
@@ -94,7 +96,7 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
                 continue;
             }
 
-                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             service.files().export(file.getId(), "text/plain")
                     .executeMediaAndDownloadTo(outputStream);
 

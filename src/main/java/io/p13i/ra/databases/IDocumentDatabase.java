@@ -7,6 +7,7 @@ import java.util.List;
 public interface IDocumentDatabase<TDocument extends AbstractDocument> {
     /**
      * Gets the name of the data store
+     *
      * @return human readable name
      */
     default String getName() {
@@ -30,6 +31,7 @@ public interface IDocumentDatabase<TDocument extends AbstractDocument> {
 
     /**
      * Fetches the documents from memory
+     *
      * @return All the documents
      */
     List<TDocument> getAllDocuments();

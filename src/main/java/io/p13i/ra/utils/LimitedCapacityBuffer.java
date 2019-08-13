@@ -7,6 +7,7 @@ import java.util.Queue;
 
 /**
  * Simple wrapper around a queue that limits the size of a queue and tracks the last element added to the queue.
+ *
  * @param <T> The type of elements in the buffer
  */
 public class LimitedCapacityBuffer<T> implements Iterable<T> {
@@ -23,6 +24,7 @@ public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     /**
      * Adds a new element removing the oldest-added element if there is not more space
+     *
      * @param element the element to add
      */
     public void add(T element) {
@@ -50,6 +52,7 @@ public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     /**
      * The number of elements currently in the buffer
+     *
      * @return a count
      */
     public int size() {
@@ -58,6 +61,7 @@ public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     /**
      * The element last interested into the buffer
+     *
      * @return the last element added
      */
     T getLastAddedElement() {
@@ -66,6 +70,7 @@ public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     /**
      * Removes the last added element
+     *
      * @return the element removed
      */
     public T removeLast() {
@@ -78,6 +83,7 @@ public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     /**
      * Gets the total number of characters added to the buffer
+     *
      * @return a count
      */
     int getTotalAddedElementsCount() {
@@ -86,6 +92,7 @@ public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     /**
      * Indicates if the buffer is empty
+     *
      * @return whether the buffer is empty
      */
     public boolean isEmpty() {

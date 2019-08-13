@@ -29,6 +29,7 @@ public class BufferingLogFileWriter implements Flushable, Closeable {
 
     /**
      * Queues a file. If the capacity is exceed, flushes the buffer
+     *
      * @param line the line to add to the queue
      */
     public synchronized void queue(String line) {

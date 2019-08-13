@@ -45,18 +45,22 @@ public class LocalDiskCacheMetadata implements Serializable {
 
     /**
      * Gets a metadata object from a string representation
+     *
      * @param string the JSON string of metadata
      * @return a {@code LocalDiskCacheMetadata} object
      */
     public static LocalDiskCacheMetadata fromJSONString(String string) {
-        return getMetadataGson().fromJson(string, new TypeToken<LocalDiskCacheMetadata>(){}.getType());
+        return getMetadataGson().fromJson(string, new TypeToken<LocalDiskCacheMetadata>() {
+        }.getType());
     }
 
     /**
      * Converts a metadata object to a string
+     *
      * @return a JSON string
      */
     public String asJSONString() {
-        return getMetadataGson().toJson(this, new TypeToken<LocalDiskCacheMetadata>(){}.getType());
+        return getMetadataGson().toJson(this, new TypeToken<LocalDiskCacheMetadata>() {
+        }.getType());
     }
 }

@@ -52,7 +52,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
         List<AbstractDocument> allDocuments = this.documentDatabase.getAllDocuments();
-                for (AbstractDocument document : allDocuments) {
+        for (AbstractDocument document : allDocuments) {
             ScoredDocument scoredDoc = Calculator.scoreQueryAgainstDocuments(query, document, allDocuments);
             scoredDocuments.add(scoredDoc);
         }
@@ -89,8 +89,8 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         /**
          * Scores a query against all the documents in the data store
          *
-         * @param query the query
-         * @param document the document to check the query against
+         * @param query        the query
+         * @param document     the document to check the query against
          * @param allDocuments the context of all documents
          * @return a score between 0.0 and 1.0
          */

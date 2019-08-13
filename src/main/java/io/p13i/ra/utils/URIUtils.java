@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 public class URIUtils {
     /**
      * Gets a URI from a path
+     *
      * @param path the string path
      * @return a URI or null if there's a syntax error
      */

@@ -6,6 +6,7 @@ package io.p13i.ra.utils;
 public class IntegerUtils {
     /**
      * Whether or not a string is an integer
+     *
      * @param string the integer as a string
      * @return whether or not a string is an integer
      */

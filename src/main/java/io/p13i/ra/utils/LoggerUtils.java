@@ -15,8 +15,9 @@ public class LoggerUtils {
 
     /**
      * Gets a logger for the given class or throws an exception
+     *
      * @param forClass the class in questino
-     * @param <T> the type of class
+     * @param <T>      the type of class
      * @return a Logger instance or an exception
      * @throws RuntimeException if a logger couldn't be created
      */

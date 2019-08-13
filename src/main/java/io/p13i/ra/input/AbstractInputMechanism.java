@@ -12,6 +12,7 @@ public abstract class AbstractInputMechanism {
 
     /**
      * Gets the name of this class
+     *
      * @return the name of this class, readable for the GUI
      */
     public String getInputMechanismName() {
@@ -33,6 +34,7 @@ public abstract class AbstractInputMechanism {
      */
     public interface InputEventsListener {
         void onInputReady(AbstractInputMechanism inputMechanism);
+
         void onInput(AbstractInputMechanism inputMechanism, Character c);
     }
 }

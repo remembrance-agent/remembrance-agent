@@ -33,14 +33,14 @@ public class LocalDiskDocumentDatabase implements IDocumentDatabase<LocalDiskDoc
         this.documents = new ArrayList<>();
         try {
             List<String> documentsFilePaths = FileIO.listFolderFilesRecursive(this.directory);
-                        for (String documentFilePath : documentsFilePaths) {
-                                if (documentFilePath.endsWith(".txt") || documentFilePath.endsWith(".md")) {
+            for (String documentFilePath : documentsFilePaths) {
+                if (documentFilePath.endsWith(".txt") || documentFilePath.endsWith(".md")) {
                     String fileName = FileIO.getFileName(documentFilePath);
                     String fileContents = FileIO.read(documentFilePath);
                     Date lastModified = FileIO.getLastModifiedDate(documentFilePath);
                     this.documents.add(new LocalDiskDocument(fileContents, fileName, fileName, lastModified, documentFilePath));
                 } else {
-                                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

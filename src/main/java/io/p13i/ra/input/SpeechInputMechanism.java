@@ -55,7 +55,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
      */
     private SpeechClient mClient;
 
-    
+
     public SpeechInputMechanism(int numberOfRunsPerInvokation, int durationPerInvokation) {
         this.numberOfRunsPerInvokation = numberOfRunsPerInvokation;
         this.durationPerInvokation = durationPerInvokation;
@@ -73,7 +73,8 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
 
     /**
      * Internal method for performing speech recognition
-     * @throws IOException an error opening a file
+     *
+     * @throws IOException              an error opening a file
      * @throws LineUnavailableException microphone is unavailable
      */
     private void startInputInternal() throws IOException, LineUnavailableException {
@@ -128,7 +129,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
                 int bytesRead = audio.read(data);
 
                 if (estimatedTime > durationPerInvokation * 1000) {
-                                        targetDataLine.stop();
+                    targetDataLine.stop();
                     targetDataLine.close();
                     break;
                 }

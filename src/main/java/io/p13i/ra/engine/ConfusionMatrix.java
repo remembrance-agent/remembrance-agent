@@ -61,7 +61,7 @@ class ConfusionMatrix {
 
         at.addRule();
 
-        return at.render(/* columns: */ );
+        return at.render(/* columns: */);
     }
 
     class Index<T1, T2> {

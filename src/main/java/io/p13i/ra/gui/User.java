@@ -64,6 +64,7 @@ public class User {
 
         /**
          * Gets a preference as a string
+         *
          * @param preference the preference
          * @return the string value
          */
@@ -80,6 +81,7 @@ public class User {
 
         /**
          * Gets a preference as an Integer
+         *
          * @param preference the preference to get
          * @return the int value
          */
@@ -89,8 +91,9 @@ public class User {
 
         /**
          * Sets the preference value in the backing store
+         *
          * @param preference the preference
-         * @param value the value to set it to in the backing store
+         * @param value      the value to set it to in the backing store
          */
         public static void set(Preference preference, String value) {
             userNodeForPackage(RemembranceAgentClient.class).put(preference.nodeName, value);

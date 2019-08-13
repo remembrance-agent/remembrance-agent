@@ -149,6 +149,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
     /**
      * Initializes the RA engine
+     *
      * @param useCache whether or not to use the local document case
      * @return the created engine
      */
@@ -168,16 +169,16 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         // Load all the documents into memory and then into the disk
         if (!useCache) {
             localDiskCacheDatabase
-                .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
-                    loadDocuments();
-                }})
-                .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{
-                    loadDocuments();
-                }})
-                .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
-                    loadDocuments();
-                }})
-                .saveDocumentsInMemoryToDisk();
+                    .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
+                        loadDocuments();
+                    }})
+                    .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{
+                        loadDocuments();
+                    }})
+                    .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
+                        loadDocuments();
+                    }})
+                    .saveDocumentsInMemoryToDisk();
         }
 
         // Update the GUI with where the suggestions are coming from
@@ -232,7 +233,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         mGUI.removeScoredDocuments();
 
         // Add the suggestion's elements to the GUI
-                for (int i = 0; i < suggestions.size(); i++) {
+        for (int i = 0; i < suggestions.size(); i++) {
             ScoredDocument scoredDocument = suggestions.get(i);
 
             // And tell the logger

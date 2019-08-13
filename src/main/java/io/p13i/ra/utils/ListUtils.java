@@ -14,14 +14,15 @@ public class ListUtils {
 
     /**
      * Finds the common elements between two lists
-     * @param first the first list
+     *
+     * @param first  the first list
      * @param second the second list
-     * @param <T> the type of the elements
+     * @param <T>    the type of the elements
      * @return a list of the intersection
      */
     public static <T> List<T> intersection(List<T> first, List<T> second) {
         List<T> intersection = new LinkedList<>();
-        for(T stringFromFirst : first) {
+        for (T stringFromFirst : first) {
             if (second.contains(stringFromFirst)) {
                 intersection.add(stringFromFirst);
             }
@@ -31,10 +32,11 @@ public class ListUtils {
 
     /**
      * Selects the largest elements from the given list
-     * @param list the given list
-     * @param maxCount the maximum number of elements to get
+     *
+     * @param list       the given list
+     * @param maxCount   the maximum number of elements to get
      * @param comparator the comparator to use
-     * @param <T> the type of the elements
+     * @param <T>        the type of the elements
      * @return a list of maximum size {@code maxCount}
      */
     public static <T extends Comparable<T>> List<T> selectLargest(List<T> list, int maxCount, Comparator<T> comparator) {
@@ -45,8 +47,9 @@ public class ListUtils {
 
     /**
      * Casts the given list up
-     * @param source the list
-     * @param <TSubClass> the sub class
+     *
+     * @param source        the list
+     * @param <TSubClass>   the sub class
      * @param <TSuperClass> the super class to cast to
      * @return the resultant casted list
      */

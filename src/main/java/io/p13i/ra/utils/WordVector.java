@@ -15,6 +15,7 @@ public class WordVector {
 
     /**
      * Tokenizes a string
+     *
      * @param content the given string
      * @return a list of words
      */
@@ -47,6 +48,7 @@ public class WordVector {
 
     /**
      * Removes common words from {@code MOST_COMMON_WORDS}
+     *
      * @param allWords the full vector
      * @return a cleaner vector
      */

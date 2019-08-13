@@ -50,6 +50,7 @@ public abstract class AbstractDocument implements IRequiresIndexing {
 
     /**
      * Gets the content of the document truncated to CONTENT_TRUNCATED_MAX_LENGTH
+     *
      * @return truncated contents
      */
     protected String getContentTruncated() {
@@ -78,6 +79,7 @@ public abstract class AbstractDocument implements IRequiresIndexing {
 
     /**
      * Gets the name of the document type
+     *
      * @return the document type's name
      */
     public String getDocumentTypeName() {

@@ -16,6 +16,7 @@ public class Assert {
 
     /**
      * Fails with an assertion error
+     *
      * @throws AssertionError the thrown exception
      */
     public static void fail() throws AssertionError {
@@ -24,6 +25,7 @@ public class Assert {
 
     /**
      * Checks that a double is in a range
+     *
      * @param value the value
      * @param lower the lower bound
      * @param upper the upper bound

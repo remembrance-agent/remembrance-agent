@@ -20,6 +20,7 @@ public class FileIO {
 
     /**
      * Reads all file contents as a string
+     *
      * @param filePath absolute file path
      * @return entire file as a string
      */
@@ -43,6 +44,7 @@ public class FileIO {
 
     /**
      * Gets a {@code PrintWriter} for the specified file path
+     *
      * @param filePath the file's path
      * @return opens a {@code PrintWriter}
      */
@@ -57,8 +59,9 @@ public class FileIO {
 
     /**
      * Writes the given text to the file at the specified path
+     *
      * @param filePath the file's path
-     * @param text the text to write
+     * @param text     the text to write
      */
     public static void write(String filePath, String text) {
         if (!FileIO.fileExists(filePath)) {
@@ -72,6 +75,7 @@ public class FileIO {
 
     /**
      * Creates a file
+     *
      * @param filePath the file's path
      * @return whether or not the file was created
      */
@@ -85,6 +89,7 @@ public class FileIO {
 
     /**
      * Checks whether a file exists
+     *
      * @param filePath the file's path
      * @return whether or not the file exists
      */
@@ -94,6 +99,7 @@ public class FileIO {
 
     /**
      * Lists a directory's contents
+     *
      * @param folderPath
      * @return
      */
@@ -105,6 +111,7 @@ public class FileIO {
 
     /**
      * Lists files in a directory
+     *
      * @param folderPath absolute folder path
      * @return list of absolute paths of folders/file in this directory
      */
@@ -116,6 +123,7 @@ public class FileIO {
 
     /**
      * Lists the files in a folder, recursively
+     *
      * @param folderPath the path of the folder
      * @return all the files in a folder
      */
@@ -136,6 +144,7 @@ public class FileIO {
 
     /**
      * Checks whether a path is a folder
+     *
      * @param absolutePath the path
      * @return whether or not the path is a folder
      */
@@ -145,6 +154,7 @@ public class FileIO {
 
     /**
      * Checks whether a path is a file
+     *
      * @param absolutePath the path
      * @return whether or not the path is a file
      */
@@ -154,6 +164,7 @@ public class FileIO {
 
     /**
      * Gets the name of a file
+     *
      * @param fromAbsolutePath from the absolute path of the file
      * @return as a string
      */
@@ -163,6 +174,7 @@ public class FileIO {
 
     /**
      * Gets the base (enclosing folder) name of a file or folder
+     *
      * @param absolutePath the path of the file or folder
      * @return the enclosing folder's name
      */
@@ -172,6 +184,7 @@ public class FileIO {
 
     /**
      * Gets the last modified date
+     *
      * @param absoluteFilePath of the given file at this path
      * @return as a Date object
      */
@@ -181,6 +194,7 @@ public class FileIO {
 
     /**
      * Remove non-alpha numeric characters from the string
+     *
      * @param dirtyName A string with all sorts of characters
      * @return with only alpha numeric characters
      */
@@ -190,6 +204,7 @@ public class FileIO {
 
     /**
      * Deletes a file
+     *
      * @param fileName the absolute path
      * @return whether or not the file was deleted
      */

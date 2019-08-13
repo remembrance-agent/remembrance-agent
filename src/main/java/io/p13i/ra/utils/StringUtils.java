@@ -16,7 +16,8 @@ public class StringUtils {
 
     /**
      * Ends a string after a given length with ...
-     * @param string the string
+     *
+     * @param string    the string
      * @param maxLength the max length
      * @return the truncated string
      */
@@ -30,7 +31,8 @@ public class StringUtils {
 
     /**
      * Adds ... to the front followed by the last {@code maxLength} characters
-     * @param string the string
+     *
+     * @param string    the string
      * @param maxLength the max length
      * @return the truncated string
      */
@@ -44,6 +46,7 @@ public class StringUtils {
 
     /**
      * https://javarevisited.blogspot.com/2013/03/generate-md5-hash-in-java-string-byte-array-example-tutorial.html
+     *
      * @param message The longer string to process
      * @return The MD5 digest
      */
@@ -70,6 +73,7 @@ public class StringUtils {
 
     /**
      * https://stackoverflow.com/a/2560017/5071723
+     *
      * @param s the string
      * @return
      */

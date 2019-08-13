@@ -22,6 +22,7 @@ public class CharacterUtils {
 
     /**
      * Converts a character to lower-case
+     *
      * @param c the character to convert
      * @return a lower-case version
      */

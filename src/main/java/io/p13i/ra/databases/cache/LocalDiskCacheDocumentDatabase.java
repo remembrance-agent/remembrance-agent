@@ -31,7 +31,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
     @Override
     public String getName() {
         return LocalDiskCacheDocumentDatabase.class.getSimpleName() +
-                "(" + StringUtils.truncateBeginningWithEllipse(this.cacheLocalDirectory, 20)+ ")";
+                "(" + StringUtils.truncateBeginningWithEllipse(this.cacheLocalDirectory, 20) + ")";
     }
 
     @Override

@@ -11,6 +11,7 @@ import java.util.Date;
 public class DateSimilarityIndex {
     /**
      * Calculates the similarity between two dates
+     *
      * @param d1 the first date
      * @param d2 the second date
      * @return a similarity index between 0.0 and 1.0
