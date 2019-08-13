@@ -94,11 +94,9 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
                 continue;
             }
 
-            LOGGER.info("Loading: " + file.getName());
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             service.files().export(file.getId(), "text/plain")
                     .executeMediaAndDownloadTo(outputStream);
-            LOGGER.info("Done.");
 
             String fileContents = new String(outputStream.toByteArray(), Charset.defaultCharset());
 

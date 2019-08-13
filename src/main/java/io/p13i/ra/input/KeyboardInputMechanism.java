@@ -1,6 +1,5 @@
 package io.p13i.ra.input;
 
-import io.p13i.ra.utils.LINQList;
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.dispatcher.SwingDispatchService;

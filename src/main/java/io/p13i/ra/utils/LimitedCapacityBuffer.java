@@ -45,7 +45,7 @@ public class LimitedCapacityBuffer<T> implements Iterable<T> {
 
     @Override
     public String toString() {
-        return LINQList.from(this.queue).toString();
+        return ListUtils.toString(this.queue);
     }
 
     /**

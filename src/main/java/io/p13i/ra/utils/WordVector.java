@@ -1,6 +1,7 @@
 package io.p13i.ra.utils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -50,8 +51,8 @@ public class WordVector {
      * @return a cleaner vector
      */
     public static List<String> removeMostCommonWords(List<String> allWords) {
-        return LINQList.from(allWords)
-                .where(word -> !MOST_COMMON_WORDS.contains(word))
-                .toList();
+        return allWords.stream()
+                .filter(word -> !MOST_COMMON_WORDS.contains(word))
+                .collect(Collectors.toList());
     }
 }

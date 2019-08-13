@@ -1,9 +1,6 @@
 package io.p13i.ra.utils;
 
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.logging.Logger;
 
 /**
  * Complicated... this object manages a size-limited queue of characters.
@@ -11,7 +8,6 @@ import java.util.logging.Logger;
  * (space) character automatically.
  */
 public class KeyboardLoggerBreakingBuffer {
-    private static final Logger LOGGER = LoggerUtils.getLogger(KeyboardLoggerBreakingBuffer.class);
     private static final long BREAKING_BUFFER_DURATION_SEC = 2;  // seconds
     private static final char DEFAULT_BREAKER_CHARACTER = '␣';
     private final LimitedCapacityBuffer<TimestampedCharacter> limitedCapacityBuffer;
@@ -43,11 +39,9 @@ public class KeyboardLoggerBreakingBuffer {
             // This must not be the first element added
             if (lastTimestampedCharacter != null) {
                 long keystrokeDelta = DateUtils.deltaSeconds(lastTimestampedCharacter.timestamp, newTimestamp.timestamp);
-                LOGGER.info("Keystroke delta: " + keystrokeDelta);
-                // And, finally, the delta should be long enough
+                                // And, finally, the delta should be long enough
                 if (keystrokeDelta > BREAKING_BUFFER_DURATION_SEC) {
-                    LOGGER.info("Added space after " + BREAKING_BUFFER_DURATION_SEC + " seconds.");
-                    limitedCapacityBuffer.add(new TimestampedCharacter(DEFAULT_BREAKER_CHARACTER));
+                                        limitedCapacityBuffer.add(new TimestampedCharacter(DEFAULT_BREAKER_CHARACTER));
                 }
             }
         }
@@ -76,18 +70,12 @@ public class KeyboardLoggerBreakingBuffer {
         limitedCapacityBuffer.clear();
     }
 
-    /**
-     * @return the total number of characters accepted into the buffer
-     */
-    public int getTotalTypedCharactersCount() {
-        return this.limitedCapacityBuffer.getTotalAddedElementsCount();
-    }
-
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
-        LINQList.from(this.limitedCapacityBuffer)
-                .forEach(stringBuilder::append);
+        for (TimestampedCharacter timestampedCharacter : this.limitedCapacityBuffer) {
+            stringBuilder.append(timestampedCharacter.character);
+        }
         return stringBuilder.toString();
     }
 

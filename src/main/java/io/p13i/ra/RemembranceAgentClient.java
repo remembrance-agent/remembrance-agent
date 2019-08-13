@@ -227,18 +227,15 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         }};
         List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
 
-        LOGGER.info("Sending query to RA: '" + queryString + "'");
 
         // Update the GUI
         mGUI.removeScoredDocuments();
 
         // Add the suggestion's elements to the GUI
-        LOGGER.info(String.format("Got %d suggestion(s).", suggestions.size()));
-        for (int i = 0; i < suggestions.size(); i++) {
+                for (int i = 0; i < suggestions.size(); i++) {
             ScoredDocument scoredDocument = suggestions.get(i);
 
             // And tell the logger
-            LOGGER.info(" -> (" + scoredDocument.getScore() + ") " + scoredDocument.toShortString());
 
             // Add each of the components for the document to the GUI
             mGUI.addScoredDocument(scoredDocument, i);
@@ -263,7 +260,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         // Add to the buffer
         mInputBuffer.addCharacter(c);
 
-        LOGGER.info(String.format("[Buffer count=%04d:] %s", mInputBuffer.getTotalTypedCharactersCount(), mInputBuffer.toString()));
 
         // Display on the GUI
         mGUI.setKeystrokesBufferText(mInputBuffer.toString());

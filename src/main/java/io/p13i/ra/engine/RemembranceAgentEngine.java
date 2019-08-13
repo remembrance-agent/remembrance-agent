@@ -52,8 +52,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
         List<AbstractDocument> allDocuments = this.documentDatabase.getAllDocuments();
-        LOGGER.info("Searching " + allDocuments.size() + " documents for '" + query.getQuery() + "'");
-        for (AbstractDocument document : allDocuments) {
+                for (AbstractDocument document : allDocuments) {
             ScoredDocument scoredDoc = Calculator.scoreQueryAgainstDocuments(query, document, allDocuments);
             scoredDocuments.add(scoredDoc);
         }

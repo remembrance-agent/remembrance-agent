@@ -38,7 +38,7 @@ public class ListUtils {
      * @return a list of maximum size {@code maxCount}
      */
     public static <T extends Comparable<T>> List<T> selectLargest(List<T> list, int maxCount, Comparator<T> comparator) {
-        List<T> copy = LINQList.from(list).toList();
+        List<T> copy = new ArrayList<>(list);
         copy.sort(Collections.reverseOrder(comparator));
         return copy.subList(0, Math.min(maxCount, copy.size()));
     }
@@ -52,5 +52,23 @@ public class ListUtils {
      */
     public static <TSubClass extends TSuperClass, TSuperClass> List<TSuperClass> castUp(List<TSubClass> source) {
         return new ArrayList<>(source);
+    }
+
+    public static <T> String toString(List<T> list) {
+        int count = list.size();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append('[');
+        int i = 0;
+        for (T item : list) {
+            stringBuilder.append("'");
+            stringBuilder.append(item.toString());
+            stringBuilder.append("'");
+            if (i < count - 1) {
+                stringBuilder.append(", ");
+            }
+            i++;
+        }
+        stringBuilder.append(']');
+        return stringBuilder.toString();
     }
 }

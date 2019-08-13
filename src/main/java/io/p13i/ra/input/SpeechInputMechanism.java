@@ -13,7 +13,6 @@ import com.google.cloud.speech.v1.StreamingRecognizeRequest;
 import com.google.cloud.speech.v1.StreamingRecognizeResponse;
 import com.google.protobuf.ByteString;
 import io.p13i.ra.utils.CharacterUtils;
-import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.LoggerUtils;
 import io.p13i.ra.utils.StringUtils;
 
@@ -25,6 +24,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -128,8 +128,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
                 int bytesRead = audio.read(data);
 
                 if (estimatedTime > durationPerInvokation * 1000) {
-                    LOGGER.info("Stop speaking.");
-                    targetDataLine.stop();
+                                        targetDataLine.stop();
                     targetDataLine.close();
                     break;
                 }
@@ -163,16 +162,14 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
 
     @Override
     public void onComplete() {
-        LINQList.from(responses)
-                // Get the transcripts
-                .aggregate(StreamingRecognizeResponse::getResultsList)
-                .aggregate(StreamingRecognitionResult::getAlternativesList)
-                .select(SpeechRecognitionAlternative::getTranscript)
-                // Log each transcript
-                .forEach(LOGGER::info)
-                .aggregate(StringUtils::toCharList)
-                .select(CharacterUtils::toUpperCase)
-                // Callback each inputted character
+        this.responses.stream()
+                .map(StreamingRecognizeResponse::getResultsList)
+                .flatMap(List::stream)
+                .map(StreamingRecognitionResult::getAlternativesList)
+                .flatMap(List::stream)
+                .map(SpeechRecognitionAlternative::getTranscript)
+                .flatMap(StringUtils::toCharStream)
+                .map(CharacterUtils::toUpperCase)
                 .forEach(c -> inputEventsListenerCallback.onInput(this, c));
     }
 

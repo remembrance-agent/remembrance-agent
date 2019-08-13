@@ -9,10 +9,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -100,9 +98,9 @@ public class FileIO {
      * @return
      */
     private static List<String> ls(String folderPath) {
-        return LINQList.from(new File(folderPath).listFiles())
-                .select(File::getAbsolutePath)
-                .toList();
+        return Arrays.stream(Objects.requireNonNull(new File(folderPath).listFiles()))
+                .map(File::getAbsolutePath)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -111,9 +109,9 @@ public class FileIO {
      * @return list of absolute paths of folders/file in this directory
      */
     public static List<String> listFiles(String folderPath) {
-        return LINQList.from(ls(folderPath))
-                .where(FileIO::isFile)
-                .toList();
+        return ls(folderPath).stream()
+                .filter(FileIO::isFile)
+                .collect(Collectors.toList());
     }
 
     /**

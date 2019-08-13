@@ -8,11 +8,8 @@ import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.MessagePart;
 import com.google.api.services.gmail.model.MessagePartHeader;
 import io.p13i.ra.databases.IDocumentDatabase;
-import io.p13i.ra.databases.cache.ICachableDocument;
 import io.p13i.ra.databases.cache.ICachableDocumentDatabase;
 import io.p13i.ra.utils.GoogleAPIUtils;
-import io.p13i.ra.utils.ListUtils;
-import io.p13i.ra.utils.LINQList;
 import io.p13i.ra.utils.LoggerUtils;
 
 import java.io.*;
@@ -23,6 +20,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 
@@ -73,7 +71,6 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
                     .execute()
                     .getMessages();
 
-            LOGGER.info("Loaded " + response.size() + " messages from Gmail API.");
 
             for (Message message : response) {
                 Message fullMessage = service
@@ -83,7 +80,6 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
                         .setFormat("full")
                         .execute();
 
-                LOGGER.info("Got message: " + fullMessage);
 
                 if (fullMessage == null) {
                     continue;
@@ -92,8 +88,7 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
                 GmailDocument gmailDocument = new GmailDocument(fullMessage.getId(), getMessageContent(fullMessage), getMessageSubject(fullMessage), getMessageSender(fullMessage), getReceivedDate(fullMessage));
                 this.gmailDocuments.add(gmailDocument);
 
-                LOGGER.info("Added Gmail AbstractDocument: " + gmailDocument.toString());
-            }
+                            }
         } catch (IOException e) {
             LOGGER.throwing(GmailDocumentDatabase.class.getSimpleName(), "loadDocuments", e);
             throw new RuntimeException(e);
@@ -107,9 +102,9 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
      */
     private Date getReceivedDate(Message message) {
         return getHeaderValues(message, "Date")
-                .take(1)
-                .select(GmailDocumentDatabase::tryParseMessageDate)
-                .firstOrDefault();
+                .map(GmailDocumentDatabase::tryParseMessageDate)
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
@@ -147,10 +142,10 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
      * @param headerName the name of the header
      * @return list of matching values for this header
      */
-    private static LINQList<String> getHeaderValues(Message message, String headerName) {
-        return new LINQList<>(message.getPayload().getHeaders())
-                .where(header -> header.getName().equals(headerName))
-                .select(MessagePartHeader::getValue);
+    private static Stream<String> getHeaderValues(Message message, String headerName) {
+        return message.getPayload().getHeaders().stream()
+                .filter(header -> header.getName().equals(headerName))
+                .map(MessagePartHeader::getValue);
     }
 
     /**
@@ -172,7 +167,7 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
      * @return the sender value
      */
     private String getMessageSender(Message message) {
-        return getHeaderValues(message, "From").firstOrDefault();
+        return getHeaderValues(message, "From").findFirst().orElse(null);
     }
 
     /**
@@ -180,7 +175,7 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
      * @return the subject value
      */
     private static String getMessageSubject(Message message) {
-        return getHeaderValues(message, "Subject").firstOrDefault();
+        return getHeaderValues(message, "Subject").findFirst().orElse(null);
     }
 
     /**
