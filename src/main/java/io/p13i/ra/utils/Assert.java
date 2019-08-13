@@ -23,16 +23,6 @@ public class Assert {
     }
 
     /**
-     * Checks if Doubles are equal-ish
-     * @param d1 the first one
-     * @param d2 the second one
-     */
-    public static void almostEqual(Double d1, Double d2) {
-        final double TOLERANCE = 0.01;
-        that(Math.abs(d1 - d2) < TOLERANCE);
-    }
-
-    /**
      * Checks that a double is in a range
      * @param value the value
      * @param lower the lower bound

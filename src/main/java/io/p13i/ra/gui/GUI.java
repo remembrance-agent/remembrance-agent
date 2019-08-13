@@ -39,20 +39,21 @@ import static io.p13i.ra.gui.User.Preferences.Preference.RAClientLogFile;
 
 
 public class GUI {
-    public static final int WIDTH = 600;
-    public static final int HEIGHT = 220;
-    public static final int LINE_HEIGHT = 30;
-    public static final int PADDING_LEFT = 10;
-    public static final int PADDING_TOP = 10;
-    public static final int PADDING_RIGHT = 10;
-    public static final int BORDER_PADDING = 5;
-    public static final Font FONT = new Font("monospaced", Font.PLAIN, 12);
-    public static final int RA_NUMBER_SUGGESTIONS = 4;
-    public static final int SUGGESTION_HEIGHT = 15;
-    public static final int SUGGESTION_PADDING_LEFT = 25;
-    public static final int SCORE_WIDTH = 100;
-    public static final int SUGGESTION_BUTTON_WIDTH = 440;
-    public static final int SUGGESTION_PADDING = 10;
+    private static final int WIDTH = 600;
+    private static final int HEIGHT = 220;
+    private static final int LINE_HEIGHT = 30;
+    private static final int PADDING_LEFT = 10;
+    private static final int PADDING_TOP = 10;
+    private static final int PADDING_RIGHT = 10;
+    private static final int BORDER_PADDING = 5;
+    private static final int SUGGESTION_HEIGHT = 15;
+    private static final int SUGGESTION_PADDING_LEFT = 25;
+    private static final int SCORE_WIDTH = 100;
+    private static final int SUGGESTION_BUTTON_WIDTH = 440;
+    private static final int SUGGESTION_PADDING = 5;
+    private static final int SUGGESTION_PANEL_PADDING_TOP = 15;
+
+    private static final Font FONT = new Font("monospaced", Font.PLAIN, 12);
 
     // Swing elements
     private BorderedJLabel mKeystrokeBufferLabel;
@@ -230,13 +231,21 @@ public class GUI {
                 }});
             }});
             add(mSuggestionsPanel = new BorderedJPanel() {{
-                setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT);
+                setBounds(
+                        GUI.PADDING_LEFT,
+                        GUI.PADDING_TOP,
+                        GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT),
+                        RemembranceAgentClient.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT);
                 setBorderTitle("Suggestions (from " + User.Preferences.getString(LocalDiskDocumentsFolderPath) + ")", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
             add(mKeystrokeBufferLabel = new BorderedJLabel() {{
-                setBounds(GUI.PADDING_LEFT, GUI.PADDING_TOP + GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT, GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT), GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
-                setBorderTitle("", GUI.BORDER_PADDING);
+                setBounds(
+                        GUI.PADDING_LEFT,
+                        GUI.PADDING_TOP + RemembranceAgentClient.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT,
+                        GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT),
+                        GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
+                setBorderTitle("Initializing input mechanism...", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
         }});
@@ -251,12 +260,20 @@ public class GUI {
     public void addScoredDocument(ScoredDocument doc, int i) {
         mSuggestionsPanel.add(new JLabel() {{
             setText(Double.toString(doc.getScore()));
-            setBounds(GUI.SUGGESTION_PADDING_LEFT, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT);
+            setBounds(
+                    GUI.SUGGESTION_PADDING_LEFT,
+                    GUI.PADDING_TOP + GUI.SUGGESTION_PANEL_PADDING_TOP + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING),
+                    GUI.SCORE_WIDTH,
+                    GUI.SUGGESTION_HEIGHT);
             setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
         }});
         mSuggestionsPanel.add(new JButton() {{
             setText(doc.toShortString());
-            setBounds(GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH, GUI.PADDING_TOP + GUI.BORDER_PADDING * 2 + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING), GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT);
+            setBounds(
+                    GUI.SUGGESTION_PADDING_LEFT +
+                            GUI.SCORE_WIDTH, GUI.PADDING_TOP + GUI.SUGGESTION_PANEL_PADDING_TOP + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING),
+                    GUI.SUGGESTION_BUTTON_WIDTH,
+                    GUI.SUGGESTION_HEIGHT);
             setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
             setHorizontalAlignment(SwingConstants.LEFT);
             addActionListener(e -> {

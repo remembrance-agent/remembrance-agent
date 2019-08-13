@@ -44,6 +44,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
 
     /**
+     * The number of suggestions sent to the RA
+     */
+    public static final int RA_NUMBER_SUGGESTIONS = 4;
+
+    /**
      * @return the RA instance
      */
     public static RemembranceAgentClient getInstance() {
@@ -206,7 +211,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         // Build a query
         String queryString = mInputBuffer.toString();
         Context context = new Context(null, User.NAME, queryString, null);
-        Query query = new Query(queryString, context, GUI.RA_NUMBER_SUGGESTIONS) {{
+        Query query = new Query(queryString, context, RA_NUMBER_SUGGESTIONS) {{
             index();
         }};
         List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
