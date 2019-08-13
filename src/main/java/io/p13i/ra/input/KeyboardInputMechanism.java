@@ -55,6 +55,5 @@ public class KeyboardInputMechanism extends AbstractInputMechanism implements Na
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent nativeKeyEvent) {
-
     }
 }

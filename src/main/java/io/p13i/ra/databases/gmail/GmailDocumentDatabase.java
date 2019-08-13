@@ -26,22 +26,34 @@ import java.util.logging.Logger;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 
+/**
+ * Enables use of Gmail as a document database.
+ * Only email with the label "RA" (or equivalently "ra") are indexed.
+ */
 public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(GmailDocumentDatabase.class);
 
+    /**
+     * The format of dates in the message.
+     */
     private static final DateFormat MESSAGE_DATE_FORMAT = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss Z");
 
+    /**
+     * The emails loaded into the database
+     */
     private List<GmailDocument> gmailDocuments;
+
+    /**
+     * The maximum number of results to pull from the Gmail API
+     */
     private long gmailResultsLimit;
 
+    /**
+     * @param gmailResultsLimit the number of emails to limit the search to
+     */
     public GmailDocumentDatabase(long gmailResultsLimit) {
         this.gmailResultsLimit = gmailResultsLimit;
-    }
-
-    @Override
-    public String getName() {
-        return GmailDocumentDatabase.class.getSimpleName();
     }
 
     @Override
@@ -56,6 +68,7 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
                     .users()
                     .messages()
                     .list("me")
+                    .setQ("label:ra")
                     .setMaxResults(this.gmailResultsLimit)
                     .execute()
                     .getMessages();
@@ -102,11 +115,6 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
     @Override
     public List<GmailDocument> getAllDocuments() {
         return this.gmailDocuments;
-    }
-
-    @Override
-    public List<ICachableDocument> getDocumentsForSavingToCache() {
-        return ListUtils.castUp(this.gmailDocuments);
     }
 
     /**

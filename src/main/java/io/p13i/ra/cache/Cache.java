@@ -8,7 +8,7 @@ import java.util.Map;
  * Implementation of a cache
  */
 public class Cache<TKey, TValue> implements ICache<TKey, TValue> {
-    protected Map<TKey, TValue> mCache = new HashMap<>();
+    Map<TKey, TValue> mCache = new HashMap<>();
 
     public Cache() {
         this.invalidate();

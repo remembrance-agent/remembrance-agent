@@ -6,6 +6,9 @@ import io.p13i.ra.models.AbstractDocument;
 
 import java.util.Date;
 
+/**
+ *
+ */
 class GoogleDriveDocument extends AbstractDocument implements ICachableDocument {
     public GoogleDriveDocument(String id, String content, String filename, Date lastModified) {
         super(content, new Context(null, null, filename, lastModified));

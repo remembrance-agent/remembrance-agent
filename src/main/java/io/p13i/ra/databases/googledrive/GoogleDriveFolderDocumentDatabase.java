@@ -23,6 +23,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Enables use of a Google Drive folder as a data store for a collection of notes
+ */
 public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<GoogleDriveDocument>, ICachableDocumentDatabase {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(GoogleDriveFolderDocumentDatabase.class);
@@ -117,10 +120,5 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
     @Override
     public List<GoogleDriveDocument> getAllDocuments() {
         return this.googleDriveDocuments;
-    }
-
-    @Override
-    public List<ICachableDocument> getDocumentsForSavingToCache() {
-        return ListUtils.castUp(this.googleDriveDocuments);
     }
 }

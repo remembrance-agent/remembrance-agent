@@ -54,9 +54,4 @@ public class LocalDiskDocumentDatabase implements IDocumentDatabase<LocalDiskDoc
     public List<LocalDiskDocument> getAllDocuments() {
         return this.documents;
     }
-
-    @Override
-    public List<ICachableDocument> getDocumentsForSavingToCache() {
-        return ListUtils.castUp(this.documents);
-    }
 }

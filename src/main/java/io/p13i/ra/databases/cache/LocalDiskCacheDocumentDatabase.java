@@ -3,7 +3,6 @@ package io.p13i.ra.databases.cache;
 import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheDocumentMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadata;
-import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadataParser;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
 import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.utils.FileIO;
@@ -15,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase, ILocalDiskCache {
+public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<AbstractDocument>, ILocalDiskCache {
 
     private final String cacheLocalDirectory;
     private List<AbstractDocument> documentsFromDisk = new ArrayList<>();
@@ -45,7 +44,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase, ILocal
         this.documentsFromDisk = new ArrayList<>();
 
         String metadataContents = FileIO.read(getMetadataJSONFilePath());
-        LocalDiskCacheMetadata metadata = LocalDiskCacheMetadataParser.fromString(metadataContents);
+        LocalDiskCacheMetadata metadata = LocalDiskCacheMetadata.fromJSONString(metadataContents);
         if (metadata == null) {
             return;
         }
@@ -79,7 +78,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase, ILocal
                 url = cachableDocument.getURL();
             }});
         }
-        FileIO.write(getMetadataJSONFilePath(), LocalDiskCacheMetadataParser.asString(new LocalDiskCacheMetadata(fileNamesToMetadata)));
+        FileIO.write(getMetadataJSONFilePath(), new LocalDiskCacheMetadata(fileNamesToMetadata).asJSONString());
 
         // Write each cache file
         for (ICachableDocument cachableDocument : this.documentsFromMemory) {
@@ -90,7 +89,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase, ILocal
 
     @Override
     public LocalDiskCacheDocumentDatabase addDocumentsToMemory(ICachableDocumentDatabase cachableDocumentDatabase) {
-        this.documentsFromMemory.addAll(cachableDocumentDatabase.getDocumentsForSavingToCache());
+        this.documentsFromMemory.addAll(cachableDocumentDatabase.getAllDocuments());
         return this;
     }
 
