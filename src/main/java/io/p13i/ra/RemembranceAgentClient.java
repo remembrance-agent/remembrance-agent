@@ -96,6 +96,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     private AbstractInputMechanism mCurrentInputMechanism;
 
     /**
+     * Tracks whether a query is pending to the RA
+     */
+    private boolean mQueryingRemembranceAgentEngine = false;
+
+    /**
      * Entry-point for the RA client
      *
      * @param args ignored
@@ -206,6 +211,12 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
      * Sends the contextual {@code Query} to the RA
      */
     private void sendQueryToRemembranceAgent() {
+        if (mQueryingRemembranceAgentEngine) {
+            return;
+        }
+
+        mQueryingRemembranceAgentEngine = true;
+
         mGUI.setTitle("* SEARCHING * " + APPLICATION_NAME + " * SEARCHING *");
 
         // Build a query
@@ -235,6 +246,8 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Reset the title
         mGUI.setTitle(APPLICATION_NAME);
+
+        mQueryingRemembranceAgentEngine = false;
     }
 
     @Override
