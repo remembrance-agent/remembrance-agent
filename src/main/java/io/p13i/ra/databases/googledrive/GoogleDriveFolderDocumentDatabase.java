@@ -52,10 +52,9 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
     @Override
     public void loadDocuments() {
         try {
-            loadDocumentsRecursive(getClient(), this.googleDriveDocuments, this.rootFolderID /* recursive: */);
+            loadDocumentsRecursive(getClient(), this.googleDriveDocuments, this.rootFolderID);
         } catch (IOException e) {
-            LOGGER.warning(e.toString());
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -89,7 +88,7 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
         FileList filesList = service.files().list()
                 .setQ("'" + parentFolderID + "' in parents and mimeType != 'application/vnd.google-apps.folder'")
                 .setSpaces("drive")
-                .setFields("nextPageToken, files(id, name, mimeType, modifiedTime)")
+                .setFields("nextPageToken, files(id, name, mimeType, trashed, modifiedTime)")
                 .execute();
 
         for (File file : filesList.getFiles()) {
@@ -99,6 +98,10 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
             }
 
             if (!file.getMimeType().equals("application/vnd.google-apps.document")) {
+                continue;
+            }
+
+            if (file.getTrashed()) {
                 continue;
             }
 
@@ -121,7 +124,7 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
                 .execute();
         for (File file : foldersList.getFiles()) {
             // recurse
-            loadDocumentsRecursive(service, documents, file.getId() /* recursive: */);
+            loadDocumentsRecursive(service, documents, file.getId());
         }
 
     }
