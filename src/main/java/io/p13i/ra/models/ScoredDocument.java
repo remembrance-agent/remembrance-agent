@@ -43,7 +43,9 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
      * @return a string displayable in the GUI
      */
     public String toShortString() {
-        return String.format("%s [%s] -- %s", this.document.getDocumentTypeName(), StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), 20), ListUtils.toString(getMatchingTermsInDocument(5)));
+        String subjectTruncated = StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), 40);
+        String matchingTerms = ListUtils.toString(getMatchingTermsInDocument(5), "", "", ", ", "");
+        return String.format("[%s]: %s", subjectTruncated, matchingTerms);
     }
 
     /**

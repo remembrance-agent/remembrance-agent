@@ -58,20 +58,26 @@ public class ListUtils {
     }
 
     public static <T> String toString(List<T> list) {
+        return toString(list, "[", "'", ", ", "]");
+    }
+
+    public static <T> String toString(List<T> list, String startingBracket, String surroundingMarkers, String seperator, String endingBracket) {
         int count = list.size();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append('[');
+        stringBuilder.append(startingBracket);
         int i = 0;
         for (T item : list) {
-            stringBuilder.append("'");
+            stringBuilder.append(surroundingMarkers);
             stringBuilder.append(item.toString());
-            stringBuilder.append("'");
+            stringBuilder.append(surroundingMarkers);
             if (i < count - 1) {
-                stringBuilder.append(", ");
+                stringBuilder.append(seperator);
             }
             i++;
         }
-        stringBuilder.append(']');
+        stringBuilder.append(endingBracket);
         return stringBuilder.toString();
     }
+
+
 }

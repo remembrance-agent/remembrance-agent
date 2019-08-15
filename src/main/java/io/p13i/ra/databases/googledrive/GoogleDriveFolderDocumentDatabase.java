@@ -89,7 +89,7 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
         FileList filesList = service.files().list()
                 .setQ("'" + parentFolderID + "' in parents and mimeType != 'application/vnd.google-apps.folder'")
                 .setSpaces("drive")
-                .setFields("nextPageToken, files(id, name, parents, modifiedTime)")
+                .setFields("nextPageToken, files(id, name, mimeType, modifiedTime)")
                 .execute();
 
         for (File file : filesList.getFiles()) {
@@ -98,20 +98,18 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
                 continue;
             }
 
+            if (!file.getMimeType().equals("application/vnd.google-apps.document")) {
+                continue;
+            }
+
             LOGGER.info("Loading document: " + file.getName());
 
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            String fileContents = null;
+            String fileContents;
 
-            try {
-                service.files().export(file.getId(), "text/plain")
-                        .executeMediaAndDownloadTo(outputStream);
-                fileContents = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
-            } catch (Exception e) {
-                e.printStackTrace();
-                LOGGER.throwing(GoogleDriveFolderDocumentDatabase.class.getSimpleName(), "loadDocumentsRecursive", e);
-                throw e;
-            }
+            service.files().export(file.getId(), "text/plain")
+                    .executeMediaAndDownloadTo(outputStream);
+            fileContents = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
 
             documents.add(new GoogleDriveDocument(file.getId(), fileContents, file.getName(), new Date(file.getModifiedTime().getValue())));
         }

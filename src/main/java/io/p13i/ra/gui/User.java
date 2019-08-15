@@ -43,7 +43,7 @@ public class User {
             KeystrokesLogFile("KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME", Home.DIR + File.separator + "keystrokes.log"),
             RAClientLogFile("RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME", Home.DIR + File.separator + "ra.log"),
             LocalDiskDocumentsFolderPath("LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME", Home.DIR),
-            GoogleDriveFolderID("GOOGLE_DRIVE_FOLDER_ID_PREFS_NODE_NAME", NOT_SET),
+            GoogleDriveFolderIDs("GOOGLE_DRIVE_FOLDER_IDS_PREFS_NODE_NAME", NOT_SET),
             GmailMaxEmailsCount("GMAIL_MAX_EMAILS_COUNT_NODE_NAME", "10");
 
             /**

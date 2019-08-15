@@ -31,11 +31,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
-import static io.p13i.ra.gui.User.Preferences.Preference.GmailMaxEmailsCount;
-import static io.p13i.ra.gui.User.Preferences.Preference.GoogleDriveFolderID;
-import static io.p13i.ra.gui.User.Preferences.Preference.KeystrokesLogFile;
-import static io.p13i.ra.gui.User.Preferences.Preference.LocalDiskDocumentsFolderPath;
-import static io.p13i.ra.gui.User.Preferences.Preference.RAClientLogFile;
+import static io.p13i.ra.gui.User.Preferences.Preference.*;
 import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 
 
@@ -134,11 +130,11 @@ public class GUI {
                             }
                         });
                     }});
-                    add(new JMenuItem("Set Google Drive folder ID...") {{
+                    add(new JMenuItem("Set Google Drive folder IDs...") {{
                         addActionListener(e -> {
-                            String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder ID (leave blank to cancel):", User.Preferences.getString(GoogleDriveFolderID));
+                            String inputId = JOptionPane.showInputDialog("Enter a Google Drive Folder IDs (leave blank to cancel, separate with commas):", User.Preferences.getString(GoogleDriveFolderIDs));
                             if (inputId != null && inputId.length() > 0) {
-                                User.Preferences.set(GoogleDriveFolderID, inputId);
+                                User.Preferences.set(GoogleDriveFolderIDs, inputId);
                             }
                         });
                     }});
@@ -308,10 +304,10 @@ public class GUI {
             addActionListener(e -> {
 
                 boolean error = false;
+
                 try {
                     Desktop.getDesktop().open(new File(doc.getDocument().getURL()));
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     error = true;
                 }
                 if (error) {

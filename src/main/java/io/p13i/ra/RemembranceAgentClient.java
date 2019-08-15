@@ -26,7 +26,7 @@ import io.p13i.ra.utils.LoggerUtils;
 import javax.swing.SwingUtilities;
 
 import static io.p13i.ra.gui.User.Preferences.Preference.GmailMaxEmailsCount;
-import static io.p13i.ra.gui.User.Preferences.Preference.GoogleDriveFolderID;
+import static io.p13i.ra.gui.User.Preferences.Preference.GoogleDriveFolderIDs;
 import static io.p13i.ra.gui.User.Preferences.Preference.KeystrokesLogFile;
 import static io.p13i.ra.gui.User.Preferences.Preference.LocalDiskDocumentsFolderPath;
 
@@ -168,17 +168,31 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Load all the documents into memory and then into the disk
         if (!useCache) {
-            localDiskCacheDatabase
-                    .addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
-                        loadDocuments();
-                    }})
-                    .addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(User.Preferences.getString(GoogleDriveFolderID)) {{
-                        loadDocuments();
-                    }})
-                    .addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
-                        loadDocuments();
-                    }})
-                    .saveDocumentsInMemoryToDisk();
+            // Load files from the local documents directory
+            localDiskCacheDatabase.addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
+                loadDocuments();
+            }});
+
+            // Load files from Google Drive
+            String googleDriveFolderIDs = User.Preferences.getString(GoogleDriveFolderIDs);
+
+            String[] ids = googleDriveFolderIDs.split(",");
+            for (String s : ids) {
+                String id = s.trim();
+                LOGGER.info("Loading files from Google Drive folder with: " + id);
+
+                localDiskCacheDatabase.addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(id) {{
+                    loadDocuments();
+                }});
+            }
+
+            // Load files from Gmail
+            localDiskCacheDatabase.addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
+                loadDocuments();
+            }});
+
+            // Save these files to disk
+            localDiskCacheDatabase.saveDocumentsInMemoryToDisk();
         }
 
         // Update the GUI with where the suggestions are coming from

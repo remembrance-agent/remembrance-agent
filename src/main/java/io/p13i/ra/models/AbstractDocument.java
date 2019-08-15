@@ -4,6 +4,7 @@ import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.WordVector;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Houses all information about a file and it's context in the world
@@ -36,8 +37,8 @@ public abstract class AbstractDocument implements IRequiresIndexing {
     private List<String> cachedDocumentVector;
 
     public AbstractDocument(String content, Context context) {
-        this.content = content;
-        this.context = context;
+        this.content = Objects.requireNonNull(content);
+        this.context = Objects.requireNonNull(context);
     }
 
     public Context getContext() {
