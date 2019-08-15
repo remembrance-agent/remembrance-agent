@@ -195,7 +195,7 @@ public class GmailDocumentDatabase implements IDocumentDatabase<GmailDocument>, 
         try {
             return new String(Base64.getDecoder().decode(stringBuilder.toString()), Charset.defaultCharset());
         } catch (IllegalArgumentException ignored) {
-            return null;
+            return "";
         }
     }
 
