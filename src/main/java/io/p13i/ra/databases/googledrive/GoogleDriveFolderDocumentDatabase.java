@@ -93,14 +93,17 @@ public class GoogleDriveFolderDocumentDatabase implements IDocumentDatabase<Goog
 
         for (File file : filesList.getFiles()) {
 
+            // Must not have ra:no-index in it
             if (file.getName().contains("ra:no-index")) {
                 continue;
             }
 
+            // Must be a Google Doc
             if (!file.getMimeType().equals("application/vnd.google-apps.document")) {
                 continue;
             }
 
+            // Must not be trashed
             if (file.getTrashed()) {
                 continue;
             }

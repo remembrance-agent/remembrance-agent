@@ -1,13 +1,6 @@
 package io.p13i.ra.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -43,21 +36,6 @@ public class FileIO {
     }
 
     /**
-     * Gets a {@code PrintWriter} for the specified file path
-     *
-     * @param filePath the file's path
-     * @return opens a {@code PrintWriter}
-     */
-    public static PrintWriter openPrintWriter(String filePath) {
-        try {
-            return new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Writes the given text to the file at the specified path
      *
      * @param filePath the file's path
@@ -68,8 +46,10 @@ public class FileIO {
             FileIO.createFile(filePath);
         }
 
-        try (PrintWriter out = openPrintWriter(filePath)) {
-            Objects.requireNonNull(out).print(text);
+        try (FileIOWriter out = new FileIOWriter(filePath)) {
+            Objects.requireNonNull(out).write(text);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -217,4 +197,5 @@ public class FileIO {
     public static boolean delete(String fileName) {
         return new File(fileName).delete();
     }
+
 }
