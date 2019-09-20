@@ -32,7 +32,6 @@ import java.io.IOException;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 import static io.p13i.ra.gui.User.Preferences.Preference.*;
-import static javax.swing.JOptionPane.OK_CANCEL_OPTION;
 
 
 public class GUI {
@@ -49,6 +48,11 @@ public class GUI {
     private static final int SUGGESTION_BUTTON_WIDTH = 440;
     private static final int SUGGESTION_PADDING = 5;
     private static final int SUGGESTION_PANEL_PADDING_TOP = 15;
+
+    /**
+     * The number of suggestions sent to the RA
+     */
+    public static final int RA_NUMBER_SUGGESTIONS = 4;
 
     private static final Font FONT = new Font("monospaced", Font.PLAIN, 12);
 
@@ -67,52 +71,49 @@ public class GUI {
             setJMenuBar(new JMenuBar() {{
                 add(new JMenu("RA Settings") {{
                     add(new JMenuItem("Reinitialize remembrance agent") {{
-                        addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                RemembranceAgentClient.getInstance().initializeRAEngine(true);
-                                JOptionPane.showMessageDialog(mJFrame, "Reinitialized!");
-                            }
+                        addActionListener(e -> {
+                            RemembranceAgentClient.getInstance().initializeRAEngine(true);
+                            JOptionPane.showMessageDialog(mJFrame, "Reinitialized!");
                         });
                     }});
                     add(new JSeparator());
                     add(new JMenuItem("Invalidate/reload cache") {{
-                        addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
+                        addActionListener(e -> {
 
+                            // All code inside SwingWorker runs on a separate thread
+                            SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+                                @Override
+                                public Boolean doInBackground() {
 
-                                // All code inside SwingWorker runs on a separate thread
-                                SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
-                                    @Override
-                                    public Boolean doInBackground() {
+                                    // Update GUI
+                                    JOptionPane.showMessageDialog(mJFrame, "Reloading with new cache! GUI will be disabled");
+                                    mJFrame.setEnabled(false);
+                                    setSuggestionsPanelTitle("Loading caches...");
 
-                                        JOptionPane.showMessageDialog(mJFrame, "Reloading with new cache! GUI will be disabled");
-                                        mJFrame.setEnabled(false);
-                                        setSuggestionsPanelTitle("Loading caches...");
-
-                                        try {
-                                            RemembranceAgentClient.getInstance().initializeRAEngine(false);
-                                        } catch (Exception e) {
-                                            JOptionPane.showMessageDialog(mJFrame, e.toString(), "Errored :(", OK_CANCEL_OPTION);
-                                            mJFrame.setEnabled(true);
-                                            return false;
-                                        }
-
-                                        JOptionPane.showMessageDialog(mJFrame, "Reinitialized with new cache!");
+                                    // Re-init
+                                    try {
+                                        RemembranceAgentClient.getInstance().initializeRAEngine(false);
+                                    } catch (Exception e) {
+                                        // Show error to GUI
+                                        JOptionPane.showMessageDialog(mJFrame, e.toString(), "Errored :(", JOptionPane.ERROR_MESSAGE);
                                         mJFrame.setEnabled(true);
 
-                                        return true;
+                                        // Task failed -> false
+                                        return false;
                                     }
 
-                                    @Override
-                                    public void done() {
+                                    // Update GUI again
+                                    JOptionPane.showMessageDialog(mJFrame, "Reinitialized with new cache!");
+                                    mJFrame.setEnabled(true);
 
-                                    }
-                                };
+                                    return true;
+                                }
 
-                                worker.execute();
-                            }
+                                @Override
+                                public void done() { /* empty */ }
+                            };
+
+                            worker.execute();
                         });
                     }});
                     add(new JSeparator());
@@ -257,19 +258,21 @@ public class GUI {
             }});
             add(mSuggestionsPanel = new BorderedJPanel() {{
                 setBounds(
-                        GUI.PADDING_LEFT,
-                        GUI.PADDING_TOP,
-                        GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT),
-                        RemembranceAgentClient.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT);
+                        /* x: */ GUI.PADDING_LEFT,
+                        /* y: */ GUI.PADDING_TOP,
+                        /* width: */ GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT),
+                        /* height: */ GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT
+                );
                 setBorderTitle("Suggestions (from " + User.Preferences.getString(LocalDiskDocumentsFolderPath) + ")", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
             add(mKeystrokeBufferLabel = new BorderedJLabel() {{
                 setBounds(
-                        GUI.PADDING_LEFT,
-                        GUI.PADDING_TOP + RemembranceAgentClient.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT,
-                        GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT),
-                        GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2);
+                        /* x: */ GUI.PADDING_LEFT,
+                        /* y: */ GUI.PADDING_TOP + GUI.RA_NUMBER_SUGGESTIONS * GUI.LINE_HEIGHT,
+                        /* width: */ GUI.WIDTH - (GUI.PADDING_LEFT + GUI.PADDING_RIGHT),
+                        /* height: */ GUI.LINE_HEIGHT + GUI.BORDER_PADDING * 2
+                );
                 setBorderTitle("Initializing input mechanism...", GUI.BORDER_PADDING);
                 setFont(GUI.FONT);
             }});
@@ -286,19 +289,20 @@ public class GUI {
         mSuggestionsPanel.add(new JLabel() {{
             setText(Double.toString(doc.getScore()));
             setBounds(
-                    GUI.SUGGESTION_PADDING_LEFT,
-                    GUI.PADDING_TOP + GUI.SUGGESTION_PANEL_PADDING_TOP + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING),
-                    GUI.SCORE_WIDTH,
-                    GUI.SUGGESTION_HEIGHT);
+                    /* x: */ GUI.SUGGESTION_PADDING_LEFT,
+                    /* y: */ GUI.PADDING_TOP + GUI.SUGGESTION_PANEL_PADDING_TOP + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING),
+                    /* width: */ GUI.SCORE_WIDTH,
+                    /* height: */ GUI.SUGGESTION_HEIGHT
+            );
             setPreferredSize(new Dimension(GUI.SCORE_WIDTH, GUI.SUGGESTION_HEIGHT));
         }});
         mSuggestionsPanel.add(new JButton() {{
             setText(doc.toShortString());
             setBounds(
-                    GUI.SUGGESTION_PADDING_LEFT +
-                            GUI.SCORE_WIDTH, GUI.PADDING_TOP + GUI.SUGGESTION_PANEL_PADDING_TOP + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING),
-                    GUI.SUGGESTION_BUTTON_WIDTH,
-                    GUI.SUGGESTION_HEIGHT);
+                    /* x: */ GUI.SUGGESTION_PADDING_LEFT + GUI.SCORE_WIDTH,
+                    /* y: */ GUI.PADDING_TOP + GUI.SUGGESTION_PANEL_PADDING_TOP + i * (GUI.SUGGESTION_HEIGHT + SUGGESTION_PADDING),
+                    /* width: */ GUI.SUGGESTION_BUTTON_WIDTH,
+                    /* height: */ GUI.SUGGESTION_HEIGHT);
             setPreferredSize(new Dimension(GUI.SUGGESTION_BUTTON_WIDTH, GUI.SUGGESTION_HEIGHT));
             setHorizontalAlignment(SwingConstants.LEFT);
             addActionListener(e -> {
@@ -338,8 +342,8 @@ public class GUI {
         mKeystrokeBufferLabel.repaint();
     }
 
-    public void setSuggestionsPanelTitle(String s) {
-        mSuggestionsPanel.setBorderTitle(s, GUI.BORDER_PADDING);
+    public void setSuggestionsPanelTitle(String title) {
+        mSuggestionsPanel.setBorderTitle(title, GUI.BORDER_PADDING);
         mSuggestionsPanel.invalidate();
         mSuggestionsPanel.repaint();
     }

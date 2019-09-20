@@ -27,7 +27,7 @@ public class KeyboardInputMechanism extends AbstractInputMechanism implements Na
             throw new RuntimeException(e);
         }
 
-        inputEventsListenerCallback.onInputReady(this);
+        inputMechanismEventsListenerCallback.onInputReady(this);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class KeyboardInputMechanism extends AbstractInputMechanism implements Na
     public void nativeKeyPressed(NativeKeyEvent nativeKeyEvent) {
         String keyText = NativeKeyEvent.getKeyText(nativeKeyEvent.getKeyCode());
         char characterToAdd = keyText.charAt(0);
-        this.inputEventsListenerCallback.onInput(this, characterToAdd);
+        this.inputMechanismEventsListenerCallback.onInput(this, characterToAdd);
     }
 
     @Override

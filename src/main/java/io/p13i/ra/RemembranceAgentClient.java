@@ -35,18 +35,13 @@ import static io.p13i.ra.gui.User.Preferences.Preference.LocalDiskDocumentsFolde
  *
  * @author Pramod Kotipalli
  */
-public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.InputEventsListener {
+public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.InputMechanismEventsListener {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
     public static final String APPLICATION_NAME = "Remembrance Agent (v" + System.getenv("VERSION") + ")";
 
     private static RemembranceAgentClient sInstance = new RemembranceAgentClient();
-
-    /**
-     * The number of suggestions sent to the RA
-     */
-    public static final int RA_NUMBER_SUGGESTIONS = 4;
 
     /**
      * @return the RA instance
@@ -237,7 +232,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         // Build a query
         String queryString = mInputBuffer.toString();
         Context context = new Context(null, User.NAME, queryString, null);
-        Query query = new Query(queryString, context, RA_NUMBER_SUGGESTIONS) {{
+        Query query = new Query(queryString, context, GUI.RA_NUMBER_SUGGESTIONS) {{
             index();
         }};
         List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
@@ -249,9 +244,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         // Add the suggestion's elements to the GUI
         for (int i = 0; i < suggestions.size(); i++) {
             ScoredDocument scoredDocument = suggestions.get(i);
-
-            // And tell the logger
-
+            
             // Add each of the components for the document to the GUI
             mGUI.addScoredDocument(scoredDocument, i);
         }
@@ -274,7 +267,6 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Add to the buffer
         mInputBuffer.addCharacter(c);
-
 
         // Display on the GUI
         mGUI.setKeystrokesBufferText(mInputBuffer.toString());

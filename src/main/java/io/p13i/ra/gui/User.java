@@ -11,7 +11,7 @@ import static java.util.prefs.Preferences.userNodeForPackage;
  */
 public class User {
 
-    public static String NAME = System.getenv("RA_USER_NAME");
+    public static String NAME = null;
 
     public static class Home {
         public static String DIR = System.getProperty("user.home");

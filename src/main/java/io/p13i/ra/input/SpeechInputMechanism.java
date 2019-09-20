@@ -115,7 +115,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
         targetDataLine.open(audioFormat);
         targetDataLine.start();
 
-        inputEventsListenerCallback.onInputReady(this);
+        inputMechanismEventsListenerCallback.onInputReady(this);
 
         for (int i = 0; i < numberOfRunsPerInvokation; i++) {
             long startTime = System.currentTimeMillis();
@@ -171,7 +171,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
                 .map(SpeechRecognitionAlternative::getTranscript)
                 .flatMap(StringUtils::toCharStream)
                 .map(CharacterUtils::toUpperCase)
-                .forEach(c -> inputEventsListenerCallback.onInput(this, c));
+                .forEach(c -> inputMechanismEventsListenerCallback.onInput(this, c));
     }
 
     @Override
