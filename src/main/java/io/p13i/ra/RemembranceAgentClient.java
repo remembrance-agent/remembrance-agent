@@ -22,6 +22,12 @@ import io.p13i.ra.utils.BufferingLogFileWriter;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
 import io.p13i.ra.utils.LoggerUtils;
+import org.apache.commons.cli.BasicParser;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import javax.swing.SwingUtilities;
 
@@ -98,9 +104,28 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     /**
      * Entry-point for the RA client
      *
-     * @param args ignored
+     * @param args see usage
      */
     public static void main(String[] args) {
+        Options options = new Options() {{
+            addOption(new Option("h", "home", /* hasArg: */ true, "the user's home directory") {{
+                setRequired(true);
+            }});
+        }};
+
+        CommandLine commandLine;
+
+        try {
+            commandLine = new BasicParser().parse(options, args);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            new HelpFormatter().printHelp("remebrance-agent-gui", options);
+            System.exit(1);
+            return;
+        }
+
+        User.Home.setDirectory(commandLine.getOptionValue("home"));
+
         SwingUtilities.invokeLater(RemembranceAgentClient.getInstance());
     }
 
@@ -159,7 +184,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Use the RA cache directory
         LocalDiskCacheDocumentDatabase localDiskCacheDatabase =
-                new LocalDiskCacheDocumentDatabase(User.Home.Documents.RA.Cache.DIR);
+                new LocalDiskCacheDocumentDatabase(User.Home.Documents.RA.Cache.getDirectory());
 
         // Load all the documents into memory and then into the disk
         if (!useCache) {

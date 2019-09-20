@@ -21,7 +21,7 @@ sudo VERSION="1.2.1" bash ./bin/install
 
 Now you can run the following from anywhere:
 ```bash
-VERSION="1.2.1" ra
+VERSION="1.2.1" ra --home $HOME
 ```
 
 ### Running (cross platform)

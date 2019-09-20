@@ -14,16 +14,29 @@ public class User {
     public static String NAME = null;
 
     public static class Home {
-        public static String DIR = System.getProperty("user.home");
+        private static String mDirectory = System.getProperty("user.home");
+        public static String getDirectory() {
+            return mDirectory;
+        }
+
+        public static void setDirectory(String directory) {
+            mDirectory = directory;
+        }
 
         public static class Documents {
-            public static String DIR = Home.DIR + File.separator + "Documents";
+            public static String getDirectory() {
+                return Home.getDirectory() + File.separator + "Documents";
+            }
 
             public static class RA {
-                public static String DIR = Home.Documents.DIR + File.separator + "RA";
+                public static String getDirectory() {
+                    return Documents.getDirectory() + File.separator + "RA";
+                }
 
                 public static class Cache {
-                    public static String DIR = Home.Documents.RA.DIR + File.separator + "~cache";
+                    public static String getDirectory() {
+                        return RA.getDirectory() + File.separator + "~cache";
+                    }
                 }
             }
         }
@@ -40,9 +53,9 @@ public class User {
          * Represents all preferences available to the user
          */
         public enum Preference {
-            KeystrokesLogFile("KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME", Home.DIR + File.separator + "keystrokes.log"),
-            RAClientLogFile("RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME", Home.DIR + File.separator + "ra.log"),
-            LocalDiskDocumentsFolderPath("LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME", Home.DIR),
+            KeystrokesLogFile("KEYSTROKES_LOG_FILE_PATH_PREFS_NODE_NAME", Home.getDirectory() + File.separator + "keystrokes.log"),
+            RAClientLogFile("RA_CLIENT_LOG_FILE_PATH_PREFS_NODE_NAME", Home.getDirectory() + File.separator + "ra.log"),
+            LocalDiskDocumentsFolderPath("LOCAL_DISK_DOCUMENTS_FOLDER_PATH_PREFS_NODE_NAME", Home.getDirectory()),
             GoogleDriveFolderIDs("GOOGLE_DRIVE_FOLDER_IDS_PREFS_NODE_NAME", NOT_SET),
             GmailMaxEmailsCount("GMAIL_MAX_EMAILS_COUNT_NODE_NAME", "10");
 
