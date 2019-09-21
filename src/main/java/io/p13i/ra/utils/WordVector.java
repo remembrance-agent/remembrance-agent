@@ -28,10 +28,12 @@ public class WordVector {
      */
     public static MultipleContentWindows process(String content) {
         // First, process the content and window it
-        List<SingleContentWindow> windows = getWindowedContent(content).stream()
-                // Stem each window
+        List<SingleContentWindow> windows =
+                // 1) Join windows that are too small and are adjacent
+                WordVector.joinAdjacentSmallContentWindows(getWindowedContent(content), 100).stream()
+                // 2) Stem each window
                 .map(WordVector::getStemmedSingleContentWindow)
-                // Remove common words from each window
+                // 3) Remove common words from each window
                 .map(WordVector::removeMostCommonWords)
                 .collect(Collectors.toList());
         return new MultipleContentWindows(windows);
@@ -43,7 +45,7 @@ public class WordVector {
      * @param content the given string
      * @return a list of words
      */
-    private static MultipleContentWindows getWindowedContent(String content) {
+    public static MultipleContentWindows getWindowedContent(String content) {
         // https://stackoverflow.com/a/454913/5071723
         String[] windowsAsStrings = content.split("\\r?\\n");
 
@@ -89,12 +91,52 @@ public class WordVector {
     }
 
     /**
+     * Joins adjacent content windows that are smaller than the given word-count threshold into a single window
+     *
+     * @param windows the variable sized windows
+     * @param wordThreshold the minimum number of words required per window
+     * @return a new set of windows, each of which (except perhaps the last) have the minimum number of words requested
+     */
+    public static MultipleContentWindows joinAdjacentSmallContentWindows(MultipleContentWindows windows, int wordThreshold) {
+        // Merge adjacent windows that are too small
+
+        List<SingleContentWindow> originalWindows = windows.getSingleWindows();
+        List<SingleContentWindow> adjustedWindows = new ArrayList<>(originalWindows.size());
+
+        int N = originalWindows.size();
+
+        int i = 0;
+
+        while (i < N) {
+            int wordCounter = 0;
+
+            int j = i;
+
+            do  {
+                wordCounter += originalWindows.get(j).getWordVector().size();
+                j++;
+            } while (j < N && wordCounter < wordThreshold);
+
+            List<String> adjustedWords = new ArrayList<>(wordCounter);
+            for (int k = i; k < j && k < N; k++) {
+                adjustedWords.addAll(originalWindows.get(k).getWordVector());
+            }
+
+            adjustedWindows.add(new SingleContentWindow(adjustedWords));
+
+            i = j;
+        }
+
+        return new MultipleContentWindows(adjustedWindows);
+    }
+
+    /**
      * Stems a single window of content
      *
      * @param contentWindow the raw content window
      * @return a stemmed content window
      */
-    private static SingleContentWindow getStemmedSingleContentWindow(SingleContentWindow contentWindow) {
+    public static SingleContentWindow getStemmedSingleContentWindow(SingleContentWindow contentWindow) {
         SingleContentWindow singleContentWindow = new SingleContentWindow(contentWindow.getWordVector().stream()
                 .map(String::toLowerCase)
                 .map(Stemmer::stem)
@@ -109,9 +151,11 @@ public class WordVector {
      * @param contentWindow the full vector in a window
      * @return a cleaner vector
      */
-    private static SingleContentWindow removeMostCommonWords(SingleContentWindow contentWindow) {
+    public static SingleContentWindow removeMostCommonWords(SingleContentWindow contentWindow) {
         return new SingleContentWindow(contentWindow.stream()
+                .map(String::toLowerCase)
                 .filter(word -> !MOST_COMMON_WORDS.contains(word))
+                .map(String::toUpperCase)
                 .collect(Collectors.toList()));
     }
 }

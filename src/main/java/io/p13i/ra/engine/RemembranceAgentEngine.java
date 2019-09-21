@@ -111,7 +111,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
                     continue;
                 }
 
-                wordScoreSum += wordScore;
+                wordScoreSum += (wordScore / (double) window.getWordVector().size());
             }
 
 
@@ -133,7 +133,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
 
             double score = contentBiased + locationBiased + personBiased + subjectBiased + dateBiased;
 
-            Assert.inRange(score, 0.0, 1.0);
+//            Assert.inRange(score, 0.0, 1.0);
 
             return new ScoredSingleContentWindow(query, score, document, window);
         }
