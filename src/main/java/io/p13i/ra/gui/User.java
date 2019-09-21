@@ -1,6 +1,7 @@
 package io.p13i.ra.gui;
 
 import io.p13i.ra.RemembranceAgentClient;
+import io.p13i.ra.utils.FileIO;
 
 import java.io.File;
 
@@ -25,17 +26,17 @@ public class User {
 
         public static class Documents {
             public static String getDirectory() {
-                return Home.getDirectory() + File.separator + "Documents";
+                return FileIO.ensureFolderExists(Home.getDirectory() + File.separator + "Documents");
             }
 
             public static class RA {
                 public static String getDirectory() {
-                    return Documents.getDirectory() + File.separator + "RA";
+                    return FileIO.ensureFolderExists(Documents.getDirectory() + File.separator + "RA");
                 }
 
                 public static class Cache {
                     public static String getDirectory() {
-                        return RA.getDirectory() + File.separator + "~cache";
+                        return FileIO.ensureFolderExists(RA.getDirectory() + File.separator + "~cache");
                     }
                 }
             }

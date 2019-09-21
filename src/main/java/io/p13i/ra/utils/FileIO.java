@@ -30,7 +30,6 @@ public class FileIO {
 
             return stringBuilder.toString();
         } catch (IOException e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -47,9 +46,9 @@ public class FileIO {
         }
 
         try (FileIOWriter out = new FileIOWriter(filePath)) {
-            Objects.requireNonNull(out).write(text);
+            out.write(text);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -68,12 +67,26 @@ public class FileIO {
     }
 
     /**
+     * Creates a folder if it doesn't exist
+     *
+     * @return the given folder path
+     */
+    public static String ensureFolderExists(String folderPath) {
+        File folder = new File(folderPath);
+        if (!folder.isDirectory() && !new File(folderPath).mkdirs()) {
+            throw new RuntimeException("Unable to mkdirs for: " + folderPath);
+        }
+        return folderPath;
+    }
+
+
+    /**
      * Checks whether a file exists
      *
      * @param filePath the file's path
      * @return whether or not the file exists
      */
-    private static boolean fileExists(String filePath) {
+    public static boolean fileExists(String filePath) {
         return new File(filePath).isFile();
     }
 
@@ -198,4 +211,13 @@ public class FileIO {
         return new File(fileName).delete();
     }
 
+    /**
+     * Checks if a directory exists
+     *
+     * @param directory the directory path
+     * @return whether or not it exists
+     */
+    public static boolean directoryExists(String directory) {
+        return new File(directory).isDirectory();
+    }
 }

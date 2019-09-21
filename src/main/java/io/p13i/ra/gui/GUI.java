@@ -85,6 +85,8 @@ public class GUI {
                                 @Override
                                 public Boolean doInBackground() {
 
+                                    boolean reloadSuccesful = false;
+
                                     // Update GUI
                                     JOptionPane.showMessageDialog(mJFrame, "Reloading with new cache! GUI will be disabled");
                                     mJFrame.setEnabled(false);
@@ -93,20 +95,22 @@ public class GUI {
                                     // Re-init
                                     try {
                                         RemembranceAgentClient.getInstance().initializeRAEngine(false);
+                                        reloadSuccesful = true;
                                     } catch (Exception e) {
+                                        e.printStackTrace();
+
                                         // Show error to GUI
                                         JOptionPane.showMessageDialog(mJFrame, e.toString(), "Errored :(", JOptionPane.ERROR_MESSAGE);
                                         mJFrame.setEnabled(true);
 
                                         // Task failed -> false
-                                        return false;
+                                        reloadSuccesful = false;
+                                    } finally {
+                                        JOptionPane.showMessageDialog(mJFrame, reloadSuccesful ? "Reinitialized with new cache!" : "Reload failed :(");
+                                        mJFrame.setEnabled(true);
                                     }
 
-                                    // Update GUI again
-                                    JOptionPane.showMessageDialog(mJFrame, "Reinitialized with new cache!");
-                                    mJFrame.setEnabled(true);
-
-                                    return true;
+                                    return reloadSuccesful;
                                 }
 
                                 @Override

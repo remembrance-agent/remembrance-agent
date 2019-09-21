@@ -214,6 +214,9 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
             // Save these files to disk
             localDiskCacheDatabase.saveDocumentsInMemoryToDisk();
+
+            // Reload the new documents from disk
+            localDiskCacheDatabase.loadDocuments();
         }
 
         // Update the GUI with where the suggestions are coming from

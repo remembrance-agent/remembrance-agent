@@ -20,9 +20,9 @@ public class FileIOWriter implements Closeable {
 
     @Override
     public void close() throws IOException {
-        fileWriter.close();
-        bufferedWriter.close();
         printWriter.close();
+        bufferedWriter.close();
+        fileWriter.close();
     }
 
     public void write(String text) {
