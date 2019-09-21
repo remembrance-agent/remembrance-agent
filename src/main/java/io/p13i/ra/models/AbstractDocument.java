@@ -1,6 +1,5 @@
 package io.p13i.ra.models;
 
-import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.WordVector;
 
 import java.util.List;
@@ -64,8 +63,7 @@ public abstract class AbstractDocument implements IRequiresIndexing {
 
     @Override
     public void index() {
-        cachedDocumentVector = WordVector.getWordVector(getContent());
-        cachedDocumentVector = WordVector.removeMostCommonWords(cachedDocumentVector);
+        cachedDocumentVector = WordVector.process(getContent());
     }
 
     public List<String> getWordVector() {

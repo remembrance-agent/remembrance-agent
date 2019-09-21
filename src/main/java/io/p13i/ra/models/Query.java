@@ -56,6 +56,6 @@ public class Query implements IRequiresIndexing {
 
     @Override
     public void index() {
-        this.cachedWordVector = WordVector.removeMostCommonWords(WordVector.getWordVector(getQuery()));
+        this.cachedWordVector = WordVector.process(getQuery());
     }
 }
