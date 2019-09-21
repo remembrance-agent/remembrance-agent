@@ -27,5 +27,6 @@ public class FileIOWriter implements Closeable {
 
     public void write(String text) {
         printWriter.print(text);
+        printWriter.flush();
     }
 }

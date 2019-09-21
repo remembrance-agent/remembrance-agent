@@ -36,7 +36,7 @@ public class BufferingLogFileWriter implements Flushable, Closeable {
      * @param line the line to add to the queue
      */
     public synchronized void queue(String line) {
-        if (mBuffer.size() > MAX_QUEUE_SIZE) {
+        if (mBuffer.size() >= MAX_QUEUE_SIZE) {
             this.flush();
         }
 
