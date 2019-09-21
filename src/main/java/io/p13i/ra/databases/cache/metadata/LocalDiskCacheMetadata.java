@@ -25,6 +25,7 @@ public class LocalDiskCacheMetadata implements Serializable {
      */
     private static Gson getMetadataGson() {
         return new GsonBuilder()
+                .setPrettyPrinting()
                 .registerTypeAdapter(LocalDiskCacheMetadata.class, new JsonSerializer<LocalDiskCacheMetadata>() {
                     @Override
                     public JsonElement serialize(LocalDiskCacheMetadata src, Type typeOfSrc, JsonSerializationContext context) {
