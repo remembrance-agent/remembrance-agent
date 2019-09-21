@@ -43,6 +43,10 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
     public void loadDocumentsFromDiskIntoMemory() {
         this.documentsFromDisk = new ArrayList<>();
 
+        if (!FileIO.directoryExists(this.cacheLocalDirectory) || !FileIO.fileExists(getMetadataJSONFilePath())) {
+            return;
+        }
+
         String metadataContents = FileIO.read(getMetadataJSONFilePath());
         LocalDiskCacheMetadata metadata = LocalDiskCacheMetadata.fromJSONString(metadataContents);
         if (metadata == null) {
