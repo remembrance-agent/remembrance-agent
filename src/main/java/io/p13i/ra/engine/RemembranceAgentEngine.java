@@ -22,7 +22,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentEngine.class);
 
     private final IDocumentDatabase documentDatabase;
-    private ICache<Query, List<ScoredDocument>> mSuggestionCache = new LimitedCapacityCache<>(128);
+    private ICache<Query, List<ScoredSingleContentWindow>> mSuggestionCache = new LimitedCapacityCache<>(128);
 
     public RemembranceAgentEngine(IDocumentDatabase documentDatabase) {
         this.documentDatabase = documentDatabase;
@@ -39,7 +39,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     }
 
     @Override
-    public List<ScoredDocument> determineSuggestions(Query query) {
+    public List<ScoredSingleContentWindow> determineSuggestions(Query query) {
         if (query.getContentWindow().getWordVector().size() == 0) {
             return new ArrayList<>();
         }
@@ -49,18 +49,20 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         }
 
         // PriorityQueue sorts low -> high, we need to invert that
-        PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
+        PriorityQueue<ScoredSingleContentWindow> scoredSingleContentWindows = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
         List<AbstractDocument> allDocuments = this.documentDatabase.getAllDocuments();
         for (AbstractDocument document : allDocuments) {
-            ScoredDocument scoredDoc = Calculator.scoreQueryAgainstDocuments(query, document, allDocuments);
-            scoredDocuments.add(scoredDoc);
+            for (SingleContentWindow window : document) {
+                ScoredSingleContentWindow scoredDoc = Calculator.scoreQueryAgainstDocumentWindow(query, window, allDocuments, document);
+                scoredSingleContentWindows.add(scoredDoc);
+            }
         }
 
         // Get the top numSuggestions documents
-        List<ScoredDocument> suggestedDocuments = new ArrayList<>(query.getNumSuggestions());
-        while (suggestedDocuments.size() < query.getNumSuggestions() && !scoredDocuments.isEmpty()) {
-            ScoredDocument suggestedDocument = scoredDocuments.poll();
+        List<ScoredSingleContentWindow> suggestedDocuments = new ArrayList<>(query.getNumSuggestions());
+        while (suggestedDocuments.size() < query.getNumSuggestions() && !scoredSingleContentWindows.isEmpty()) {
+            ScoredSingleContentWindow suggestedDocument = scoredSingleContentWindows.poll();
             if (!Double.isNaN(suggestedDocument.getScore()) && suggestedDocument.getScore() > 0.0) {
                 suggestedDocuments.add(suggestedDocument);
             }
@@ -89,19 +91,20 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         /**
          * Scores a query against all the documents in the data store
          *
-         * @param query        the query
-         * @param document     the document to check the query against
-         * @param allDocuments the context of all documents
+         * @param query         the query
+         * @param window        the window to check again
+         * @param document      the document to check the query against
+         * @param allDocuments  the context of all documents
          * @return a score between 0.0 and 1.0
          */
-        private static ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments) {
+        private static ScoredSingleContentWindow scoreQueryAgainstDocumentWindow(Query query, SingleContentWindow window, List<AbstractDocument> allDocuments, AbstractDocument document) {
             List<String> wordVector = query.getContentWindow().getWordVector();
 
             // Perform TFiDF on each word
             double wordScoreSum = 0.0;
             for (String word : wordVector) {
 
-                double wordScore = TFIDFCalculator.tfIdf(word, document, allDocuments);
+                double wordScore = TFIDFCalculator.tfIdf(word, window, allDocuments);
 
                 if (Double.isNaN(wordScore)) {
                     // adding NaN to a double will cause the double to become NaN
@@ -132,7 +135,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
 
             Assert.inRange(score, 0.0, 1.0);
 
-            return new ScoredDocument(query, score, document);
+            return new ScoredSingleContentWindow(query, score, document, window);
         }
     }
 }

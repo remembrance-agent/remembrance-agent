@@ -2,13 +2,13 @@ package io.p13i.ra.models;
 
 import io.p13i.ra.utils.WordVector;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Objects;
 
 /**
  * Houses all information about a file and it's context in the world
  */
-public abstract class AbstractDocument implements IRequiresIndexing {
+public abstract class AbstractDocument implements IRequiresIndexing, Iterable<SingleContentWindow> {
 
     /**
      * How many characters to place in the toString() call
@@ -33,7 +33,7 @@ public abstract class AbstractDocument implements IRequiresIndexing {
     /**
      * The post-index property
      */
-    private ContentWindow cachedContentWindow;
+    private MultipleContentWindows cachedContentWindows;
 
     public AbstractDocument(String content, Context context) {
         this.content = Objects.requireNonNull(content);
@@ -63,11 +63,11 @@ public abstract class AbstractDocument implements IRequiresIndexing {
 
     @Override
     public void index() {
-        this.cachedContentWindow = WordVector.process(getContent());
+        this.cachedContentWindows = WordVector.process(getContent());
     }
 
-    public ContentWindow getContentWindow() {
-        return cachedContentWindow;
+    public MultipleContentWindows getContentWindows() {
+        return cachedContentWindows;
     }
 
     @Override
@@ -86,5 +86,10 @@ public abstract class AbstractDocument implements IRequiresIndexing {
      */
     public String getDocumentTypeName() {
         return this.getClass().getSimpleName();
+    }
+
+    @Override
+    public Iterator<SingleContentWindow> iterator() {
+        return this.getContentWindows().iterator();
     }
 }

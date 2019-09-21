@@ -10,15 +10,17 @@ import java.util.List;
 /**
  * Used in the document ranking process to hold both the document and the corresponding score for a given query
  */
-public final class ScoredDocument implements Comparable<ScoredDocument> {
+public final class ScoredSingleContentWindow implements Comparable<ScoredSingleContentWindow> {
     private final Query query;
     private final double score;
     private final AbstractDocument document;
+    private final SingleContentWindow window;
 
-    public ScoredDocument(Query query, double score, AbstractDocument document) {
+    public ScoredSingleContentWindow(Query query, double score, AbstractDocument document, SingleContentWindow window) {
         this.query = query;
         this.score = score;
         this.document = document;
+        this.window = window;
     }
 
     public double getScore() {
@@ -29,14 +31,22 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
         return document;
     }
 
+    public Query getQuery() {
+        return this.query;
+    }
+
+    public SingleContentWindow getWindow() {
+        return this.window;
+    }
+
     @Override
-    public int compareTo(ScoredDocument o) {
+    public int compareTo(ScoredSingleContentWindow o) {
         return Double.compare(this.score, o.score);
     }
 
     @Override
     public String toString() {
-        return "<ScoredDocument score=" + new DecimalFormat("#0.0000").format(getScore()) + ", document=" + getDocument().toString() + ">";
+        return "<ScoredSingleContentWindow score=" + new DecimalFormat("#0.0000").format(getScore()) + ", document=" + getDocument().toString() + ">";
     }
 
     /**
@@ -55,12 +65,12 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
      * @return the list of matching terms ranked
      */
     private List<String> getMatchingTermsInDocument(int maxCount) {
-        List<String> queryWordVector = query.getContentWindow().getWordVector();
-        List<String> documentWordVector = document.getContentWindow().getWordVector();
+        List<String> queryWordVector = getQuery().getContentWindow().getWordVector();
+        List<String> documentWordVector = getDocument().getContentWindows().asSingleContentWindow().getWordVector();
         List<String> intersection = ListUtils.intersection(queryWordVector, documentWordVector);
         return ListUtils.selectLargest(intersection, maxCount, ((queryTerm1, queryTerm2) -> {
-            double queryTerm1TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm1);
-            double queryTerm2TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm2);
+            double queryTerm1TermFrequency = TFIDFCalculator.tf(getWindow(), queryTerm1);
+            double queryTerm2TermFrequency = TFIDFCalculator.tf(getWindow(), queryTerm2);
             return Double.compare(queryTerm1TermFrequency, queryTerm2TermFrequency);
         }));
     }

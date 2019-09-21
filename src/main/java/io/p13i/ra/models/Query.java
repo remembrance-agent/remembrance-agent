@@ -2,7 +2,6 @@ package io.p13i.ra.models;
 
 import io.p13i.ra.utils.WordVector;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -12,7 +11,7 @@ public class Query implements IRequiresIndexing {
     private final String query;
     private final Context context;
     private final int numSuggestions;
-    private ContentWindow cachedContentWindow;
+    private SingleContentWindow cachedContentWindow;
 
     public Query(String query, Context context, int numSuggestions) {
         this.query = query;
@@ -32,7 +31,7 @@ public class Query implements IRequiresIndexing {
         return numSuggestions;
     }
 
-    public ContentWindow getContentWindow() {
+    public SingleContentWindow getContentWindow() {
         return cachedContentWindow;
     }
 
@@ -56,6 +55,6 @@ public class Query implements IRequiresIndexing {
 
     @Override
     public void index() {
-        this.cachedContentWindow = WordVector.process(getQuery());
+        this.cachedContentWindow = WordVector.process(getQuery()).asSingleContentWindow();
     }
 }

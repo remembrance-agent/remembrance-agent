@@ -17,7 +17,7 @@ import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.KeyboardInputMechanism;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Query;
-import io.p13i.ra.models.ScoredDocument;
+import io.p13i.ra.models.ScoredSingleContentWindow;
 import io.p13i.ra.utils.BufferingLogFileWriter;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
@@ -238,7 +238,16 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         mRAUpdateTimer.schedule(new TimerTask() {
             @Override
             public void run() {
+                long startTime = System.currentTimeMillis();
+
                 sendQueryToRemembranceAgent();
+
+                long endTime = System.currentTimeMillis();
+
+                long timeElapsed = endTime - startTime;
+
+                LOGGER.info("Query sending took " + timeElapsed + " ms");
+
             }
         }, RA_CLIENT_UPDATE_PERIOD_MS, RA_CLIENT_UPDATE_PERIOD_MS);
 
@@ -263,7 +272,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         Query query = new Query(queryString, context, GUI.RA_NUMBER_SUGGESTIONS) {{
             index();
         }};
-        List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
+        List<ScoredSingleContentWindow> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
 
 
         // Update the GUI
@@ -271,10 +280,10 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Add the suggestion's elements to the GUI
         for (int i = 0; i < suggestions.size(); i++) {
-            ScoredDocument scoredDocument = suggestions.get(i);
+            ScoredSingleContentWindow scoredSingleContentWindow = suggestions.get(i);
             
             // Add each of the components for the document to the GUI
-            mGUI.addScoredDocument(scoredDocument, i);
+            mGUI.addScoredDocument(scoredSingleContentWindow, i);
         }
 
         // Reset the title
