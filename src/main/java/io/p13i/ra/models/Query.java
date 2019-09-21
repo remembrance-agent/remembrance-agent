@@ -12,7 +12,7 @@ public class Query implements IRequiresIndexing {
     private final String query;
     private final Context context;
     private final int numSuggestions;
-    private List<String> cachedWordVector;
+    private ContentWindow cachedContentWindow;
 
     public Query(String query, Context context, int numSuggestions) {
         this.query = query;
@@ -32,8 +32,8 @@ public class Query implements IRequiresIndexing {
         return numSuggestions;
     }
 
-    public List<String> getWordVector() {
-        return cachedWordVector;
+    public ContentWindow getContentWindow() {
+        return cachedContentWindow;
     }
 
     @Override
@@ -56,6 +56,6 @@ public class Query implements IRequiresIndexing {
 
     @Override
     public void index() {
-        this.cachedWordVector = WordVector.process(getQuery());
+        this.cachedContentWindow = WordVector.process(getQuery());
     }
 }

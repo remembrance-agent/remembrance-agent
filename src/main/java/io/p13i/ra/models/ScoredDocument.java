@@ -55,8 +55,8 @@ public final class ScoredDocument implements Comparable<ScoredDocument> {
      * @return the list of matching terms ranked
      */
     private List<String> getMatchingTermsInDocument(int maxCount) {
-        List<String> queryWordVector = query.getWordVector();
-        List<String> documentWordVector = document.getWordVector();
+        List<String> queryWordVector = query.getContentWindow().getWordVector();
+        List<String> documentWordVector = document.getContentWindow().getWordVector();
         List<String> intersection = ListUtils.intersection(queryWordVector, documentWordVector);
         return ListUtils.selectLargest(intersection, maxCount, ((queryTerm1, queryTerm2) -> {
             double queryTerm1TermFrequency = TFIDFCalculator.tf(getDocument(), queryTerm1);

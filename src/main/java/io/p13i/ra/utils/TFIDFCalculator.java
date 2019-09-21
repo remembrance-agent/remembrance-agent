@@ -18,7 +18,7 @@ public class TFIDFCalculator {
      */
     public static double tf(AbstractDocument doc, String term) {
         int result = 0;
-        List<String> wordVector = doc.getWordVector();
+        List<String> wordVector = doc.getContentWindow().getWordVector();
         for (String word : wordVector) {
             if (term.equalsIgnoreCase(word))
                 result++;
@@ -35,7 +35,7 @@ public class TFIDFCalculator {
         int n = 0;
         int N = 0;
         for (AbstractDocument doc : docs) {
-            List<String> wordVector = doc.getWordVector();
+            List<String> wordVector = doc.getContentWindow().getWordVector();
             for (String word : wordVector) {
                 if (term.equalsIgnoreCase(word)) {
                     n++;

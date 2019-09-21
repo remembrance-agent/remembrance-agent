@@ -33,7 +33,7 @@ public abstract class AbstractDocument implements IRequiresIndexing {
     /**
      * The post-index property
      */
-    private List<String> cachedDocumentVector;
+    private ContentWindow cachedContentWindow;
 
     public AbstractDocument(String content, Context context) {
         this.content = Objects.requireNonNull(content);
@@ -63,11 +63,11 @@ public abstract class AbstractDocument implements IRequiresIndexing {
 
     @Override
     public void index() {
-        cachedDocumentVector = WordVector.process(getContent());
+        this.cachedContentWindow = WordVector.process(getContent());
     }
 
-    public List<String> getWordVector() {
-        return cachedDocumentVector;
+    public ContentWindow getContentWindow() {
+        return cachedContentWindow;
     }
 
     @Override

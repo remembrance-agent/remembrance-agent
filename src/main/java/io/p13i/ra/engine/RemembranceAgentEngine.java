@@ -40,7 +40,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
 
     @Override
     public List<ScoredDocument> determineSuggestions(Query query) {
-        if (query.getWordVector().size() == 0) {
+        if (query.getContentWindow().getWordVector().size() == 0) {
             return new ArrayList<>();
         }
 
@@ -95,7 +95,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
          * @return a score between 0.0 and 1.0
          */
         private static ScoredDocument scoreQueryAgainstDocuments(Query query, AbstractDocument document, List<AbstractDocument> allDocuments) {
-            List<String> wordVector = query.getWordVector();
+            List<String> wordVector = query.getContentWindow().getWordVector();
 
             // Perform TFiDF on each word
             double wordScoreSum = 0.0;
