@@ -8,20 +8,7 @@ import io.p13i.ra.input.SpeechInputMechanism;
 import io.p13i.ra.models.ScoredSingleContentWindow;
 import io.p13i.ra.utils.*;
 
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -262,6 +249,12 @@ public class GUI {
 
                                         String url = GoogleChrome.getURLofActiveTab();
                                         String title = GoogleChrome.getTitleOfActiveTab();
+
+                                        url = JOptionPane.showInputDialog(mJFrame, "Index web page with Remembrance Agent:", url);
+                                        if (url == null || url.length() == 0) {
+                                            return false;
+                                        }
+
                                         String html = HTTP.get(url);
                                         String text = HTML.text(html);
 
@@ -271,7 +264,7 @@ public class GUI {
 
                                         RemembranceAgentClient.getInstance().addDocumentToDataStore(htmlDocument);
 
-                                        JOptionPane.showMessageDialog(mJFrame, url, "Added text from:", INFORMATION_MESSAGE);
+                                        JOptionPane.showMessageDialog(mJFrame, title, "Added text!", INFORMATION_MESSAGE);
 
                                         return true;
                                     }

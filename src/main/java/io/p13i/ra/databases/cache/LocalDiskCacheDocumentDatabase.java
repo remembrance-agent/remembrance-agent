@@ -1,16 +1,21 @@
 package io.p13i.ra.databases.cache;
 
+import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheDocumentMetadata;
 import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadata;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
 import io.p13i.ra.models.AbstractDocument;
+import io.p13i.ra.utils.Assert;
+import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static io.p13i.ra.databases.cache.ICachableDocument.CACHE_FILE_EXTENSION;
 
 public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<AbstractDocument>, ILocalDiskCache {
 
@@ -42,8 +47,12 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
         }
 
         List<String> cachedFilePaths = FileIO.listFiles(this.cacheLocalDirectory);
-        for (String cachedFilePath : cachedFilePaths) {
-            this.documentsFromDisk.add(getSingleDocumentFromDisk(cachedFilePath));
+        for (String filePath : cachedFilePaths) {
+            if (!filePath.endsWith(CACHE_FILE_EXTENSION)) {
+                continue;
+            }
+
+            this.documentsFromDisk.add(getSingleDocumentFromDisk(filePath));
         }
     }
 
@@ -58,13 +67,19 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
         String[] lines = StringUtils.lines(fileContents);
 
         String fileName = FileIO.getFileName(cachedFilePath);
-        String subject = lines[1].substring(12);
-        String url = lines[2].substring(12);
+        String version = lines[1].substring(16);
+        String lastModified = lines[2].substring(16);
+        String subject = lines[3].substring(16);
+        String url = lines[4].substring(16);
         String content = Arrays.stream(lines)
-                .skip(4)
+                .skip(6)
                 .collect(Collectors.joining("\n"));
 
-        return new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url) {{
+        // Checks and conversions
+        Assert.equals(version, RemembranceAgentClient.VERSION);
+        Date lastModifiedDate = DateUtils.parseTimestamp(lastModified);
+
+        return new LocalDiskDocument(content, fileName, subject, lastModifiedDate, url) {{
             index();
         }};
     }
@@ -85,9 +100,13 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
 
         FileIO.append(cacheFileName, "---");
         FileIO.newline(cacheFileName);
-        FileIO.append(cacheFileName, "Subject     " + cachableDocument.getContext().getSubject());
+        FileIO.append(cacheFileName, "Version         " + RemembranceAgentClient.VERSION);
         FileIO.newline(cacheFileName);
-        FileIO.append(cacheFileName, "URL         " + cachableDocument.getURL());
+        FileIO.append(cacheFileName, "Last modified   " + DateUtils.timestampOf(cachableDocument.getLastModified()));
+        FileIO.newline(cacheFileName);
+        FileIO.append(cacheFileName, "Subject         " + cachableDocument.getContext().getSubject());
+        FileIO.newline(cacheFileName);
+        FileIO.append(cacheFileName, "URL             " + cachableDocument.getURL());
         FileIO.newline(cacheFileName);
         FileIO.append(cacheFileName, "---");
         FileIO.newline(cacheFileName);

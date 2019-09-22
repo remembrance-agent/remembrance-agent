@@ -4,6 +4,7 @@ import io.p13i.ra.cache.Cache;
 import io.p13i.ra.cache.ICache;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,11 +37,7 @@ public class DateUtils {
      * @return the formatted date
      */
     public static String formatDate(Date date, String pattern) {
-        if (!dateFormatCache.hasKey(pattern)) {
-            dateFormatCache.put(pattern, new SimpleDateFormat(pattern));
-        }
-
-        return dateFormatCache.get(pattern).format(date);
+        return dateFormatCache.get(pattern, () -> new SimpleDateFormat(pattern)).format(date);
     }
 
     /**
@@ -81,5 +78,20 @@ public class DateUtils {
     public static long deltaSeconds(Date d1, Date d2) {
         long difference = d2.getTime() - d1.getTime();
         return difference / 1000;
+    }
+
+    /**
+     * Parses the given timestamp string based on the TIMESTAMP_FORMAT
+     *
+     * @param timestamp the timestamp string
+     * @return a Date
+     */
+    public static Date parseTimestamp(String timestamp) {
+        try {
+            return dateFormatCache.get(TIMESTAMP_FORMAT, () -> new SimpleDateFormat(TIMESTAMP_FORMAT)).parse(timestamp);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
     }
 }

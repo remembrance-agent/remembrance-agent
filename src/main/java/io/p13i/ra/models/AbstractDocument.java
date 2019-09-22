@@ -110,4 +110,8 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
+
+    public Date getLastModified() {
+        return this.lastModified;
+    }
 }

@@ -1,5 +1,7 @@
 package io.p13i.ra.utils;
 
+import java.util.Objects;
+
 /**
  * Utilities for asserting conditions in code
  */
@@ -32,5 +34,9 @@ public class Assert {
      */
     public static void inRange(Double value, Double lower, Double upper) {
         Assert.that(lower <= value && value <= upper);
+    }
+
+    public static void equals(Object one, Object two) {
+        that(Objects.equals(one, two));
     }
 }

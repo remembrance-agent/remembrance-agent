@@ -55,4 +55,9 @@ public interface ICachableDocument {
      * @param lastModified when the document was last modified
      */
     void setLastModified(Date lastModified);
+
+    /**
+     * @return when the document was last modified by remote
+     */
+    Date getLastModified();
 }
