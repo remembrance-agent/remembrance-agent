@@ -10,18 +10,18 @@ Java package for Remembrance Agents! Based on Rhodes/Starner
 ### Building
 
 ```bash
-VERSION="1.2.1" ./gradlew build
+VERSION="2.0.0" ./gradlew build
 ```
 
 ### Installing as Launch Daemon (macOS)
 
 ```bash
-sudo VERSION="1.2.1" bash ./bin/install
+sudo VERSION="2.0.0" bash ./bin/install
 ```
 
 Now you can run the following from anywhere:
 ```bash
-VERSION="1.2.1" ra --home $HOME
+VERSION="2.0.0" ra --home $HOME
 ```
 
 ### Running (cross platform)
