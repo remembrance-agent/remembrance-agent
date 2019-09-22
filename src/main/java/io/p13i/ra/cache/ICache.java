@@ -18,6 +18,15 @@ public interface ICache<TKey, TValue> {
      */
     TValue get(TKey key);
 
+    /**
+     * Gets the key from the cache if it exists or uses the defaultValueGenerator to insert and return a new value.
+     * Useful for computationally-expensive calculations.
+     *
+     * @param key the key
+     * @param defaultValueGenerator the default value generator only invoked if the key doesn't exist
+     * @throws RuntimeException if the defaultValueGenerator produces an Exception
+     * @return the keyed index or the result of the defaultValueGenerator
+     */
     default TValue get(TKey key, Callable<TValue> defaultValueGenerator) {
         TValue value;
         if (hasKey(key)) {

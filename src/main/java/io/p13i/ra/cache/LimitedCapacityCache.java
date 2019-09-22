@@ -6,7 +6,7 @@ import java.util.Map;
 
 
 /**
- * A caches limited in size
+ * A cache limited in size
  */
 public class LimitedCapacityCache<TKey, TValue> extends Cache<TKey, TValue> {
 
