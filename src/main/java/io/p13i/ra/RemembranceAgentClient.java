@@ -5,6 +5,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
+import io.p13i.ra.cache.Cache;
 import io.p13i.ra.databases.cache.LocalDiskCacheDocumentDatabase;
 import io.p13i.ra.databases.gmail.GmailDocumentDatabase;
 import io.p13i.ra.databases.googledrive.GoogleDriveFolderDocumentDatabase;
@@ -15,10 +16,7 @@ import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
 import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.KeyboardInputMechanism;
-import io.p13i.ra.models.AbstractDocument;
-import io.p13i.ra.models.Context;
-import io.p13i.ra.models.Query;
-import io.p13i.ra.models.ScoredSingleContentWindow;
+import io.p13i.ra.models.*;
 import io.p13i.ra.utils.BufferingLogFileWriter;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.KeyboardLoggerBreakingBuffer;
@@ -178,6 +176,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     public void addDocumentToDataStore(AbstractDocument document) {
         String filePath = this.mLocalDiskCacheDatabase.saveSingleDocumentToDisk(document);
         this.mLocalDiskCacheDatabase.loadSingleDocumentFromDiskIntoMemory(filePath);
+        Cache.invalidateManagedCaches();
     }
 
     /**
@@ -289,7 +288,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         Query query = new Query(queryString, context, GUI.RA_NUMBER_SUGGESTIONS) {{
             index();
         }};
-        List<ScoredSingleContentWindow> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
+        List<ScoredDocument> suggestions = mRemembranceAgentEngine.determineSuggestions(query);
 
 
         // Update the GUI
@@ -297,10 +296,10 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
         // Add the suggestion's elements to the GUI
         for (int i = 0; i < suggestions.size(); i++) {
-            ScoredSingleContentWindow scoredSingleContentWindow = suggestions.get(i);
+            ScoredDocument scoredDocument = suggestions.get(i);
             
             // Add each of the components for the document to the GUI
-            mGUI.addScoredDocument(scoredSingleContentWindow, i);
+            mGUI.addScoredDocument(scoredDocument, i);
         }
 
         // Reset the title

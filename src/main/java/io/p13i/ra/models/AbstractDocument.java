@@ -114,4 +114,19 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
     public Date getLastModified() {
         return this.lastModified;
     }
+
+    @Override
+    public int hashCode() {
+        return getURL().hashCode() * getContext().getSubject().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        AbstractDocument other = (AbstractDocument) obj;
+        return this.getURL().equals(other.getURL()) && this.getContext().getSubject().equals(other.getContext().getSubject());
+    }
 }

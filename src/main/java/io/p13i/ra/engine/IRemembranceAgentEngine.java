@@ -1,6 +1,7 @@
 package io.p13i.ra.engine;
 
 import io.p13i.ra.models.Query;
+import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.models.ScoredSingleContentWindow;
 
 import java.util.List;
@@ -30,5 +31,5 @@ public interface IRemembranceAgentEngine {
      * @param query the query
      * @return scored documents limited to the number of suggestions requested in the query, ordered by score, descending
      */
-    List<ScoredSingleContentWindow> determineSuggestions(Query query);
+    List<ScoredDocument> determineSuggestions(Query query);
 }

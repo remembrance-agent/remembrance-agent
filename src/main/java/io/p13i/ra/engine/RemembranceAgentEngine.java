@@ -1,5 +1,6 @@
 package io.p13i.ra.engine;
 
+import com.google.gson.internal.LinkedTreeMap;
 import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.models.*;
 import io.p13i.ra.similarity.DateSimilarityIndex;
@@ -8,10 +9,7 @@ import io.p13i.ra.utils.*;
 import io.p13i.ra.cache.ICache;
 import io.p13i.ra.cache.LimitedCapacityCache;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.logging.Logger;
 
 
@@ -22,7 +20,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentEngine.class);
 
     private final IDocumentDatabase documentDatabase;
-    private ICache<Query, List<ScoredSingleContentWindow>> mSuggestionCache = new LimitedCapacityCache<>(128);
+    private ICache<Query, List<ScoredDocument>> mSuggestionCache = new LimitedCapacityCache<>(128);
 
     public RemembranceAgentEngine(IDocumentDatabase documentDatabase) {
         this.documentDatabase = documentDatabase;
@@ -39,7 +37,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     }
 
     @Override
-    public List<ScoredSingleContentWindow> determineSuggestions(Query query) {
+    public List<ScoredDocument> determineSuggestions(Query query) {
         if (query.getContentWindow().getWordVector().size() == 0) {
             return new ArrayList<>();
         }
@@ -59,18 +57,42 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
             }
         }
 
-        // Get the top numSuggestions documents
-        List<ScoredSingleContentWindow> suggestedDocuments = new ArrayList<>(query.getNumSuggestions());
-        while (suggestedDocuments.size() < query.getNumSuggestions() && !scoredSingleContentWindows.isEmpty()) {
-            ScoredSingleContentWindow suggestedDocument = scoredSingleContentWindows.poll();
-            if (!Double.isNaN(suggestedDocument.getScore()) && suggestedDocument.getScore() > 0.0) {
-                suggestedDocuments.add(suggestedDocument);
+        Map<AbstractDocument, Tuple<Double, MultipleContentWindows>> documentsToScoresAndWindows = new LinkedHashMap<>();
+
+        for (ScoredSingleContentWindow scoredWindow : scoredSingleContentWindows) {
+            double currentScore = 0.0;
+            MultipleContentWindows currentWindows = new MultipleContentWindows();
+
+            if (documentsToScoresAndWindows.containsKey(scoredWindow.getDocument())) {
+                Tuple<Double, MultipleContentWindows> currentScoreAndWindows = documentsToScoresAndWindows.get(scoredWindow.getDocument());
+
+                currentScore = currentScoreAndWindows.x();
+                currentWindows = currentScoreAndWindows.y();
+            }
+
+            if (!Double.isNaN(scoredWindow.getScore()) && scoredWindow.getScore() > 0.0) {
+                currentScore += scoredWindow.getScore();
+                currentWindows.getSingleWindows().add(scoredWindow.getWindow());
+            }
+
+            documentsToScoresAndWindows.put(scoredWindow.getDocument(), new Tuple<>(currentScore, currentWindows));
+        }
+
+        List<ScoredDocument> scoredDocuments = new ArrayList<>(query.getNumSuggestions());
+
+        for (Map.Entry<AbstractDocument, Tuple<Double, MultipleContentWindows>> abstractDocumentDoubleEntry : documentsToScoresAndWindows.entrySet()) {
+            AbstractDocument document = abstractDocumentDoubleEntry.getKey();
+            Double score = abstractDocumentDoubleEntry.getValue().x();
+            MultipleContentWindows windows = abstractDocumentDoubleEntry.getValue().y();
+
+            if (!score.isNaN() && score > 0.0) {
+                scoredDocuments.add(new ScoredDocument(query, document, score, windows));
             }
         }
 
-        mSuggestionCache.put(query, suggestedDocuments);
+        mSuggestionCache.put(query, scoredDocuments);
 
-        return suggestedDocuments;
+        return scoredDocuments;
     }
 
 
@@ -91,10 +113,10 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         /**
          * Scores a query against all the documents in the data store
          *
-         * @param query         the query
-         * @param window        the window to check again
-         * @param document      the document to check the query against
-         * @param allDocuments  the context of all documents
+         * @param query        the query
+         * @param window       the window to check again
+         * @param document     the document to check the query against
+         * @param allDocuments the context of all documents
          * @return a score between 0.0 and 1.0
          */
         private static ScoredSingleContentWindow scoreQueryAgainstDocumentWindow(Query query, SingleContentWindow window, List<AbstractDocument> allDocuments, AbstractDocument document) {

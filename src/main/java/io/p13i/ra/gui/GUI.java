@@ -5,6 +5,7 @@ import io.p13i.ra.databases.html.HTMLDocument;
 import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.KeyboardInputMechanism;
 import io.p13i.ra.input.SpeechInputMechanism;
+import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.models.ScoredSingleContentWindow;
 import io.p13i.ra.utils.*;
 
@@ -322,7 +323,7 @@ public class GUI {
         mSuggestionsPanel.repaint();
     }
 
-    public void addScoredDocument(ScoredSingleContentWindow doc, int i) {
+    public void addScoredDocument(ScoredDocument doc, int i) {
         mSuggestionsPanel.add(new JLabel() {{
             setText(Double.toString(doc.getScore()));
             setBounds(
