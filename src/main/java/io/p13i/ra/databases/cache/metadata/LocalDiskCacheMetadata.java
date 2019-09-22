@@ -21,7 +21,7 @@ public class LocalDiskCacheMetadata implements Serializable {
     }
 
     /**
-     * @return a GSON object that can read and write metadata
+     * @return a GSON object that can read and append metadata
      */
     private static Gson getMetadataGson() {
         return new GsonBuilder()

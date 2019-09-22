@@ -60,4 +60,7 @@ dependencies {
 
     // Apache Commons CLI
     compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
+
+    // jsoup HTML parser library @ https://jsoup.org/
+    compile 'org.jsoup:jsoup:1.12.1'
 }

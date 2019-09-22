@@ -13,6 +13,8 @@ import java.util.stream.Stream;
  */
 public class StringUtils {
     private static final String NULL = "<null>";
+    public static final String NEWLINE_REGEX = "\\r?\\n";
+    public static final String NEWLINE = "\n";
 
     /**
      * Ends a string after a given length with ...
@@ -88,6 +90,12 @@ public class StringUtils {
         );
     }
 
+    /**
+     * Converts a string to a Stream of characters
+     *
+     * @param s the string
+     * @return the character stream
+     */
     public static Stream<Character> toCharStream(String s) {
         char[] characters = s.toCharArray();
         List<Character> list = new ArrayList<>(characters.length);
@@ -95,5 +103,65 @@ public class StringUtils {
             list.add(c);
         }
         return list.stream();
+    }
+
+    /**
+     * Based on newlines, \n, gets the requested line number
+     *
+     * @param body the body of the String
+     * @param lineNumber the line number requested, zero-indexed
+     * @return the line at the lineNumber
+     */
+    public static String getLine(String body, int lineNumber) {
+        return getLines(body, lineNumber, lineNumber + 1);
+    }
+
+    /**
+     * Based on newlines, \n, gets the requested line number
+     *
+     * @param body the body of the String
+     * @param lineNumberStart the start line number requested, zero-indexed
+     * @return the line at the lineNumber and to the end
+     */
+    public static String getLines(String body, int lineNumberStart) {
+        return getLines(body, lineNumberStart);
+    }
+
+    /**
+     * Based on newlines, \n, gets the requested line number
+     *
+     * @param body the body of the String
+     * @param lineNumberStart the start line number requested, zero-indexed
+     * @param lineNumberEnd the end line number requested, zero-indexed exclusive
+     * @return the lines between lineNumberStart and lineNumberEnd
+     */
+    public static String getLines(String body, int lineNumberStart, int lineNumberEnd) {
+        return getLines(lines(body), lineNumberStart, lineNumberEnd);
+    }
+
+    /**
+     * Gets the lines in a string
+     *
+     * @param body the string
+     * @return lines split on \n or \r
+     */
+    public static String[] lines(String body) {
+        return body.split(NEWLINE_REGEX);
+    }
+
+    /**
+     * Helper method that adds lines based on the params
+     *
+     * @param lines the string lines
+     * @param lineNumberStart where to start adding lines
+     * @param lineNumberEnd the ending line
+     * @return the lines between the start (inclusive) and end (exclusive)
+     */
+    public static String getLines(String[] lines, int lineNumberStart, int lineNumberEnd) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = lineNumberStart; i < lineNumberEnd; i++) {
+            stringBuilder.append(lines[i]);
+        }
+        return stringBuilder.toString();
     }
 }

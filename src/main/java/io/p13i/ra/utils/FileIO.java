@@ -25,7 +25,7 @@ public class FileIO {
             String line;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line);
-                stringBuilder.append("\n");
+                stringBuilder.append(StringUtils.NEWLINE);
             }
 
             return stringBuilder.toString();
@@ -38,9 +38,9 @@ public class FileIO {
      * Writes the given text to the file at the specified path
      *
      * @param filePath the file's path
-     * @param text     the text to write
+     * @param text     the text to append
      */
-    public static void write(String filePath, String text) {
+    public static void append(String filePath, String text) {
         if (!FileIO.fileExists(filePath)) {
             FileIO.createFile(filePath);
         }
@@ -50,6 +50,15 @@ public class FileIO {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Writes the a newline to the file at the specified path
+     *
+     * @param filePath the file's path
+     */
+    public static void newline(String filePath) {
+        append(filePath, StringUtils.NEWLINE);
     }
 
     /**

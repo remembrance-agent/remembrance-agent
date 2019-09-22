@@ -1,12 +1,12 @@
 package io.p13i.ra.gui;
 
 import io.p13i.ra.RemembranceAgentClient;
+import io.p13i.ra.databases.html.HTMLDocument;
 import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.KeyboardInputMechanism;
 import io.p13i.ra.input.SpeechInputMechanism;
 import io.p13i.ra.models.ScoredSingleContentWindow;
-import io.p13i.ra.utils.IntegerUtils;
-import io.p13i.ra.utils.URIUtils;
+import io.p13i.ra.utils.*;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -32,6 +32,7 @@ import java.io.IOException;
 
 import static io.p13i.ra.RemembranceAgentClient.APPLICATION_NAME;
 import static io.p13i.ra.gui.User.Preferences.Preference.*;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 
 
 public class GUI {
@@ -232,6 +233,45 @@ public class GUI {
                                         RemembranceAgentClient.getInstance().startInputMechanism(speechRecognizer);
 
                                         RemembranceAgentClient.getInstance().startInputMechanism(new KeyboardInputMechanism());
+
+                                        return true;
+                                    }
+
+                                    @Override
+                                    public void done() {
+
+                                    }
+                                };
+
+                                // Call the SwingWorker from within the Swing thread
+                                worker.execute();
+                            }
+                        });
+                    }});
+                }});
+                add(new JMenu("Active") {{
+                    add(new JMenuItem("Load active Google Chrome tab") {{
+                        addActionListener(new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent e) {
+
+                                // All code inside SwingWorker runs on a seperate thread
+                                SwingWorker<Boolean, Void> worker = new SwingWorker<Boolean, Void>() {
+                                    @Override
+                                    public Boolean doInBackground() {
+
+                                        String url = GoogleChrome.getURLofActiveTab();
+                                        String title = GoogleChrome.getTitleOfActiveTab();
+                                        String html = HTTP.get(url);
+                                        String text = HTML.text(html);
+
+                                        HTMLDocument htmlDocument = new HTMLDocument(text, DateUtils.now(), url, title) {{
+                                            index();
+                                        }};
+
+                                        RemembranceAgentClient.getInstance().addDocumentToDataStore(htmlDocument);
+
+                                        JOptionPane.showMessageDialog(mJFrame, url, "Added text from:", INFORMATION_MESSAGE);
 
                                         return true;
                                     }

@@ -4,6 +4,8 @@ import io.p13i.ra.models.Context;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
+import java.util.Date;
+
 
 /**
  * Represents one object that can be cached
@@ -43,4 +45,14 @@ public interface ICachableDocument {
      * @return the URL of the document
      */
     String getURL();
+
+    /**
+     * @param url the URL to set
+     */
+    void setURL(String url);
+
+    /**
+     * @param lastModified when the document was last modified
+     */
+    void setLastModified(Date lastModified);
 }

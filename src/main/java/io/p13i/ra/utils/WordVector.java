@@ -47,7 +47,7 @@ public class WordVector {
      */
     public static MultipleContentWindows getWindowedContent(String content) {
         // https://stackoverflow.com/a/454913/5071723
-        String[] windowsAsStrings = content.split("\\r?\\n");
+        String[] windowsAsStrings = StringUtils.lines(content);
 
         List<SingleContentWindow> windows = new ArrayList<>(windowsAsStrings.length);
 

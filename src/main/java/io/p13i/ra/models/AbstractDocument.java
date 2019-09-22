@@ -1,14 +1,16 @@
 package io.p13i.ra.models;
 
+import io.p13i.ra.databases.cache.ICachableDocument;
 import io.p13i.ra.utils.WordVector;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Objects;
 
 /**
  * Houses all information about a file and it's context in the world
  */
-public abstract class AbstractDocument implements IRequiresIndexing, Iterable<SingleContentWindow> {
+public abstract class AbstractDocument implements IRequiresIndexing, Iterable<SingleContentWindow>, ICachableDocument {
 
     /**
      * How many characters to place in the toString() call
@@ -34,6 +36,11 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
      * The post-index property
      */
     private MultipleContentWindows cachedContentWindows;
+
+    /**
+     * When this document was last modified
+     */
+    private Date lastModified;
 
     public AbstractDocument(String content, Context context) {
         this.content = Objects.requireNonNull(content);
@@ -79,6 +86,10 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
         return url;
     }
 
+    public void setURL(String url) {
+        this.url = url;
+    }
+
     /**
      * Gets the name of the document type
      *
@@ -91,5 +102,9 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
     @Override
     public Iterator<SingleContentWindow> iterator() {
         return this.getContentWindows().iterator();
+    }
+
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
     }
 }

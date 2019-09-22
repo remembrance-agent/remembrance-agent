@@ -15,6 +15,7 @@ import io.p13i.ra.gui.GUI;
 import io.p13i.ra.gui.User;
 import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.KeyboardInputMechanism;
+import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.models.Context;
 import io.p13i.ra.models.Query;
 import io.p13i.ra.models.ScoredSingleContentWindow;
@@ -77,7 +78,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
     public final KeyboardLoggerBreakingBuffer mInputBuffer = new KeyboardLoggerBreakingBuffer(KEYBOARD_BUFFER_SIZE);
 
     /**
-     * Used to write to the keylogger log file with a buffer instead of writing once each time
+     * Used to append to the keylogger log file with a buffer instead of writing once each time
      */
     private final BufferingLogFileWriter mKeyLoggerBufferLogFileWriter;
 
@@ -90,6 +91,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
      * The backing RA engine
      */
     private IRemembranceAgentEngine mRemembranceAgentEngine;
+
+    /**
+     * The backing data store for the RA
+     */
+    private LocalDiskCacheDocumentDatabase mLocalDiskCacheDatabase;
 
     /**
      * Tracks the currently used input mechanism
@@ -167,6 +173,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         mCurrentInputMechanism.startInputMechanism();
     }
 
+    public void addDocumentToDataStore(AbstractDocument document) {
+        String filePath = this.mLocalDiskCacheDatabase.saveSingleDocumentToDisk(document);
+        this.mLocalDiskCacheDatabase.loadSingleDocumentFromDiskIntoMemory(filePath);
+    }
+
     /**
      * Initializes the RA engine
      *
@@ -183,13 +194,13 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         }
 
         // Use the RA cache directory
-        LocalDiskCacheDocumentDatabase localDiskCacheDatabase =
+        mLocalDiskCacheDatabase =
                 new LocalDiskCacheDocumentDatabase(User.Home.Documents.RA.Cache.getDirectory());
 
         // Load all the documents into memory and then into the disk
         if (!useCache) {
             // Load files from the local documents directory
-            localDiskCacheDatabase.addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
+            mLocalDiskCacheDatabase.addDocumentsToMemory(new LocalDiskDocumentDatabase(User.Preferences.getString(LocalDiskDocumentsFolderPath)) {{
                 loadDocuments();
             }});
 
@@ -201,28 +212,28 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
                 String id = s.trim();
                 LOGGER.info("Loading files from Google Drive folder with: " + id);
 
-                localDiskCacheDatabase.addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(id) {{
+                mLocalDiskCacheDatabase.addDocumentsToMemory(new GoogleDriveFolderDocumentDatabase(id) {{
                     loadDocuments();
                 }});
             }
 
             // Load files from Gmail
-            localDiskCacheDatabase.addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
+            mLocalDiskCacheDatabase.addDocumentsToMemory(new GmailDocumentDatabase(User.Preferences.getInt(GmailMaxEmailsCount)) {{
                 loadDocuments();
             }});
 
             // Save these files to disk
-            localDiskCacheDatabase.saveDocumentsInMemoryToDisk();
+            mLocalDiskCacheDatabase.saveDocumentsInMemoryToDisk();
 
             // Reload the new documents from disk
-            localDiskCacheDatabase.loadDocuments();
+            mLocalDiskCacheDatabase.loadDocuments();
         }
 
         // Update the GUI with where the suggestions are coming from
-        mGUI.setSuggestionsPanelTitle("Suggestions (from " + localDiskCacheDatabase.getName() + ")");
+        mGUI.setSuggestionsPanelTitle("Suggestions (from " + mLocalDiskCacheDatabase.getName() + ")");
 
         // Initialize!
-        RemembranceAgentEngine remembranceAgentEngine = new RemembranceAgentEngine(localDiskCacheDatabase);
+        RemembranceAgentEngine remembranceAgentEngine = new RemembranceAgentEngine(mLocalDiskCacheDatabase);
 
         // Pull documents from disk
         remembranceAgentEngine.loadDocuments();

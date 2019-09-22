@@ -9,20 +9,14 @@ import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<AbstractDocument>, ILocalDiskCache {
 
     private final String cacheLocalDirectory;
     private List<AbstractDocument> documentsFromDisk = new ArrayList<>();
     private List<ICachableDocument> documentsFromMemory = new ArrayList<>();
-
-    private String getMetadataJSONFilePath() {
-        return this.cacheLocalDirectory + File.separator + "~metadata.json";
-    }
 
     public LocalDiskCacheDocumentDatabase(String cacheLocalDirectory) {
         this.cacheLocalDirectory = cacheLocalDirectory;
@@ -43,52 +37,64 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
     public void loadDocumentsFromDiskIntoMemory() {
         this.documentsFromDisk = new ArrayList<>();
 
-        if (!FileIO.directoryExists(this.cacheLocalDirectory) || !FileIO.fileExists(getMetadataJSONFilePath())) {
-            return;
-        }
-
-        String metadataContents = FileIO.read(getMetadataJSONFilePath());
-        LocalDiskCacheMetadata metadata = LocalDiskCacheMetadata.fromJSONString(metadataContents);
-        if (metadata == null) {
+        if (!FileIO.directoryExists(this.cacheLocalDirectory)) {
             return;
         }
 
         List<String> cachedFilePaths = FileIO.listFiles(this.cacheLocalDirectory);
-        cachedFilePaths.remove(getMetadataJSONFilePath());
         for (String cachedFilePath : cachedFilePaths) {
-            String fileName = FileIO.getFileName(cachedFilePath);
-            String subject = metadata.fileNamesToMetadata.get(fileName).subject;
-            String url = metadata.fileNamesToMetadata.get(fileName).url;
-            String content = FileIO.read(cachedFilePath);
-            AbstractDocument document = new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url);
-            this.documentsFromDisk.add(document);
+            this.documentsFromDisk.add(getSingleDocumentFromDisk(cachedFilePath));
         }
     }
 
     @Override
+    public void loadSingleDocumentFromDiskIntoMemory(String cachedFilePath) {
+        this.documentsFromDisk.add(getSingleDocumentFromDisk(cachedFilePath));
+    }
+
+    @Override
+    public AbstractDocument getSingleDocumentFromDisk(String cachedFilePath) {
+        String fileContents = FileIO.read(cachedFilePath);
+        String[] lines = StringUtils.lines(fileContents);
+
+        String fileName = FileIO.getFileName(cachedFilePath);
+        String subject = lines[1].substring(12);
+        String url = lines[2].substring(12);
+        String content = Arrays.stream(lines)
+                .skip(4)
+                .collect(Collectors.joining("\n"));
+
+        AbstractDocument document = new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url);
+
+        return document;
+    }
+
+    @Override
     public void saveDocumentsInMemoryToDisk() {
-        // Delete all documents already in cache
-        List<String> documentsInCache = FileIO.listFiles(this.cacheLocalDirectory);
-        for (String documentPath : documentsInCache) {
-            FileIO.delete(documentPath);
-        }
-
-        // Save metadata file
-        Map<String, LocalDiskCacheDocumentMetadata> fileNamesToMetadata = new HashMap<>();
-        for (ICachableDocument cachableDocument : this.documentsFromMemory) {
-            fileNamesToMetadata.put(cachableDocument.getCacheFileName(), new LocalDiskCacheDocumentMetadata() {{
-                fileName = cachableDocument.getCacheFileName();
-                subject = cachableDocument.getContext().getSubject();
-                url = cachableDocument.getURL();
-            }});
-        }
-        FileIO.write(getMetadataJSONFilePath(), new LocalDiskCacheMetadata(fileNamesToMetadata).asJSONString());
-
         // Write each cache file
         for (ICachableDocument cachableDocument : this.documentsFromMemory) {
-            String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
-            FileIO.write(cacheFileName, cachableDocument.getContent());
+            this.saveSingleDocumentToDisk(cachableDocument);
         }
+    }
+
+    @Override
+    public String saveSingleDocumentToDisk(ICachableDocument cachableDocument) {
+        String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
+
+        FileIO.delete(cacheFileName);
+
+        FileIO.append(cacheFileName, "---");
+        FileIO.newline(cacheFileName);
+        FileIO.append(cacheFileName, "Subject     " + cachableDocument.getContext().getSubject());
+        FileIO.newline(cacheFileName);
+        FileIO.append(cacheFileName, "URL         " + cachableDocument.getURL());
+        FileIO.newline(cacheFileName);
+        FileIO.append(cacheFileName, "---");
+        FileIO.newline(cacheFileName);
+
+        FileIO.append(cacheFileName, cachableDocument.getContent());
+
+        return cacheFileName;
     }
 
     @Override
