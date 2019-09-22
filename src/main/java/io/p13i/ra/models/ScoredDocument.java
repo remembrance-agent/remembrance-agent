@@ -8,7 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
-public class ScoredDocument {
+public class ScoredDocument implements Comparable<ScoredDocument> {
     private Query query;
     private AbstractDocument document;
     private double score;
@@ -58,5 +58,10 @@ public class ScoredDocument {
 
     private Query getQuery() {
         return this.query;
+    }
+
+    @Override
+    public int compareTo(ScoredDocument o) {
+        return Double.compare(this.score, o.score);
     }
 }

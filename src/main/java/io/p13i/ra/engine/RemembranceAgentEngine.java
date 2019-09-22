@@ -78,7 +78,7 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
             documentsToScoresAndWindows.put(scoredWindow.getDocument(), new Tuple<>(currentScore, currentWindows));
         }
 
-        List<ScoredDocument> scoredDocuments = new ArrayList<>();
+        PriorityQueue<ScoredDocument> scoredDocuments = new PriorityQueue<>(query.getNumSuggestions(), Collections.reverseOrder());
 
         for (Map.Entry<AbstractDocument, Tuple<Double, MultipleContentWindows>> abstractDocumentDoubleEntry : documentsToScoresAndWindows.entrySet()) {
             AbstractDocument document = abstractDocumentDoubleEntry.getKey();
@@ -90,9 +90,16 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
             }
         }
 
-        mSuggestionCache.put(query, scoredDocuments);
+        while (scoredDocuments.size() > query.getNumSuggestions()) {
+            scoredDocuments.remove();
+        }
 
-        return scoredDocuments.subList(0, Math.min(query.getNumSuggestions(), scoredDocuments.size()));
+        List<ScoredDocument> scoredDocumentList = Arrays.asList(scoredDocuments.toArray(new ScoredDocument[0]));
+        scoredDocumentList = scoredDocumentList.subList(0, Math.min(query.getNumSuggestions(), scoredDocumentList.size()));
+
+        mSuggestionCache.put(query, scoredDocumentList);
+
+        return scoredDocumentList;
     }
 
 

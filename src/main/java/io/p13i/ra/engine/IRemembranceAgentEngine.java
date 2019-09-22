@@ -5,6 +5,7 @@ import io.p13i.ra.models.ScoredDocument;
 import io.p13i.ra.models.ScoredSingleContentWindow;
 
 import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * Core implementation of a Remembrance Agent.

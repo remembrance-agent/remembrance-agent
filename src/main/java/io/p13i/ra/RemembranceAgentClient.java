@@ -1,6 +1,7 @@
 package io.p13i.ra;
 
 import java.util.List;
+import java.util.PriorityQueue;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -295,11 +296,10 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
         mGUI.removeScoredDocuments();
 
         // Add the suggestion's elements to the GUI
-        for (int i = 0; i < suggestions.size(); i++) {
-            ScoredDocument scoredDocument = suggestions.get(i);
-            
+        int i = 0;
+        for (ScoredDocument scoredDocument : suggestions) {
             // Add each of the components for the document to the GUI
-            mGUI.addScoredDocument(scoredDocument, i);
+            mGUI.addScoredDocument(scoredDocument, i++);
         }
 
         // Reset the title
