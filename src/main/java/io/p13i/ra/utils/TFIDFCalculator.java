@@ -43,9 +43,7 @@ public class TFIDFCalculator {
         int N = 0;
 
         for (AbstractDocument doc : docs) {
-            List<SingleContentWindow> windows = doc.getContentWindows().getSingleWindows();
-
-            for (SingleContentWindow window : windows) {
+            for (SingleContentWindow window : doc.getContentWindows()) {
                 List<String> wordVector = window.getWordVector();
                 for (String word : wordVector) {
                     if (term.equalsIgnoreCase(word)) {

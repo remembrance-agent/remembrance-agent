@@ -64,9 +64,9 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
                 .skip(4)
                 .collect(Collectors.joining("\n"));
 
-        AbstractDocument document = new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url);
-
-        return document;
+        return new LocalDiskDocument(content, fileName, subject, FileIO.getLastModifiedDate(cachedFilePath), url) {{
+            index();
+        }};
     }
 
     @Override

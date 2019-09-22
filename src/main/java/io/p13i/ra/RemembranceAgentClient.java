@@ -251,7 +251,11 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             public void run() {
                 long startTime = System.currentTimeMillis();
 
-                sendQueryToRemembranceAgent();
+                try {
+                    sendQueryToRemembranceAgent();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
                 long endTime = System.currentTimeMillis();
 

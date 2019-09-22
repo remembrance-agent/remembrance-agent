@@ -249,8 +249,8 @@ public class GUI {
                         });
                     }});
                 }});
-                add(new JMenu("Active") {{
-                    add(new JMenuItem("Load active Google Chrome tab") {{
+                add(new JMenu("Google Chrome") {{
+                    add(new JMenuItem("Save active tab text") {{
                         addActionListener(new ActionListener() {
                             @Override
                             public void actionPerformed(ActionEvent e) {

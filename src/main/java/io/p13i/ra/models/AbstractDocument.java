@@ -74,6 +74,9 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
     }
 
     public MultipleContentWindows getContentWindows() {
+        if (cachedContentWindows == null) {
+            throw new NullPointerException("indexing is required; did you call index()?");
+        }
         return cachedContentWindows;
     }
 
