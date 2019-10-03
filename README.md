@@ -1,7 +1,7 @@
 # remembrance-agent
 Java package for Remembrance Agents! Based on Rhodes/Starner
 
-[![Build Status](https://travis-ci.org/remembrance-agent/remembrance-agent.svg?branch=master)](https://travis-ci.org/remembrance-agent/remembrance-agent)
+[![Build Status](https://travis-ci.org/remembrance-agent/remembrance-agent.svg?branch=master)](https://travis-ci.org/remembrance-agent/remembrance-agent) [![Build Status](https://github.com/remembrance-agent/remembrance-agent/workflows/Java%20CI/badge.svg)](https://github.com/remembrance-agent/remembrance-agent/actions?workflow=Java+CI)
 
 ![Logo](./docs/img/logo.png)
 
