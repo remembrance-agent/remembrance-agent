@@ -57,17 +57,15 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         }
 
         Map<AbstractDocument, Tuple<Double, MultipleContentWindows>> documentsToScoresAndWindows = new LinkedHashMap<>();
+        for (AbstractDocument document : allDocuments) {
+            documentsToScoresAndWindows.put(document, new Tuple<>(0.0, new MultipleContentWindows()));
+        }
 
         for (ScoredSingleContentWindow scoredWindow : scoredSingleContentWindows) {
-            double currentScore = 0.0;
-            MultipleContentWindows currentWindows = new MultipleContentWindows();
+            Tuple<Double, MultipleContentWindows> currentScoreAndWindows = documentsToScoresAndWindows.get(scoredWindow.getDocument());
 
-            if (documentsToScoresAndWindows.containsKey(scoredWindow.getDocument())) {
-                Tuple<Double, MultipleContentWindows> currentScoreAndWindows = documentsToScoresAndWindows.get(scoredWindow.getDocument());
-
-                currentScore = currentScoreAndWindows.x();
-                currentWindows = currentScoreAndWindows.y();
-            }
+            double currentScore = currentScoreAndWindows.x();
+            MultipleContentWindows currentWindows = currentScoreAndWindows.y();
 
             if (!Double.isNaN(scoredWindow.getScore()) && scoredWindow.getScore() > 0.0) {
                 currentScore += scoredWindow.getScore();

@@ -1,7 +1,6 @@
 package io.p13i.ra.databases;
 
 import io.p13i.ra.models.AbstractDocument;
-
 import java.util.List;
 
 public interface IDocumentDatabase<TDocument extends AbstractDocument> {

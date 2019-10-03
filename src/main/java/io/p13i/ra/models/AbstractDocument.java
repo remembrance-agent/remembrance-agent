@@ -117,7 +117,7 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
 
     @Override
     public int hashCode() {
-        return getURL().hashCode() * getContext().getSubject().hashCode();
+        return Objects.hash(getContent(), getContext(), getURL(), getLastModified());
     }
 
     @Override
@@ -127,6 +127,9 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
         }
 
         AbstractDocument other = (AbstractDocument) obj;
-        return this.getURL().equals(other.getURL()) && this.getContext().getSubject().equals(other.getContext().getSubject());
+        return Objects.equals(this.getURL(), other.getURL())
+                & Objects.equals(this.getContext(), other.getContext())
+                & Objects.equals(this.getContent(), other.getContent())
+                & Objects.equals(this.getLastModified(), other.getLastModified());
     }
 }
