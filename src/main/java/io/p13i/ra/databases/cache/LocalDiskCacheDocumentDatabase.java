@@ -2,8 +2,6 @@ package io.p13i.ra.databases.cache;
 
 import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.databases.IDocumentDatabase;
-import io.p13i.ra.databases.cache.metadata.LocalDiskCacheDocumentMetadata;
-import io.p13i.ra.databases.cache.metadata.LocalDiskCacheMetadata;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
 import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.utils.Assert;
@@ -12,7 +10,10 @@ import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static io.p13i.ra.databases.cache.ICachableDocument.CACHE_FILE_EXTENSION;

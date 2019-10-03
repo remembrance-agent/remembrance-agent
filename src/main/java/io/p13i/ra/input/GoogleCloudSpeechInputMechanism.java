@@ -31,9 +31,9 @@ import java.util.logging.Logger;
 /**
  * Represents a speech input mechanism
  */
-public class SpeechInputMechanism extends AbstractInputMechanism implements ResponseObserver<StreamingRecognizeResponse> {
+public class GoogleCloudSpeechInputMechanism extends AbstractInputMechanism implements ResponseObserver<StreamingRecognizeResponse> {
 
-    private static Logger LOGGER = LoggerUtils.getLogger(SpeechInputMechanism.class);
+    private static Logger LOGGER = LoggerUtils.getLogger(GoogleCloudSpeechInputMechanism.class);
 
     /**
      * The responses returned from the API
@@ -56,7 +56,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
     private SpeechClient mClient;
 
 
-    public SpeechInputMechanism(int numberOfRunsPerInvokation, int durationPerInvokation) {
+    public GoogleCloudSpeechInputMechanism(int numberOfRunsPerInvokation, int durationPerInvokation) {
         this.numberOfRunsPerInvokation = numberOfRunsPerInvokation;
         this.durationPerInvokation = durationPerInvokation;
     }
@@ -66,7 +66,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
         try {
             startInputInternal();
         } catch (IOException | LineUnavailableException e) {
-            LOGGER.throwing(SpeechInputMechanism.class.getSimpleName(), "recognizeFromMicrophone", e);
+            LOGGER.throwing(GoogleCloudSpeechInputMechanism.class.getSimpleName(), "recognizeFromMicrophone", e);
             throw new RuntimeException(e);
         }
     }
@@ -176,7 +176,7 @@ public class SpeechInputMechanism extends AbstractInputMechanism implements Resp
 
     @Override
     public void onError(Throwable t) {
-        LOGGER.throwing(SpeechInputMechanism.class.getSimpleName(), "onError", t);
+        LOGGER.throwing(GoogleCloudSpeechInputMechanism.class.getSimpleName(), "onError", t);
         throw new RuntimeException(t);
     }
 

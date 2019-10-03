@@ -126,7 +126,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             commandLine = new BasicParser().parse(options, args);
         } catch (ParseException e) {
             e.printStackTrace();
-            new HelpFormatter().printHelp("remebrance-agent-gui", options);
+            new HelpFormatter().printHelp("remembrance-agent-gui", options);
             System.exit(1);
             return;
         }

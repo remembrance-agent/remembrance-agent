@@ -47,9 +47,6 @@ dependencies {
     // GSON
     compile 'com.google.code.gson:gson:2.8.5'
 
-    // ASCII tables
-    compile 'de.vandermeer:asciitable:0.3.2'
-
     // Gmail API
     compile 'com.google.apis:google-api-services-gmail:v1-rev83-1.23.0'
 

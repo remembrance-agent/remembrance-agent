@@ -10,8 +10,16 @@ import java.util.Map;
  * Implementation of a cache
  */
 public class Cache<TKey, TValue> implements ICache<TKey, TValue> {
+
+    /**
+     * A list of caches that are used in this application.
+     * Used so that all caches can be cleared at the same time.
+     */
     private static List<Cache> managedCaches = new LinkedList<>();
 
+    /**
+     * Invalidates all caches managed by this application.
+     */
     public static void invalidateManagedCaches() {
         for (Cache cache : managedCaches) {
             cache.invalidate();

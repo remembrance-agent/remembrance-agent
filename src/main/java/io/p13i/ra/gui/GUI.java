@@ -4,9 +4,8 @@ import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.databases.html.HTMLDocument;
 import io.p13i.ra.input.AbstractInputMechanism;
 import io.p13i.ra.input.KeyboardInputMechanism;
-import io.p13i.ra.input.SpeechInputMechanism;
+import io.p13i.ra.input.GoogleCloudSpeechInputMechanism;
 import io.p13i.ra.models.ScoredDocument;
-import io.p13i.ra.models.ScoredSingleContentWindow;
 import io.p13i.ra.utils.*;
 
 import javax.swing.*;
@@ -216,7 +215,7 @@ public class GUI {
                                     @Override
                                     public Boolean doInBackground() {
 
-                                        SpeechInputMechanism speechRecognizer = new SpeechInputMechanism(1, 10);
+                                        GoogleCloudSpeechInputMechanism speechRecognizer = new GoogleCloudSpeechInputMechanism(1, 10);
 
                                         RemembranceAgentClient.getInstance().startInputMechanism(speechRecognizer);
 

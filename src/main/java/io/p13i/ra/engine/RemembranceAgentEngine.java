@@ -1,6 +1,5 @@
 package io.p13i.ra.engine;
 
-import com.google.gson.internal.LinkedTreeMap;
 import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.models.*;
 import io.p13i.ra.similarity.DateSimilarityIndex;
