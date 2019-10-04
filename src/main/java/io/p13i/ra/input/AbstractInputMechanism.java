@@ -1,6 +1,5 @@
 package io.p13i.ra.input;
 
-import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.utils.StringUtils;
 
 /**
@@ -8,7 +7,7 @@ import io.p13i.ra.utils.StringUtils;
  */
 public abstract class AbstractInputMechanism {
 
-    InputMechanismEventsListener inputMechanismEventsListenerCallback = RemembranceAgentClient.getInstance();
+    InputMechanismEventsListener inputMechanismEventsListenerCallback;
 
     /**
      * Gets the name of this class
@@ -17,6 +16,10 @@ public abstract class AbstractInputMechanism {
      */
     public String getInputMechanismName() {
         return StringUtils.splitCamelCase(this.getClass().getSimpleName());
+    }
+
+    public void setInputMechanismEventsListenerCallback(InputMechanismEventsListener callback) {
+        this.inputMechanismEventsListenerCallback = callback;
     }
 
     /**

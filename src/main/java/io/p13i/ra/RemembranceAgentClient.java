@@ -171,6 +171,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             mCurrentInputMechanism.closeInputMechanism();
         }
         mCurrentInputMechanism = inputMechanism;
+        mCurrentInputMechanism.setInputMechanismEventsListenerCallback(this);
         mCurrentInputMechanism.startInputMechanism();
     }
 
