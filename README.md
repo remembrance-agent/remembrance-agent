@@ -5,48 +5,7 @@ Java package for Remembrance Agents! Based on Rhodes/Starner
 
 ![Logo](./docs/img/logo.png)
 
-## Commands
-
-### Building
-
-```bash
-VERSION="2.0.0" ./gradlew build
-```
-
-### Installing as Launch Daemon (macOS)
-
-```bash
-sudo VERSION="2.0.0" bash ./bin/install
-```
-
-Now you can run the following from anywhere:
-```bash
-VERSION="2.0.0" ra --home $HOME
-```
-
-### Running (cross platform)
-
-Adapt the file `./bin/ra` for your platform.
-
-## Screenshots
-
-### RA client with menu open
-
-![](./docs/img/ra-client-menu-open.png)
-
-### RA client with suggestion
-
-![](./docs/img/ra-client-with-suggestion.png)
-
-### Chrome opened suggestion
-
-![](./docs/img/chrome-opened-suggestion.png)
-
-## Developing
-
-### Versioning
-
-Increment the version numbers in this README.
+This package contains core functionality for the remembrance agent, packaged in a form easily importable into other Java projects. Contains no dependencies; pure Java.
 
 ---
 
