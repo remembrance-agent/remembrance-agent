@@ -77,7 +77,9 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
                 .collect(Collectors.joining("\n"));
 
         // Checks and conversions
-        Assert.equals(version, RemembranceAgentClient.VERSION);
+        if (!version.equals(RemembranceAgentClient.VERSION)) {
+            return null;
+        }
         Date lastModifiedDate = DateUtils.parseTimestamp(lastModified);
 
         return new LocalDiskDocument(content, fileName, subject, lastModifiedDate, url) {{
