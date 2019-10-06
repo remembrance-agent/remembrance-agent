@@ -45,7 +45,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
 
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentClient.class);
 
-    public static final String VERSION = "2.0";
+    public static final String VERSION = "2.0.0";
 
     public static final String APPLICATION_NAME = "Remembrance Agent (v" + VERSION + ")";
 
