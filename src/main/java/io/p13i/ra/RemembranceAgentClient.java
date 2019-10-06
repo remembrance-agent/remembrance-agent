@@ -115,9 +115,7 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
      */
     public static void main(String[] args) {
         Options options = new Options() {{
-            addOption(new Option("h", "home", /* hasArg: */ true, "the user's home directory") {{
-                setRequired(true);
-            }});
+            addOption(new Option("h", "home", /* hasArg: */ true, "the user's home directory"));
         }};
 
         CommandLine commandLine;
@@ -131,7 +129,13 @@ public class RemembranceAgentClient implements Runnable, AbstractInputMechanism.
             return;
         }
 
-        User.Home.setDirectory(commandLine.getOptionValue("home"));
+        String userHomeDirectory = commandLine.getOptionValue("home");
+
+        if (userHomeDirectory == null) {
+            userHomeDirectory = System.getProperty("user.home");
+        }
+
+        User.Home.setDirectory(userHomeDirectory);
 
         SwingUtilities.invokeLater(RemembranceAgentClient.getInstance());
     }
