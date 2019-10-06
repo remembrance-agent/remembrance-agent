@@ -7,7 +7,7 @@ import io.p13i.ra.utils.StringUtils;
  */
 public abstract class AbstractInputMechanism {
 
-    InputMechanismEventsListener inputMechanismEventsListenerCallback;
+    protected InputMechanismEventsListener inputMechanismEventsListenerCallback;
 
     /**
      * Gets the name of this class
