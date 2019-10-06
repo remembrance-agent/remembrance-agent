@@ -1,12 +1,8 @@
 package io.p13i.ra.utils;
 
-import io.p13i.ra.gui.User;
-
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.*;
-
-import static io.p13i.ra.gui.User.Preferences.Preference.RAClientLogFile;
 
 /**
  * utilities for working with the logger
@@ -33,9 +29,6 @@ public class LoggerUtils {
     private static <T> Logger getLoggerInternal(Class<T> forClass) throws IOException {
         Logger LOGGER = Logger.getLogger(forClass.getName());
         LOGGER.setLevel(Level.INFO);
-        LOGGER.addHandler(new FileHandler(User.Preferences.getString(RAClientLogFile)) {{
-            setFormatter(new DefaultTimestampedFormatter());
-        }});
         LOGGER.addHandler(new ConsoleHandler() {{
             setFormatter(new LoggerUtils.DefaultTimestampedFormatter());
         }});
