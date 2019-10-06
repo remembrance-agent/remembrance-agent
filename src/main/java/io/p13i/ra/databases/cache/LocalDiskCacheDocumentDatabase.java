@@ -1,10 +1,9 @@
 package io.p13i.ra.databases.cache;
 
-import io.p13i.ra.RemembranceAgentClient;
 import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
+import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.AbstractDocument;
-import io.p13i.ra.utils.Assert;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.StringUtils;
@@ -77,7 +76,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
                 .collect(Collectors.joining("\n"));
 
         // Checks and conversions
-        if (!version.equals(RemembranceAgentClient.VERSION)) {
+        if (!version.equals(RemembranceAgentEngine.VERSION)) {
             return null;
         }
         Date lastModifiedDate = DateUtils.parseTimestamp(lastModified);
@@ -103,7 +102,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
 
         FileIO.append(cacheFileName, "---");
         FileIO.newline(cacheFileName);
-        FileIO.append(cacheFileName, "Version         " + RemembranceAgentClient.VERSION);
+        FileIO.append(cacheFileName, "Version         " + RemembranceAgentEngine.VERSION);
         FileIO.newline(cacheFileName);
         FileIO.append(cacheFileName, "Last modified   " + DateUtils.timestampOf(cachableDocument.getLastModified()));
         FileIO.newline(cacheFileName);

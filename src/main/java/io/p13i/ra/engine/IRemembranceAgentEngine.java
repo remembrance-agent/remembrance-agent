@@ -16,6 +16,8 @@ import java.util.PriorityQueue;
  */
 public interface IRemembranceAgentEngine {
 
+    public static final String VERSION = "2.0";
+
     /**
      * Loads all documents from their database
      */
