@@ -4,10 +4,7 @@ import io.p13i.ra.utils.ListUtils;
 import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.TFIDFCalculator;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 public class ScoredDocument implements Comparable<ScoredDocument> {
     private Query query;
@@ -33,9 +30,9 @@ public class ScoredDocument implements Comparable<ScoredDocument> {
     /**
      * @return a string displayable in the GUI
      */
-    public String toShortString() {
-        String subjectTruncated = StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), 40);
-        String matchingTerms = ListUtils.toString(getMatchingTermsInDocument(5), "", "", ", ", "");
+    public String toShortString(int subjectMaxLength, int maxMatchingTerms) {
+        String subjectTruncated = StringUtils.truncateEndWithEllipse(getDocument().getContext().getSubject(), subjectMaxLength);
+        String matchingTerms = ListUtils.toString(getMatchingTermsInDocument(maxMatchingTerms), "", "", ", ", "");
         return String.format("[%s]: %s", subjectTruncated, matchingTerms);
     }
 
