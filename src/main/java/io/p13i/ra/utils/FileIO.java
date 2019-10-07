@@ -3,7 +3,6 @@ package io.p13i.ra.utils;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 /**
@@ -112,9 +111,11 @@ public class FileIO {
             return Collections.emptyList();
         }
 
-        return Arrays.stream(files)
-                .map(File::getAbsolutePath)
-                .collect(Collectors.toList());
+        List<String> paths = new LinkedList<>();
+        for (File file : files) {
+            paths.add(file.getAbsolutePath());
+        }
+        return paths;
     }
 
     /**
@@ -124,9 +125,13 @@ public class FileIO {
      * @return list of absolute paths of folders/file in this directory
      */
     public static List<String> listFiles(String folderPath) {
-        return ls(folderPath).stream()
-                .filter(FileIO::isFile)
-                .collect(Collectors.toList());
+        List<String> files = new LinkedList<>();
+        for (String file : ls(folderPath)) {
+            if (FileIO.isFile(file)) {
+                files.add(file);
+            }
+        }
+        return files;
     }
 
     /**

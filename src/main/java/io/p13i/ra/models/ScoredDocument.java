@@ -5,6 +5,7 @@ import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.TFIDFCalculator;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -48,11 +49,14 @@ public class ScoredDocument implements Comparable<ScoredDocument> {
         List<String> queryWordVector = getQuery().getContentWindow().getWordVector();
         List<String> documentWordVector = getDocument().getContentWindows().asSingleContentWindow().getWordVector();
         List<String> intersection = ListUtils.intersection(queryWordVector, documentWordVector);
-        return ListUtils.selectLargest(intersection, maxCount, ((queryTerm1, queryTerm2) -> {
-            SingleContentWindow singleContentWindow = multipleContentWindows.asSingleContentWindow();
-            double queryTerm1TermFrequency = TFIDFCalculator.tf(singleContentWindow, queryTerm1);
-            double queryTerm2TermFrequency = TFIDFCalculator.tf(singleContentWindow, queryTerm2);
-            return Double.compare(queryTerm1TermFrequency, queryTerm2TermFrequency);
+        return ListUtils.selectLargest(intersection, maxCount, (new Comparator<String>() {
+            @Override
+            public int compare(String queryTerm1, String queryTerm2) {
+                SingleContentWindow singleContentWindow = multipleContentWindows.asSingleContentWindow();
+                double queryTerm1TermFrequency = TFIDFCalculator.tf(singleContentWindow, queryTerm1);
+                double queryTerm2TermFrequency = TFIDFCalculator.tf(singleContentWindow, queryTerm2);
+                return Double.compare(queryTerm1TermFrequency, queryTerm2TermFrequency);
+            }
         }));
     }
 

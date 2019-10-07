@@ -6,6 +6,7 @@ import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.models.SingleContentWindow;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * Computes TFiDF
@@ -67,9 +68,19 @@ public class TFIDFCalculator {
      * @param documents all documents
      * @return the TF-IDF of term
      */
-    public static double tfIdf(String queryTerm, SingleContentWindow window, Iterable<AbstractDocument> documents) {
-        double tf = tfCache.get(new Tuple<>(window, queryTerm), () -> tf(window, queryTerm));
-        double idf = idfCache.get(new Tuple<>(documents, queryTerm), () -> idf(documents, queryTerm));
+    public static double tfIdf(final String queryTerm, final SingleContentWindow window, final Iterable<AbstractDocument> documents) {
+        double tf = tfCache.get(new Tuple<>(window, queryTerm), new Callable<Double>() {
+            @Override
+            public Double call() throws Exception {
+                return tf(window, queryTerm);
+            }
+        });
+        double idf = idfCache.get(new Tuple<>(documents, queryTerm), new Callable<Double>() {
+            @Override
+            public Double call() throws Exception {
+                return idf(documents, queryTerm);
+            }
+        });
         return tf * idf;
     }
 }

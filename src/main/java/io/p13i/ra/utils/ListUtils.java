@@ -41,7 +41,7 @@ public class ListUtils {
      */
     public static <T extends Comparable<T>> List<T> selectLargest(List<T> list, int maxCount, Comparator<T> comparator) {
         List<T> copy = new ArrayList<>(list);
-        copy.sort(Collections.reverseOrder(comparator));
+        Collections.sort(copy, Collections.<T>reverseOrder());
         return copy.subList(0, Math.min(maxCount, copy.size()));
     }
 
@@ -54,7 +54,7 @@ public class ListUtils {
      * @return the resultant casted list
      */
     public static <TSubClass extends TSuperClass, TSuperClass> List<TSuperClass> castUp(List<TSubClass> source) {
-        return new ArrayList<>(source);
+        return new ArrayList<TSuperClass>(source);
     }
 
     public static <T> String toString(List<T> list) {

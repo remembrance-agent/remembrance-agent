@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.concurrent.Callable;
 
 /**
  * Utilities for formatting dates
@@ -36,8 +37,13 @@ public class DateUtils {
      * @param pattern the pattern to use
      * @return the formatted date
      */
-    public static String formatDate(Date date, String pattern) {
-        return dateFormatCache.get(pattern, () -> new SimpleDateFormat(pattern)).format(date);
+    public static String formatDate(Date date, final String pattern) {
+        return dateFormatCache.get(pattern, new Callable<DateFormat>() {
+            @Override
+            public DateFormat call() throws Exception {
+                return new SimpleDateFormat(pattern);
+            }
+        }).format(date);
     }
 
     /**
@@ -88,7 +94,12 @@ public class DateUtils {
      */
     public static Date parseTimestamp(String timestamp) {
         try {
-            return dateFormatCache.get(TIMESTAMP_FORMAT, () -> new SimpleDateFormat(TIMESTAMP_FORMAT)).parse(timestamp);
+            return dateFormatCache.get(TIMESTAMP_FORMAT, new Callable<DateFormat>() {
+                @Override
+                public DateFormat call() throws Exception {
+                    return new SimpleDateFormat(TIMESTAMP_FORMAT);
+                }
+            }).parse(timestamp);
         } catch (ParseException e) {
             e.printStackTrace();
             throw new RuntimeException(e);

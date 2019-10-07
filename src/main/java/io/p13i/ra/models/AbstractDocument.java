@@ -1,6 +1,7 @@
 package io.p13i.ra.models;
 
-import io.p13i.ra.databases.cache.ICachableDocument;
+import io.p13i.ra.utils.FileIO;
+import io.p13i.ra.utils.StringUtils;
 import io.p13i.ra.utils.WordVector;
 
 import java.util.Date;
@@ -10,7 +11,7 @@ import java.util.Objects;
 /**
  * Houses all information about a file and it's context in the world
  */
-public abstract class AbstractDocument implements IRequiresIndexing, Iterable<SingleContentWindow>, ICachableDocument {
+public abstract class AbstractDocument implements IRequiresIndexing, Iterable<SingleContentWindow> {
 
     /**
      * How many characters to place in the toString() call
@@ -41,6 +42,11 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
      * When this document was last modified
      */
     private Date lastModified;
+
+    /**
+     * The extension of cache files
+     */
+    public static final String CACHE_FILE_EXTENSION = ".cache.txt";
 
     public AbstractDocument(String content, Context context) {
         this.content = Objects.requireNonNull(content);
@@ -113,6 +119,20 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
 
     public Date getLastModified() {
         return this.lastModified;
+    }
+
+    /**
+     * @return the file name of a document in the cache
+     */
+    public String getCacheFileName() {
+        return getCacheHashCode() + CACHE_FILE_EXTENSION;
+    }
+
+    /**
+     * @return the hash code of the document
+     */
+    public String getCacheHashCode() {
+        return StringUtils.md5(FileIO.getCleanName(this.toString()));
     }
 
     @Override

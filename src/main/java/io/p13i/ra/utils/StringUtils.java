@@ -3,10 +3,6 @@ package io.p13i.ra.utils;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Stream;
 
 /**
  * Useful string utilities
@@ -88,21 +84,6 @@ public class StringUtils {
                 ),
                 " "
         );
-    }
-
-    /**
-     * Converts a string to a Stream of characters
-     *
-     * @param s the string
-     * @return the character stream
-     */
-    public static Stream<Character> toCharStream(String s) {
-        char[] characters = s.toCharArray();
-        List<Character> list = new ArrayList<>(characters.length);
-        for (char c : characters) {
-            list.add(c);
-        }
-        return list.stream();
     }
 
     /**

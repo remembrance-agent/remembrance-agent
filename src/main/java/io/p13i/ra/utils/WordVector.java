@@ -3,12 +3,7 @@ package io.p13i.ra.utils;
 import io.p13i.ra.models.MultipleContentWindows;
 import io.p13i.ra.models.SingleContentWindow;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 
 /**
@@ -27,16 +22,15 @@ public class WordVector {
      * @return multiple windows for searching
      */
     public static MultipleContentWindows process(String content) {
-        // First, process the content and window it
-        List<SingleContentWindow> windows =
-                // 1) Join windows that are too small and are adjacent
-                WordVector.joinAdjacentSmallContentWindows(getWindowedContent(content), 100).stream()
-                // 2) Stem each window
-                .map(WordVector::getStemmedSingleContentWindow)
-                // 3) Remove common words from each window
-                .map(WordVector::removeMostCommonWords)
-                .collect(Collectors.toList());
-        return new MultipleContentWindows(windows);
+
+        List<SingleContentWindow> resultantWindows = new LinkedList<>();
+        for (SingleContentWindow window : WordVector.joinAdjacentSmallContentWindows(getWindowedContent(content), 100)) {
+            SingleContentWindow stemmedWindow = WordVector.getStemmedSingleContentWindow(window);
+            SingleContentWindow withoutCommonWords = WordVector.removeMostCommonWords(stemmedWindow);
+            resultantWindows.add(withoutCommonWords);
+        }
+
+        return new MultipleContentWindows(resultantWindows);
     }
 
     /**
@@ -137,12 +131,17 @@ public class WordVector {
      * @return a stemmed content window
      */
     public static SingleContentWindow getStemmedSingleContentWindow(SingleContentWindow contentWindow) {
-        SingleContentWindow singleContentWindow = new SingleContentWindow(contentWindow.getWordVector().stream()
-                .map(String::toLowerCase)
-                .map(Stemmer::stem)
-                .map(String::toUpperCase)
-                .collect(Collectors.toList()));
-        return singleContentWindow;
+
+        List<String> wordVector = new ArrayList<>();
+
+        for (String word : contentWindow.getWordVector()) {
+            String lowercased = word.toLowerCase();
+            String stemmed = Stemmer.stem(lowercased);
+            String uppercased = stemmed.toUpperCase();
+            wordVector.add(uppercased);
+        }
+
+        return new SingleContentWindow(wordVector);
     }
 
     /**
@@ -152,10 +151,16 @@ public class WordVector {
      * @return a cleaner vector
      */
     public static SingleContentWindow removeMostCommonWords(SingleContentWindow contentWindow) {
-        return new SingleContentWindow(contentWindow.stream()
-                .map(String::toLowerCase)
-                .filter(word -> !MOST_COMMON_WORDS.contains(word))
-                .map(String::toUpperCase)
-                .collect(Collectors.toList()));
+        List<String> words = new LinkedList<>();
+
+        for (String word : contentWindow.getWordVector()) {
+            String lowercased = word.toLowerCase();
+            if (!MOST_COMMON_WORDS.contains(lowercased)) {
+                String uppercased = word.toUpperCase();
+                words.add(uppercased);
+            }
+        }
+
+        return new SingleContentWindow(words);
     }
 }
