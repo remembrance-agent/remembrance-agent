@@ -40,8 +40,8 @@ public class TFIDFCalculator {
      * @return the inverse term frequency of term in documents
      */
     private static double idf(Iterable<AbstractDocument> docs, String term) {
-        int n = 0;
-        int N = 0;
+        int n = 0;  // total number of number of documents that contains this word
+        int N = 0;  // number of documents
 
         for (AbstractDocument doc : docs) {
             for (SingleContentWindow window : doc.getContentWindows()) {
@@ -55,6 +55,10 @@ public class TFIDFCalculator {
             }
 
             N++;
+        }
+
+        if (N == n) {
+            return 1.0;
         }
 
         return Math.log((double) N / (double) n);
