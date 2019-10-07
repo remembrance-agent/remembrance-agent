@@ -1,5 +1,6 @@
 package io.p13i.ra.databases.cache;
 
+import io.p13i.ra.databases.IDocumentDatabase;
 import io.p13i.ra.models.AbstractDocument;
 
 /**
@@ -12,10 +13,10 @@ interface ILocalDiskCache {
 
     void saveDocumentsInMemoryToDisk();
 
-    String saveSingleDocumentToDisk(ICachableDocument document);
+    String saveSingleDocumentToDisk(AbstractDocument document);
 
     void loadSingleDocumentFromDiskIntoMemory(String cachedFilePath);
 
     // Allow method chaining
-    ILocalDiskCache addDocumentsToMemory(ICachableDocumentDatabase cachableDocumentDatabase);
+    ILocalDiskCache addDocumentsToMemory(IDocumentDatabase cachableDocumentDatabase);
 }

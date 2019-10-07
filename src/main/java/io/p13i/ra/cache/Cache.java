@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Implementation of a cache
  */
-public class Cache<TKey, TValue> implements ICache<TKey, TValue> {
+public class Cache<TKey, TValue> extends ICache<TKey, TValue> {
 
     /**
      * A list of caches that are used in this application.

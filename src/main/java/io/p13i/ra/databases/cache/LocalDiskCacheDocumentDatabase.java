@@ -13,15 +13,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static io.p13i.ra.databases.cache.ICachableDocument.CACHE_FILE_EXTENSION;
-
-public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<AbstractDocument>, ILocalDiskCache {
+public class LocalDiskCacheDocumentDatabase extends IDocumentDatabase<AbstractDocument> implements ILocalDiskCache {
 
     private final String cacheLocalDirectory;
     private List<AbstractDocument> documentsFromDisk = new ArrayList<>();
-    private List<ICachableDocument> documentsFromMemory = new ArrayList<>();
+    private List<AbstractDocument> documentsFromMemory = new ArrayList<>();
 
     public LocalDiskCacheDocumentDatabase(String cacheLocalDirectory) {
         this.cacheLocalDirectory = cacheLocalDirectory;
@@ -48,7 +45,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
 
         List<String> cachedFilePaths = FileIO.listFiles(this.cacheLocalDirectory);
         for (String filePath : cachedFilePaths) {
-            if (!filePath.endsWith(CACHE_FILE_EXTENSION)) {
+            if (!filePath.endsWith(AbstractDocument.CACHE_FILE_EXTENSION)) {
                 continue;
             }
 
@@ -71,9 +68,15 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
         String lastModified = lines[2].substring(16);
         String subject = lines[3].substring(16);
         String url = lines[4].substring(16);
-        String content = Arrays.stream(lines)
-                .skip(6)
-                .collect(Collectors.joining("\n"));
+
+        String content;
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 6; i < lines.length; i++) {
+                stringBuilder.append(lines[i]);
+            }
+            content = stringBuilder.toString();
+        }
 
         // Checks and conversions
         if (!version.equals(RemembranceAgentEngine.VERSION)) {
@@ -89,13 +92,13 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
     @Override
     public void saveDocumentsInMemoryToDisk() {
         // Write each cache file
-        for (ICachableDocument cachableDocument : this.documentsFromMemory) {
+        for (AbstractDocument cachableDocument : this.documentsFromMemory) {
             this.saveSingleDocumentToDisk(cachableDocument);
         }
     }
 
     @Override
-    public String saveSingleDocumentToDisk(ICachableDocument cachableDocument) {
+    public String saveSingleDocumentToDisk(AbstractDocument cachableDocument) {
         String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
 
         FileIO.delete(cacheFileName);
@@ -119,7 +122,7 @@ public class LocalDiskCacheDocumentDatabase implements IDocumentDatabase<Abstrac
     }
 
     @Override
-    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(ICachableDocumentDatabase cachableDocumentDatabase) {
+    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(IDocumentDatabase cachableDocumentDatabase) {
         this.documentsFromMemory.addAll(cachableDocumentDatabase.getAllDocuments());
         return this;
     }

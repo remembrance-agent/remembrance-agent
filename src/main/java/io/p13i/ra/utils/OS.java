@@ -17,6 +17,11 @@ public class OS {
 
         List<String> result = CommandLine.execute("osascript -e '" + script + "'");
 
-        return String.join("", result);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String line : result) {
+            stringBuilder.append(line);
+        }
+
+        return stringBuilder.toString();
     }
 }

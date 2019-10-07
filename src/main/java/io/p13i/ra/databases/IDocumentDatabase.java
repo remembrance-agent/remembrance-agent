@@ -3,25 +3,25 @@ package io.p13i.ra.databases;
 import io.p13i.ra.models.AbstractDocument;
 import java.util.List;
 
-public interface IDocumentDatabase<TDocument extends AbstractDocument> {
+public abstract class IDocumentDatabase<TDocument extends AbstractDocument> {
     /**
      * Gets the name of the data store
      *
      * @return human readable name
      */
-    default String getName() {
+    public String getName() {
         return this.getClass().getSimpleName();
     }
 
     /**
      * Loads all the documents from disk into memory
      */
-    void loadDocuments();
+    public abstract void loadDocuments();
 
     /**
      * Indexes all the documents
      */
-    default void indexDocuments() {
+    public void indexDocuments() {
         List<TDocument> documents = getAllDocuments();
         for (TDocument document : documents) {
             document.index();
@@ -33,5 +33,5 @@ public interface IDocumentDatabase<TDocument extends AbstractDocument> {
      *
      * @return All the documents
      */
-    List<TDocument> getAllDocuments();
+    public abstract List<TDocument> getAllDocuments();
 }

@@ -2,15 +2,14 @@ package io.p13i.ra.models;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class MultipleContentWindows implements Iterable<SingleContentWindow> {
     private List<SingleContentWindow> singleContentWindowList;
 
     public MultipleContentWindows() {
-        this(new ArrayList<>());
+        this(new ArrayList<SingleContentWindow>());
     }
 
     public MultipleContentWindows(List<SingleContentWindow> singleContentWindows) {
@@ -21,14 +20,12 @@ public class MultipleContentWindows implements Iterable<SingleContentWindow> {
         return singleContentWindowList;
     }
 
-    public Stream<SingleContentWindow> stream() {
-        return Stream.of(this.singleContentWindowList.toArray(new SingleContentWindow[0]));
-    }
-
     public SingleContentWindow asSingleContentWindow() {
-        return new SingleContentWindow(this.singleContentWindowList.stream()
-                .flatMap(window -> window.getWordVector().stream())
-                .collect(Collectors.toList()));
+        List<String> words = new LinkedList<>();
+        for (SingleContentWindow window : singleContentWindowList) {
+            words.addAll(window.getWordVector());
+        }
+        return new SingleContentWindow(words);
     }
 
     @Override
