@@ -1,4 +1,4 @@
-import io.p13i.ra.databases.IDocumentDatabase;
+import io.p13i.ra.databases.AbstractDocumentDatabase;
 import io.p13i.ra.databases.in_memory.InMemoryDocument;
 import io.p13i.ra.databases.in_memory.InMemoryDocumentDatabase;
 import io.p13i.ra.engine.IRemembranceAgentEngine;
@@ -22,7 +22,7 @@ public class RemembranceAgentEngineTests {
             add(new InMemoryDocument("mno pqr stu", Context.NULL));
         }};
 
-        IDocumentDatabase documentDatabase = new InMemoryDocumentDatabase(documents);
+        AbstractDocumentDatabase documentDatabase = new InMemoryDocumentDatabase(documents);
 
         IRemembranceAgentEngine engine = new RemembranceAgentEngine(documentDatabase) {{
             loadDocuments();

@@ -1,11 +1,6 @@
 package io.p13i.ra.similarity;
 
 
-import io.p13i.ra.utils.Assert;
-import io.p13i.ra.cache.ICache;
-import io.p13i.ra.cache.LimitedCapacityCache;
-import io.p13i.ra.utils.Tuple;
-
 import java.util.Objects;
 
 /**

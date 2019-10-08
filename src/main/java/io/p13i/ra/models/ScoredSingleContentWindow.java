@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Used in the document ranking process to hold both the document and the corresponding score for a given query
  */
-public final class ScoredSingleContentWindow implements Comparable<ScoredSingleContentWindow> {
+public class ScoredSingleContentWindow implements Comparable<ScoredSingleContentWindow> {
     private final Query query;
     private final double score;
     private final AbstractDocument document;

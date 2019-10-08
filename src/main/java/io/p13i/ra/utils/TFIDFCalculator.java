@@ -1,7 +1,7 @@
 package io.p13i.ra.utils;
 
 import io.p13i.ra.cache.Cache;
-import io.p13i.ra.cache.ICache;
+import io.p13i.ra.cache.AbstractCache;
 import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.models.SingleContentWindow;
 
@@ -16,8 +16,8 @@ import java.util.concurrent.Callable;
  */
 public class TFIDFCalculator {
 
-    private static ICache<Tuple<SingleContentWindow, String>, Double> tfCache = new Cache<>();
-    private static ICache<Tuple<Iterable<AbstractDocument>, String>, Double> idfCache = new Cache<>();
+    private static AbstractCache<Tuple<SingleContentWindow, String>, Double> tfCache = new Cache<>();
+    private static AbstractCache<Tuple<Iterable<AbstractDocument>, String>, Double> idfCache = new Cache<>();
 
     /**
      * @param doc  list of strings

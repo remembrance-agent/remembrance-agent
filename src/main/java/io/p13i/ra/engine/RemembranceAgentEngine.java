@@ -1,11 +1,11 @@
 package io.p13i.ra.engine;
 
-import io.p13i.ra.databases.IDocumentDatabase;
+import io.p13i.ra.databases.AbstractDocumentDatabase;
 import io.p13i.ra.models.*;
 import io.p13i.ra.similarity.DateSimilarityIndex;
 import io.p13i.ra.similarity.StringSimilarityIndex;
 import io.p13i.ra.utils.*;
-import io.p13i.ra.cache.ICache;
+import io.p13i.ra.cache.AbstractCache;
 import io.p13i.ra.cache.LimitedCapacityCache;
 
 import java.util.*;
@@ -18,10 +18,10 @@ import java.util.logging.Logger;
 public class RemembranceAgentEngine implements IRemembranceAgentEngine {
     private static final Logger LOGGER = LoggerUtils.getLogger(RemembranceAgentEngine.class);
 
-    private final IDocumentDatabase documentDatabase;
-    private ICache<Query, List<ScoredDocument>> mSuggestionCache = new LimitedCapacityCache<>(128);
+    private final AbstractDocumentDatabase documentDatabase;
+    private AbstractCache<Query, List<ScoredDocument>> mSuggestionCache = new LimitedCapacityCache<>(128);
 
-    public RemembranceAgentEngine(IDocumentDatabase documentDatabase) {
+    public RemembranceAgentEngine(AbstractDocumentDatabase documentDatabase) {
         this.documentDatabase = documentDatabase;
     }
 

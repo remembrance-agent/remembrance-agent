@@ -1,10 +1,10 @@
 package io.p13i.ra.databases.in_memory;
 
-import io.p13i.ra.databases.IDocumentDatabase;
+import io.p13i.ra.databases.AbstractDocumentDatabase;
 
 import java.util.List;
 
-public class InMemoryDocumentDatabase extends IDocumentDatabase<InMemoryDocument> {
+public class InMemoryDocumentDatabase extends AbstractDocumentDatabase<InMemoryDocument> {
     private final List<InMemoryDocument> mDocuments;
 
     public InMemoryDocumentDatabase(List<InMemoryDocument> documents) {

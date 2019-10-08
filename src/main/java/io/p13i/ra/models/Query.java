@@ -7,7 +7,7 @@ import java.util.Objects;
 /**
  * Wraps a query to the RA
  */
-public class Query implements IRequiresIndexing {
+public class Query {
     private final String query;
     private final Context context;
     private final int numSuggestions;
@@ -32,6 +32,9 @@ public class Query implements IRequiresIndexing {
     }
 
     public SingleContentWindow getContentWindow() {
+        if (cachedContentWindow == null) {
+            throw new NullPointerException("indexing is required; did you call index()?");
+        }
         return cachedContentWindow;
     }
 
@@ -53,7 +56,6 @@ public class Query implements IRequiresIndexing {
                 this.numSuggestions == other.numSuggestions;
     }
 
-    @Override
     public void index() {
         this.cachedContentWindow = WordVector.process(getQuery()).asSingleContentWindow();
     }
