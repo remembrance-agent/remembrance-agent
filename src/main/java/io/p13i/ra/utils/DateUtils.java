@@ -1,7 +1,7 @@
 package io.p13i.ra.utils;
 
 import io.p13i.ra.cache.Cache;
-import io.p13i.ra.cache.ICache;
+import io.p13i.ra.cache.AbstractCache;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -28,7 +28,7 @@ public class DateUtils {
     /**
      * Use a normal cache because the number of elements is limited to under 10 (upon code inspection).
      */
-    private static ICache<String, DateFormat> dateFormatCache = new Cache<>();
+    private static AbstractCache<String, DateFormat> dateFormatCache = new Cache<>();
 
     /**
      * Formats a date

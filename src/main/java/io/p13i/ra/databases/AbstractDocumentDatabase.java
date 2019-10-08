@@ -3,7 +3,7 @@ package io.p13i.ra.databases;
 import io.p13i.ra.models.AbstractDocument;
 import java.util.List;
 
-public abstract class IDocumentDatabase<TDocument extends AbstractDocument> {
+public abstract class AbstractDocumentDatabase<TDocument extends AbstractDocument> {
     /**
      * Gets the name of the data store
      *

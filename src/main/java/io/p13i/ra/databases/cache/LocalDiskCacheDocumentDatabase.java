@@ -1,6 +1,6 @@
 package io.p13i.ra.databases.cache;
 
-import io.p13i.ra.databases.IDocumentDatabase;
+import io.p13i.ra.databases.AbstractDocumentDatabase;
 import io.p13i.ra.databases.localdisk.LocalDiskDocument;
 import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.AbstractDocument;
@@ -10,11 +10,10 @@ import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class LocalDiskCacheDocumentDatabase extends IDocumentDatabase<AbstractDocument> implements ILocalDiskCache {
+public class LocalDiskCacheDocumentDatabase extends AbstractDocumentDatabase<AbstractDocument> implements ILocalDiskCache {
 
     private final String cacheLocalDirectory;
     private List<AbstractDocument> documentsFromDisk = new ArrayList<>();
@@ -122,7 +121,7 @@ public class LocalDiskCacheDocumentDatabase extends IDocumentDatabase<AbstractDo
     }
 
     @Override
-    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(IDocumentDatabase cachableDocumentDatabase) {
+    public LocalDiskCacheDocumentDatabase addDocumentsToMemory(AbstractDocumentDatabase cachableDocumentDatabase) {
         this.documentsFromMemory.addAll(cachableDocumentDatabase.getAllDocuments());
         return this;
     }

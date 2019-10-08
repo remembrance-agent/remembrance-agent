@@ -1,6 +1,6 @@
 package io.p13i.ra.databases.localdisk;
 
-import io.p13i.ra.databases.IDocumentDatabase;
+import io.p13i.ra.databases.AbstractDocumentDatabase;
 import io.p13i.ra.utils.FileIO;
 import io.p13i.ra.utils.LoggerUtils;
 
@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 /**
  * Represents the data store of files on local disk
  */
-public class LocalDiskDocumentDatabase extends IDocumentDatabase<LocalDiskDocument> {
+public class LocalDiskDocumentDatabase extends AbstractDocumentDatabase<LocalDiskDocument> {
 
     private static final Logger LOGGER = LoggerUtils.getLogger(LocalDiskDocumentDatabase.class);
     private final String directory;

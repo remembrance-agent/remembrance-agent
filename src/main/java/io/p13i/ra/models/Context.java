@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Represents all the contextual information surround a document
  */
-public final class Context {
+public class Context {
     public static Context NULL = new Context(null, null, null, null);
 
     private final String location;

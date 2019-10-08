@@ -11,7 +11,7 @@ import java.util.Objects;
 /**
  * Houses all information about a file and it's context in the world
  */
-public abstract class AbstractDocument implements IRequiresIndexing, Iterable<SingleContentWindow> {
+public abstract class AbstractDocument implements Iterable<SingleContentWindow> {
 
     /**
      * How many characters to place in the toString() call
@@ -74,7 +74,6 @@ public abstract class AbstractDocument implements IRequiresIndexing, Iterable<Si
         return content.substring(0, Math.min(this.content.length(), CONTENT_TRUNCATED_MAX_LENGTH)) + (includeEllipses ? "..." : "");
     }
 
-    @Override
     public void index() {
         this.cachedContentWindows = WordVector.process(getContent());
     }

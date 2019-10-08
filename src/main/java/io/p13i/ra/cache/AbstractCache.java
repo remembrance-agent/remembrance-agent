@@ -8,7 +8,7 @@ import java.util.concurrent.Callable;
  * @param <TKey>   the cache key
  * @param <TValue> the value stored in the cache
  */
-public abstract class ICache<TKey, TValue> {
+public abstract class AbstractCache<TKey, TValue> {
 
     /**
      * Gets the key from the cache or null
@@ -28,19 +28,19 @@ public abstract class ICache<TKey, TValue> {
      * @return the keyed index or the result of the defaultValueGenerator
      */
     public TValue get(TKey key, Callable<TValue> defaultValueGenerator) {
-        TValue value;
         if (hasKey(key)) {
-            value = get(key);
-        } else {
-            try {
-                value = defaultValueGenerator.call();
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new RuntimeException(e);
-            }
-
-            put(key, value);
+            return get(key);
         }
+
+        TValue value;
+        try {
+            value = defaultValueGenerator.call();
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        put(key, value);
 
         return value;
     }
