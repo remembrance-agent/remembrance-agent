@@ -38,6 +38,11 @@ public abstract class AbstractInputMechanism {
     public interface InputMechanismEventsListener {
         void onInputReady(AbstractInputMechanism inputMechanism);
 
-        void onInput(AbstractInputMechanism inputMechanism, Character c);
+        /**
+         * Callback for input from the input mechanism
+         * @param inputMechanism the input mechanism used
+         * @param character the character presented (or a special character value)
+         */
+        void onInput(AbstractInputMechanism inputMechanism, String character);
     }
 }
