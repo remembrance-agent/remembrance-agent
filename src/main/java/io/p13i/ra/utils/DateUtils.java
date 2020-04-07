@@ -36,6 +36,7 @@ public class DateUtils {
      * @param date    the date to format
      * @param pattern the pattern to use
      * @return the formatted date
+     * @throws io.p13i.ra.utils.Arguments.NullArgumentException if date or pattern is null
      */
     public static String formatDate(Date date, final String pattern) {
         Arguments.Ensure.NotNull(date, pattern);
@@ -73,7 +74,10 @@ public class DateUtils {
      * @return a formatted string timestamp
      */
     public static String timestampOf(Date date) {
-        Arguments.Ensure.NotNull(date);
+        if (date == null) {
+            return null;
+        }
+
         return formatDate(date, TIMESTAMP_FORMAT);
     }
 
@@ -94,10 +98,12 @@ public class DateUtils {
      * Parses the given timestamp string based on the TIMESTAMP_FORMAT
      *
      * @param timestamp the timestamp string
-     * @return a Date or null if parsing failed
+     * @return a Date or null if parsing failed or if the provided timestamp is null or whitespace
      */
     public static Date parseTimestamp(String timestamp) {
-        Arguments.Ensure.NotNull(timestamp);
+        if (StringUtils.isNullOrWhitespace(timestamp)) {
+            return null;
+        }
 
         try {
             return sDateFormatCache.get(TIMESTAMP_FORMAT, new Callable<DateFormat>() {
