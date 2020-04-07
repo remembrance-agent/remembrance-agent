@@ -101,7 +101,7 @@ public class DateUtils {
      * @return a Date or null if parsing failed or if the provided timestamp is null or whitespace
      */
     public static Date parseTimestamp(String timestamp) {
-        if (StringUtils.isNullOrWhitespace(timestamp)) {
+        if (StringUtils.isNullOrWhitespace(timestamp) || timestamp.equals("null")) {
             return null;
         }
 
