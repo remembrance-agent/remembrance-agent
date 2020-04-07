@@ -28,7 +28,7 @@ public class DateUtils {
     /**
      * Use a normal cache because the number of elements is limited to under 10 (upon code inspection).
      */
-    private static AbstractCache<String, DateFormat> dateFormatCache = new Cache<>();
+    private static AbstractCache<String, DateFormat> sDateFormatCache = new Cache<>();
 
     /**
      * Formats a date
@@ -38,7 +38,9 @@ public class DateUtils {
      * @return the formatted date
      */
     public static String formatDate(Date date, final String pattern) {
-        return dateFormatCache.get(pattern, new Callable<DateFormat>() {
+        Arguments.Ensure.NotNull(date, pattern);
+
+        return sDateFormatCache.get(pattern, new Callable<DateFormat>() {
             @Override
             public DateFormat call() throws Exception {
                 return new SimpleDateFormat(pattern);
@@ -71,6 +73,7 @@ public class DateUtils {
      * @return a formatted string timestamp
      */
     public static String timestampOf(Date date) {
+        Arguments.Ensure.NotNull(date);
         return formatDate(date, TIMESTAMP_FORMAT);
     }
 
@@ -82,6 +85,7 @@ public class DateUtils {
      * @return the difference in seconds
      */
     public static long deltaSeconds(Date d1, Date d2) {
+        Arguments.Ensure.NotNull(d1, d2);
         long difference = d2.getTime() - d1.getTime();
         return difference / 1000;
     }
@@ -90,11 +94,13 @@ public class DateUtils {
      * Parses the given timestamp string based on the TIMESTAMP_FORMAT
      *
      * @param timestamp the timestamp string
-     * @return a Date
+     * @return a Date or null if parsing failed
      */
     public static Date parseTimestamp(String timestamp) {
+        Arguments.Ensure.NotNull(timestamp);
+
         try {
-            return dateFormatCache.get(TIMESTAMP_FORMAT, new Callable<DateFormat>() {
+            return sDateFormatCache.get(TIMESTAMP_FORMAT, new Callable<DateFormat>() {
                 @Override
                 public DateFormat call() throws Exception {
                     return new SimpleDateFormat(TIMESTAMP_FORMAT);
@@ -102,7 +108,7 @@ public class DateUtils {
             }).parse(timestamp);
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            return null;
         }
     }
 }
