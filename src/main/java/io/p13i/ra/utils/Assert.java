@@ -17,6 +17,23 @@ public class Assert {
     }
 
     /**
+     * @param condition the condition to check
+     * @param message the message in the assertion error
+     */
+    public static void that(boolean condition, String message) {
+        if (!condition) {
+            fail(message);
+        }
+    }
+
+    /**
+     * @param message in the assertion error
+     */
+    private static void fail(String message) {
+        throw new AssertionError(message);
+    }
+
+    /**
      * Fails with an assertion error
      *
      * @throws AssertionError the thrown exception

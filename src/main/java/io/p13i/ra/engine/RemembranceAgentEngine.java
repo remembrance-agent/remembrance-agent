@@ -27,11 +27,13 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
 
     @Override
     public void loadDocuments() {
+        LOGGER.info("RemembranceAgentEngine::loadDocuments()");
         this.documentDatabase.loadDocuments();
     }
 
     @Override
     public void indexDocuments() {
+        LOGGER.info("RemembranceAgentEngine::indexDocuments()");
         this.documentDatabase.indexDocuments();
     }
 
@@ -51,14 +53,14 @@ public class RemembranceAgentEngine implements IRemembranceAgentEngine {
         List<AbstractDocument> allDocuments = this.documentDatabase.getAllDocuments();
         for (AbstractDocument document : allDocuments) {
             for (SingleContentWindow window : document) {
-                ScoredSingleContentWindow scoredDoc = Calculator.scoreQueryAgainstDocumentWindow(query, window, allDocuments, document);
-                scoredSingleContentWindows.add(scoredDoc);
+                ScoredSingleContentWindow scoredWindow = Calculator.scoreQueryAgainstDocumentWindow(query, window, allDocuments, document);
+                scoredSingleContentWindows.add(scoredWindow);
             }
         }
 
         Map<AbstractDocument, Tuple<Double, MultipleContentWindows>> documentsToScoresAndWindows = new LinkedHashMap<>();
         for (AbstractDocument document : allDocuments) {
-            documentsToScoresAndWindows.put(document, new Tuple<>(0.0, new MultipleContentWindows()));
+            documentsToScoresAndWindows.put(document, Tuple.of(0.0, new MultipleContentWindows()));
         }
 
         for (ScoredSingleContentWindow scoredWindow : scoredSingleContentWindows) {

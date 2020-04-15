@@ -4,13 +4,35 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
 
 
 /**
  * Wrapper class for interactions with the system shell
  */
 public class CommandLine {
-    public static ArrayList<String> execute(final String command) {
+    public static Logger LOGGER = LoggerUtils.getLogger(CommandLine.class);
+
+    public static class Result {
+        public List<String> lines;
+        public int exitCode;
+
+        public Result(List<String> lines, int exitCode) {
+            this.lines = lines;
+            this.exitCode = exitCode;
+        }
+
+        public String getLinesAsString() {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (String line : lines) {
+                stringBuilder.append(line);
+            }
+            return stringBuilder.toString();
+        }
+    }
+
+    public static Result execute(final String command) {
         return execute(command, null);
     }
 
@@ -18,7 +40,11 @@ public class CommandLine {
      * @return null if it failed for some reason.
      * @author https://stackoverflow.com/a/27437171/5071723
      */
-    public static ArrayList<String> execute(final String command, final String directory) {
+    public static Result execute(final String command, final String directory) {
+        if (command.contains("\"")) {
+            LOGGER.warning("String command includes \" character. May lead to unexpected results as bash -c is used to evaluate commands.");
+        }
+
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", command)
                     .redirectErrorStream(true);
@@ -38,17 +64,11 @@ public class CommandLine {
                 output.add(line);
             }
 
-            // There should really be a timeout here.
-            if (process.waitFor() != 0) {
-                return null;
-            }
+            int exitCode = process.waitFor();
 
-            return output;
+            return new Result(output, exitCode);
 
         } catch (Exception e) {
-            //Warning: doing this is no good in high quality applications.
-            //Instead, present appropriate error messages to the user.
-            //But it's perfectly fine for prototyping.
             throw new RuntimeException(e);
         }
     }

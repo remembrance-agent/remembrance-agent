@@ -20,7 +20,7 @@ public abstract class AbstractCache<TKey, TValue> {
 
     /**
      * Gets the key from the cache if it exists or uses the defaultValueGenerator to insert and return a new value.
-     * Useful for computationally-expensive calculations.
+     * Useful for computationally-expensive calculations that generate the value in the cache.
      *
      * @param key the key
      * @param defaultValueGenerator the default value generator only invoked if the key doesn't exist
@@ -36,7 +36,6 @@ public abstract class AbstractCache<TKey, TValue> {
         try {
             value = defaultValueGenerator.call();
         } catch (Exception e) {
-            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
