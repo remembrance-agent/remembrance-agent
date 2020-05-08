@@ -17,7 +17,7 @@ public class CharacterUtils {
      * @return whether or not the character is a space
      */
     public static boolean isSpace(char c) {
-        return c == ' ' || c == '␣';
+        return c == ' ';
     }
 
     /**

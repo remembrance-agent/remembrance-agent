@@ -28,7 +28,7 @@ public class DateUtils {
     /**
      * Use a normal cache because the number of elements is limited to under 10 (upon code inspection).
      */
-    private static AbstractCache<String, DateFormat> dateFormatCache = new Cache<>();
+    private static AbstractCache<String, DateFormat> sDateFormatCache = new Cache<>();
 
     /**
      * Formats a date
@@ -36,9 +36,12 @@ public class DateUtils {
      * @param date    the date to format
      * @param pattern the pattern to use
      * @return the formatted date
+     * @throws io.p13i.ra.utils.Arguments.NullArgumentException if date or pattern is null
      */
     public static String formatDate(Date date, final String pattern) {
-        return dateFormatCache.get(pattern, new Callable<DateFormat>() {
+        Arguments.Ensure.NotNull(date, pattern);
+
+        return sDateFormatCache.get(pattern, new Callable<DateFormat>() {
             @Override
             public DateFormat call() throws Exception {
                 return new SimpleDateFormat(pattern);
@@ -71,6 +74,10 @@ public class DateUtils {
      * @return a formatted string timestamp
      */
     public static String timestampOf(Date date) {
+        if (date == null) {
+            return null;
+        }
+
         return formatDate(date, TIMESTAMP_FORMAT);
     }
 
@@ -82,6 +89,7 @@ public class DateUtils {
      * @return the difference in seconds
      */
     public static long deltaSeconds(Date d1, Date d2) {
+        Arguments.Ensure.NotNull(d1, d2);
         long difference = d2.getTime() - d1.getTime();
         return difference / 1000;
     }
@@ -90,11 +98,15 @@ public class DateUtils {
      * Parses the given timestamp string based on the TIMESTAMP_FORMAT
      *
      * @param timestamp the timestamp string
-     * @return a Date
+     * @return a Date or null if parsing failed or if the provided timestamp is null or whitespace
      */
     public static Date parseTimestamp(String timestamp) {
+        if (StringUtils.isNullOrWhitespace(timestamp) || timestamp.equals("null")) {
+            return null;
+        }
+
         try {
-            return dateFormatCache.get(TIMESTAMP_FORMAT, new Callable<DateFormat>() {
+            return sDateFormatCache.get(TIMESTAMP_FORMAT, new Callable<DateFormat>() {
                 @Override
                 public DateFormat call() throws Exception {
                     return new SimpleDateFormat(TIMESTAMP_FORMAT);
@@ -102,7 +114,7 @@ public class DateUtils {
             }).parse(timestamp);
         } catch (ParseException e) {
             e.printStackTrace();
-            throw new RuntimeException(e);
+            return null;
         }
     }
 }

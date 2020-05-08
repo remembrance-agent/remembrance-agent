@@ -6,14 +6,18 @@ import io.p13i.ra.engine.RemembranceAgentEngine;
 import io.p13i.ra.models.AbstractDocument;
 import io.p13i.ra.utils.DateUtils;
 import io.p13i.ra.utils.FileIO;
+import io.p13i.ra.utils.LoggerUtils;
 import io.p13i.ra.utils.StringUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class LocalDiskCacheDocumentDatabase extends AbstractDocumentDatabase<AbstractDocument> implements ILocalDiskCache {
+
+    private static final Logger LOGGER = LoggerUtils.getLogger(LocalDiskCacheDocumentDatabase.class);
 
     private final String cacheLocalDirectory;
     private List<AbstractDocument> documentsFromDisk = new ArrayList<>();
@@ -36,6 +40,8 @@ public class LocalDiskCacheDocumentDatabase extends AbstractDocumentDatabase<Abs
 
     @Override
     public void loadDocumentsFromDiskIntoMemory() {
+        LOGGER.info("LocalDiskCacheDocumentDatabase::loadDocumentsFromDiskIntoMemory()");
+
         this.documentsFromDisk = new ArrayList<>();
 
         if (!FileIO.directoryExists(this.cacheLocalDirectory)) {
@@ -54,11 +60,14 @@ public class LocalDiskCacheDocumentDatabase extends AbstractDocumentDatabase<Abs
 
     @Override
     public void loadSingleDocumentFromDiskIntoMemory(String cachedFilePath) {
+        LOGGER.info("LocalDiskCacheDocumentDatabase::loadSingleDocumentFromDiskIntoMemory");
         this.documentsFromDisk.add(getSingleDocumentFromDisk(cachedFilePath));
     }
 
     @Override
     public AbstractDocument getSingleDocumentFromDisk(String cachedFilePath) {
+        LOGGER.info("LocalDiskCacheDocumentDatabase::getSingleDocumentFromDisk");
+
         String fileContents = FileIO.read(cachedFilePath);
         String[] lines = StringUtils.lines(fileContents);
 
@@ -98,6 +107,8 @@ public class LocalDiskCacheDocumentDatabase extends AbstractDocumentDatabase<Abs
 
     @Override
     public String saveSingleDocumentToDisk(AbstractDocument cachableDocument) {
+        LOGGER.info("LocalDiskCacheDocumentDatabase::saveSingleDocumentToDisk");
+
         String cacheFileName = this.cacheLocalDirectory + File.separator + cachableDocument.getCacheFileName();
 
         FileIO.delete(cacheFileName);
