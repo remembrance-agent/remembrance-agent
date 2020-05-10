@@ -42,7 +42,8 @@ public abstract class AbstractInputMechanism {
          * Callback for input from the input mechanism
          * @param inputMechanism the input mechanism used
          * @param character the character presented (or a special character value)
+         * @param isActionKey
          */
-        void onInput(AbstractInputMechanism inputMechanism, String character);
+        void onInput(AbstractInputMechanism inputMechanism, String character, boolean isActionKey);
     }
 }
