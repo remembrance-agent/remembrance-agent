@@ -30,6 +30,7 @@ public class LocalDiskDocumentDatabase extends AbstractDocumentDatabase<LocalDis
         this.documents = new ArrayList<>();
         try {
             List<String> documentsFilePaths = FileIO.listFolderFilesRecursive(this.directory);
+            LOGGER.info("Found " + documentsFilePaths.size() + " files in " + this.directory);
             for (String documentFilePath : documentsFilePaths) {
                 if (documentFilePath.endsWith(".txt") || documentFilePath.endsWith(".md")) {
                     String fileName = FileIO.getFileName(documentFilePath);
